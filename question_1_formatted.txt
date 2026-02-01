@@ -1,0 +1,56 @@
+Question 1
+
+Question and Options in Text Format
+In which changes do the particles move further apart? 
+
+1 A gas is heated from 0°C to 25°C. 
+2 Pressure is applied to a gas at a constant temperature. 
+3 Steam condenses to form water. 
+4 Water evaporates at room temperature. 
+
+🅰️ 1 and 2 
+🅱️ 1 and 4 
+C 2 and 3 
+D 3 and 4 
+
+Detailed Explanation of the Question and Right Answer
+The question asks to identify physical changes where the distance between particles increases. This occurs when thermal energy increases particle movement (expansion) or when a substance changes to a less dense state of matter (liquid to gas). 
+
+Core Concept: The kinetic particle theory states that the distance between particles increases during expansion (heating) and phase changes from liquid to gas (evaporation/boiling), while it decreases during compression or cooling/condensation. 
+
+Analyze Step 1: When a gas is heated from 0°C to 25°C, the particles gain kinetic energy and move faster, leading to thermal expansion where particles move further apart. 
+Intermediate result: Change 1 fits the criteria. 
+
+Analyze Step 2: Applying pressure to a gas forces the particles closer together into a smaller volume. 
+Intermediate result: Change 2 does not fit the criteria. 
+
+Analyze Step 3: Condensation is the transition from a gas to a liquid. Particles in a gas are far apart, whereas in a liquid, they are close together. Therefore, particles move closer. 
+Intermediate result: Change 3 does not fit the criteria. 
+
+Analyze Step 4: Evaporation is the transition from a liquid to a gas. Particles at the surface of the liquid gain enough energy to escape into the gaseous state, where they are significantly further apart. 
+Result: Change 4 fits the criteria. 
+
+Final Correct Answer: 🅱️
+
+Option Wise Explanation (Detailed)
+Option 🅰️ is incorrect because while heating a gas (1) increases particle distance, applying pressure (2) decreases it by forcing particles into a smaller volume. 
+Option 🅱️ is correct because both heating a gas (1) and evaporation (4) result in particles moving further apart due to increased kinetic energy and phase transition to a less dense state, respectively. 
+Option C is incorrect because applying pressure (2) and condensation (3) both result in particles moving closer together. 
+Option D is incorrect because condensation (3) decreases the distance between particles, even though evaporation (4) increases it. 
+
+🧠 Concept Gap Analysis and Flashcards
+Option 🅰️ Gap: Misunderstanding the effect of pressure on gas volume and particle proximity. 
+Flashcard 1: How does increasing pressure affect the distance between gas particles? Back: It decreases the distance as particles are forced closer together. 
+Flashcard 2: What happens to the volume of a gas when it is compressed? Back: The volume decreases because the space between particles is reduced. 
+
+Option 🅱️ Gap: None (Correct selection). 
+Flashcard 1: Define evaporation in terms of particle distance. Back: Evaporation is the process where liquid particles move much further apart to become a gas. 
+Flashcard 2: Why do gas particles move further apart when heated? Back: They gain kinetic energy and move more vigorously, causing the gas to expand. 
+
+Option C Gap: Confusion between condensation and evaporation; misunderstanding that pressure reduces volume. 
+Flashcard 1: Does condensation increase or decrease particle distance? Back: Decrease; particles move from far apart (gas) to close together (liquid). 
+Flashcard 2: Why is pressure used to liquefy gases? Back: Because pressure forces particles closer together until attractive forces take over. 
+
+Option D Gap: Incorrectly identifying condensation as a process where particles spread out. 
+Flashcard 1: Compare particle spacing in steam vs. liquid water. Back: Particles in steam are far apart and move randomly; in water, they are close together and touching. 
+Flashcard 2: Is energy absorbed or released during condensation? Back: Energy is released as particles move closer together and form bonds/attractive forces.

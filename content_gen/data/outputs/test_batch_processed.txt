@@ -1,0 +1,82 @@
+Question 2
+
+Question and Options in Text Format
+Substance X has a simple molecular structure and substance Y has a giant covalent structure. Which row is correct?
+
+A X could be an element only; Y could be an element only.
+B X could be an element only; Y could be an element or a compound.
+C X could be an element or a compound; Y could be an element only.
+D X could be an element or a compound; Y could be an element or a compound.
+
+Detailed Explanation of the Question and Right Answer
+Chemical structures are categorized by the way atoms are bonded together. Both simple molecular and giant covalent structures can be formed by pure elements or by combinations of different elements (compounds).
+
+Core Concept: Classification of substances by bonding and structure.
+
+Analyze Step 1: Examine substance X (simple molecular). Elements like O₂ or I₂ are simple molecular. Compounds like H₂O or CO₂ are also simple molecular. Thus, X can be an element or a compound.
+Analyze Step 2: Examine substance Y (giant covalent). Elements like Diamond (Carbon) have giant covalent structures. Compounds like Silicon Dioxide (SiO₂) also have giant covalent structures.
+Analyze Step 3: Synthesize the findings. Since both structural types can accommodate both elements and compounds, the row stating "element or compound" for both is the correct choice.
+
+Final Correct Answer: D
+
+Option Wise Explanation (Detailed)
+Option A is incorrect because it limits both X and Y to being elements only. This ignores common simple molecular compounds like water and giant covalent compounds like sand (silica).
+Option B is incorrect because it restricts substance X to being an element only. Simple molecular structures are actually very common in covalent compounds, such as methane or ammonia.
+Option C is incorrect because it suggests Y can only be an element. This is false, as silicon dioxide is a classic example of a giant covalent compound.
+Option D is correct. It accurately reflects that a simple molecular structure (X) can be found in elements (Cl₂) and compounds (CH₄), and a giant covalent structure (Y) can also be found in elements (Graphite) and compounds (SiO₂).
+
+🧠 Concept Gap Analysis and Flashcards
+Option A Gap: Fails to recognize that compounds can exhibit both simple molecular and giant covalent lattices.
+Flashcard 1: Give an example of a simple molecular compound. Back: Water (H₂O) or Carbon Dioxide (CO₂).
+Flashcard 2: Give an example of a giant covalent compound. Back: Silicon dioxide (SiO₂).
+
+Option B Gap: Specifically misses the fact that the majority of simple molecular substances encountered in chemistry are compounds.
+Flashcard 1: Can a compound have a simple molecular structure? Back: Yes, most covalent compounds exist as simple molecules.
+Flashcard 2: What defines a simple molecular structure? Back: Small molecules held together by weak intermolecular forces.
+
+Option C Gap: Fails to identify that "giant" structures are not exclusive to pure elements like carbon.
+Flashcard 1: Is Diamond an element or a compound? Back: An element (pure carbon).
+Flashcard 2: Is Silicon Dioxide an element or a compound? Back: A compound (Silicon and Oxygen).
+
+---
+
+Question 3
+
+Question and Options in Text Format
+Which statement about enzymes is correct?
+
+A Enzymes are carbohydrates.
+B Enzymes are catalysts.
+C Enzymes are consume during reaction.
+D Enzymes are living organisms.
+
+Detailed Explanation of the Question and Right Answer
+Enzymes are biological molecules that speed up chemical reactions without being used up themselves. They are essential for life processes.
+
+Core Concept: Application of enzymes as biological catalysts.
+
+Analyze Step 1: Analyze Option A. Enzymes are proteins, not carbohydrates.
+Analyze Step 2: Analyze Option B. Enzymes act as biological catalysts, meaning they increase the rate of reactions without being chemically changed.
+Analyze Step 3: Analyze Option C. A defining feature of a catalyst is that it is *not* consumed during the reaction and can be used repeatedly.
+Analyze Step 4: Analyze Option D. Enzymes are molecules (proteins) produced by living organisms; they are not organisms themselves.
+
+Final Correct Answer: 🅱️
+
+Option Wise Explanation (Detailed)
+Option A is incorrect because enzymes are primarily globular proteins made of amino acid chains, not carbohydrates (sugars/starches).
+Option 🅱️ is correct because the primary function of an enzyme is to act as a catalyst, lowering the activation energy required for a reaction to proceed.
+Option C is incorrect because catalysts, including enzymes, participate in the reaction but remain unchanged at the end; they are not consumed.
+Option D is incorrect because although enzymes are "biological" and found in living things, they are non-living chemical molecules (proteins).
+
+🧠 Concept Gap Analysis and Flashcards
+Option A Gap: Confusion about the chemical nature of enzymes (Protein vs Carbohydrate).
+Flashcard 1: What type of biological molecule is an enzyme? Back: A protein.
+Flashcard 2: Are enzymes made of sugar? Back: No, they are made of amino acids.
+
+Option C Gap: Misunderstanding the definition of a catalyst regarding its consumption.
+Flashcard 1: What happens to the quantity of enzyme during a reaction? Back: It remains constant because enzymes are not consumed.
+Flashcard 2: Can a single enzyme molecule catalysing a reaction be used again? Back: Yes, repeatedly.
+
+Option D Gap: Confusing a biological molecule with a biological organism.
+Flashcard 1: Is an enzyme alive? Back: No, it is a non-living protein molecule.
+Flashcard 2: Do enzymes reproduce? Back: No, they are synthesized by the cell's machinery (ribosomes).
