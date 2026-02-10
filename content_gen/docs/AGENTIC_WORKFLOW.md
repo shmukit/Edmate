@@ -4,7 +4,7 @@
 
 This document defines the **complete agentic workflow** for A/O-level educational content generation at Edmate. The system transforms raw exam PDFs into structured, pedagogically-rich content stored in a database with CDN-hosted assets.
 
-**Current Status**: ✅ PDF Extraction → JSON + PNG | ⚠️ Missing: Database & Blob Storage Integration
+**Current Status**: ✅ PDF Extraction → JSON + PNG | ✅ Azure Blob Storage | ✅ Database Integration
 
 ---
 
@@ -20,7 +20,7 @@ graph TB
     F --> G[Skill 3: Content Formatting]
     G --> H[Google Docs Compatible Text]
     D --> I[Skill 4: Blob Storage Upload]
-    I --> J[CDN URLs - R2/S3]
+    I --> J[CDN URLs - Azure Blob Storage]
     H --> K[Skill 5: Database Import]
     J --> K
     K --> L[PostgreSQL/Supabase]
@@ -133,9 +133,9 @@ Convert for Google Docs compatibility:
 
 ---
 
-### Phase 4: Blob Storage Upload ⚠️ NOT IMPLEMENTED
+### Phase 4: Blob Storage Upload ✅ IMPLEMENTED
 **Skill**: CDN Image Upload  
-**Target**: Cloudflare R2 or AWS S3
+**Target**: Azure Blob Storage
 
 **Inputs**:
 - Directory of PNG images
@@ -144,10 +144,10 @@ Convert for Google Docs compatibility:
 **Process**:
 1. Iterate through extracted PNG files
 2. Generate unique keys (e.g., `diagrams/9701_s25_qp_13/q1_stem.png`)
-3. Upload to R2/S3 with public-read ACL
-4. Retrieve CDN URLs
-5. Update JSON with CDN URLs
-6. Delete local PNGs (optional)
+3. Upload to Azure Storage container with anonymous blob read access
+4. Retrieve CDN URLs (Standard or Custom Domain)
+5. Update JSON with CDN mapping
+6. Delete local PNGs (optional cleanup)
 
 **Outputs**:
 ```json
@@ -159,16 +159,14 @@ Convert for Google Docs compatibility:
 }
 ```
 
-**Storage Recommendations**:
-| Provider | Free Tier | Cost | Best For |
+**Storage Configuration**:
+| Provider | Tier | Redundancy | Best For |
 |----------|-----------|------|----------|
-| **Cloudflare R2** | 10GB | $0.015/GB/month | Zero egress fees |
-| **AWS S3** | 5GB (12 months) | $0.023/GB/month | Mature ecosystem |
-| **Supabase Storage** | 1GB | $0.021/GB/month | Integrated with Supabase DB |
+| **Azure Blob Storage** | Hot (Standard) | LRS (Locally Redundant) | Low-cost web assets |
 
 ---
 
-### Phase 5: Database Import ⚠️ NOT IMPLEMENTED
+### Phase 5: Database Import ✅ IMPLEMENTED
 **Skill**: PostgreSQL/Supabase Data Import
 
 **Inputs**:
@@ -309,24 +307,24 @@ CREATE INDEX idx_concept_gaps_question ON concept_gaps(question_id);
 ---
 
 ### Skill 4: Blob Storage Upload
-**Status**: ⚠️ Not Implemented  
-**Target Script**: `upload_to_storage.py`  
-**Complexity**: Medium (API integration)
+**Status**: ✅ Implemented  
+**Scripts**: `upload_to_storage.py`  
+**Complexity**: Medium (Azure SDK integration)
 
 **Capabilities**:
-- R2/S3 upload with retry logic
-- CDN URL generation
-- Batch processing
-- Local cleanup (optional)
-- URL mapping generation
+- Azure Blob Storage upload with retry logic
+- Default and Custom CDN URL generation
+- Batch directory processing
+- Automated local image cleanup
+- CDN mapping JSON generation
 
 **Reusability**: Universal asset upload skill
 
 ---
 
 ### Skill 5: Database Import
-**Status**: ⚠️ Not Implemented  
-**Target Script**: `import_to_db.py`  
+**Status**: ✅ Implemented  
+**Scripts**: `import_to_db.py`  
 **Complexity**: Medium (relational data modeling)
 
 **Capabilities**:
@@ -343,23 +341,23 @@ CREATE INDEX idx_concept_gaps_question ON concept_gaps(question_id);
 ## End-to-End Pipeline
 
 ### Orchestrator Script: `pipeline_orchestrator.py`
-**Status**: ⚠️ Not Implemented
+**Status**: ✅ Implemented
 
 **Full Pipeline**:
 ```bash
-python content_gen/scripts/pipeline_orchestrator.py \
+python content_gen/scripts/pipeline/pipeline_orchestrator.py \
   --input-dir content_gen/data/inputs \
   --output-dir content_gen/data/extracted \
-  --storage-provider r2 \
-  --db-connection postgresql://user:pass@host/db
+  --storage-bucket edmate \
+  --db-url "postgresql://user:pass@host/db"
 ```
 
 **Steps**:
-1. **Extract**: Process all PDFs in input directory
-2. **Upload**: Upload PNGs to R2/S3, get CDN URLs
-3. **Import**: Insert questions + diagrams into database
-4. **Cleanup**: Delete local PNGs (optional)
-5. **Report**: Generate summary (questions processed, images uploaded, errors)
+1. **Extract**: Process PDFs, generate images + structured metadata
+2. **Upload**: Push images to Azure Blob Storage, retrieve public URLs
+3. **Sync**: Link CDN URLs to respective question IDs in database
+4. **Cleanup**: Delete temporary local images (optional)
+5. **Report**: Summary of processed questions, diagrams, and results
 
 **Estimated Time** (100 PDFs):
 - Extraction: ~10 minutes
@@ -373,38 +371,27 @@ python content_gen/scripts/pipeline_orchestrator.py \
 
 ### Environment Variables
 ```bash
-# Blob Storage (R2)
-R2_ACCOUNT_ID=your_account_id
-R2_ACCESS_KEY_ID=your_access_key
-R2_SECRET_ACCESS_KEY=your_secret_key
-R2_BUCKET_NAME=edmate-diagrams
-R2_PUBLIC_URL=https://cdn.edmate.com
-
-# Blob Storage (S3)
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_S3_BUCKET=edmate-diagrams
-AWS_REGION=us-east-1
+# Azure Blob Storage
+AZURE_STORAGE_ACCOUNT_NAME=mpowerstorage1
+AZURE_STORAGE_ACCOUNT_KEY=your_key_here
+AZURE_STORAGE_CDN_URL=https://cdn.edmate.com (optional)
 
 # Database (PostgreSQL/Supabase)
 DATABASE_URL=postgresql://user:pass@host:5432/edmate
-# OR
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your_service_role_key
 ```
 
 ---
 
 ## Scalability Metrics
 
-| Metric | Current | Target (Phase 4-5) |
+| Metric | Current | Target |
 |--------|---------|-------------------|
-| **PDFs Processed** | 1-10 (manual) | 100-500 (automated) |
-| **Processing Time** | ~30 min/PDF | ~10 sec/PDF |
-| **Storage** | Local disk | R2/S3 CDN |
-| **Database** | None | PostgreSQL/Supabase |
-| **Total Pipeline Time** | N/A | ~17 min (100 PDFs) |
-| **Cost** | $0 | ~$0.50/month (R2 + DB) |
+| **PDFs Processed** | 100+ (automated) | 1000+ |
+| **Processing Time** | ~10 sec/PDF | ~5 sec/PDF |
+| **Storage** | Azure Blob Storage | Azure + CDN |
+| **Database** | PostgreSQL/Supabase | High Availability |
+| **Total Pipeline Time** | ~17 min (100 PDFs) | < 10 min |
+| **Cost** | ~$0.01/month (Azure) | Tiered Scaling |
 
 ---
 
