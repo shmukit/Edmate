@@ -1,0 +1,16 @@
+# Content Generation System Dependencies
+
+# PDF Processing
+PyMuPDF>=1.23.0  # fitz - PDF rendering and extraction
+pdfplumber>=0.10.0  # Table detection (future)
+Pillow>=10.0.0  # Image processing
+
+# Cloud Storage
+boto3>=1.28.0  # AWS S3 and Cloudflare R2
+
+# Database
+psycopg2-binary>=2.9.0  # PostgreSQL adapter
+
+# Optional: API Integrations (Future)
+# google-generativeai>=0.3.0  # Gemini API
+# openai>=1.0.0  # ChatGPT API
