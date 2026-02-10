@@ -541,6 +541,31 @@ for pdf_path in glob.glob("content_gen/data/inputs/*.pdf"):
 
 ---
 
+## Skill 6: LLM-as-Judge Evaluation
+
+### Metadata
+- **Skill ID**: `llm_as_judge_eval`
+- **Status**: ⚠️ Target (Planned)
+- **Implementation**: API-based (GPT-4o/Claude)
+- **Complexity**: Medium
+- **Dependencies**: LLM API access, `QC_RUBRIC.md`
+
+### Purpose
+Automate the quality control of generated educational explanations by using a separate, high-reasoning LLM to score and critique the output.
+
+### Capabilities
+- **Pedagogical Audit**: Verifying that the explanation follows the Step-by-Step logic.
+- **Accuracy Verification**: Cross-checking the explanation against the provided correct answer.
+- **Rubric Scoring**: Generating a 1-10 score based on `QC_RUBRIC.md`.
+- **Misconception Detection**: Ensuring option-wise explanations address the specific concept gap.
+
+### Usage Pattern
+1. Take generated output from **Skill 2**.
+2. Run through Judge LLM with **QC Rubric** as the system prompt.
+3. If score < 8, trigger re-generation or flag for human review.
+
+---
+
 ## Skill Metrics
 
 | Skill | Avg Time | Success Rate | Error Types |
