@@ -17,14 +17,15 @@ graph TB
     B --> D[PNG Images]
     C --> E[Skill 2: Content Generation]
     E --> F[Enhanced Content JSON]
-    F --> G[Skill 3: Content Formatting]
-    G --> H[Google Docs Compatible Text]
-    D --> I[Skill 4: Blob Storage Upload]
-    I --> J[CDN URLs - Azure Blob Storage]
-    H --> K[Skill 5: Database Import]
-    J --> K
-    K --> L[PostgreSQL/Supabase]
-    L --> M[Production System]
+    F --> G[Skill 2.5: LLM-as-Judge Eval]
+    G --> H[Verified Content]
+    H --> I[Skill 3: Content Formatting]
+    I --> J[Google Docs Compatible Text]
+    D --> K[Skill 4: Blob Storage Upload]
+    K --> L[CDN URLs - Azure]
+    J --> M[Skill 5: Database Import]
+    L --> M
+    M --> N[PostgreSQL/Supabase]
 ```
 
 ---
@@ -105,6 +106,25 @@ For Biology questions 1-10, generate:
 - Markdown document with structured explanations
 - Concept gap analysis
 - Flashcards for each incorrect option
+
+---
+
+### Phase 2.5: LLM-as-Judge Evaluation ⚠️ TARGET
+**Skill**: Automated Content Review (Observability)
+**Tools**: LangSmith / Custom Eval Script (GPT-4o Judge)
+
+**Process**:
+1. Take the generated explanation from Gemini (Phase 2).
+2. Pass it to a "Judge" model with a logic-check prompt.
+3. **Rubric Check**:
+   - Is the correct answer actually supported by the explanation?
+   - Are the "Analyze Steps" logically sound?
+   - Does the "Option-wise" explanation cover all 4 options?
+4. **Flagging**: If score < 4/5, flag for manual review or re-generation.
+
+**Benefits**:
+- **Observability**: Track quality metrics over time.
+- **Reliability**: Reduces manual QC by 80%.
 
 ---
 
