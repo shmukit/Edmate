@@ -35,7 +35,7 @@ Edmate/
 ### Prerequisites
 - Python 3.8+
 - PostgreSQL database
-- Cloudflare R2 or AWS S3 account
+- Azure Blob Storage
 
 ### Installation
 

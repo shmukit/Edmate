@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Blob Storage Upload Script
-Uploads extracted PNG images to Cloudflare R2 or AWS S3
+Uploads extracted PNG images to Azure Blob Storage
 Generates CDN URL mappings for database import
 """
 import os
@@ -9,66 +9,35 @@ import json
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
-import boto3
-from botocore.exceptions import ClientError
+from azure.storage.blob import BlobServiceClient, ContentSettings
 
 class StorageUploader:
-    def __init__(self, provider: str = "r2"):
+    def __init__(self):
         """
-        Initialize storage uploader
-        
-        Args:
-            provider: "r2" for Cloudflare R2, "s3" for AWS S3
+        Initialize storage uploader with Azure Blob Storage
         """
-        self.provider = provider
         self.client = self._init_client()
         
     def _init_client(self):
-        """Initialize boto3 client for R2 or S3"""
-        if self.provider == "r2":
-            # Cloudflare R2 configuration
-            account_id = os.getenv("R2_ACCOUNT_ID")
-            access_key = os.getenv("R2_ACCESS_KEY_ID")
-            secret_key = os.getenv("R2_SECRET_ACCESS_KEY")
-            
-            if not all([account_id, access_key, secret_key]):
-                raise ValueError("Missing R2 credentials. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY")
-            
-            return boto3.client(
-                's3',
-                endpoint_url=f'https://{account_id}.r2.cloudflarestorage.com',
-                aws_access_key_id=access_key,
-                aws_secret_access_key=secret_key,
-                region_name='auto'
-            )
+        """Initialize Azure Blob Storage client"""
+        # Azure Blob Storage configuration
+        account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+        account_key = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
         
-        elif self.provider == "s3":
-            # AWS S3 configuration
-            access_key = os.getenv("AWS_ACCESS_KEY_ID")
-            secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-            region = os.getenv("AWS_REGION", "us-east-1")
-            
-            if not all([access_key, secret_key]):
-                raise ValueError("Missing S3 credentials. Set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY")
-            
-            return boto3.client(
-                's3',
-                aws_access_key_id=access_key,
-                aws_secret_access_key=secret_key,
-                region_name=region
-            )
+        if not all([account_name, account_key]):
+            raise ValueError("Missing Azure credentials. Set AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY")
         
-        else:
-            raise ValueError(f"Unsupported provider: {provider}. Use 'r2' or 's3'")
+        connection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
+        return BlobServiceClient.from_connection_string(connection_string)
     
-    def upload_file(self, local_path: str, bucket: str, key: str, retries: int = 3) -> str:
+    def upload_file(self, local_path: str, container: str, key: str, retries: int = 3) -> str:
         """
-        Upload a single file to storage with retry logic
+        Upload a single file to Azure Blob Storage with retry logic
         
         Args:
             local_path: Path to local file
-            bucket: Storage bucket name
-            key: Object key (path in bucket)
+            container: Storage container name
+            key: Object key (path in container)
             retries: Number of retry attempts
             
         Returns:
@@ -76,46 +45,48 @@ class StorageUploader:
         """
         for attempt in range(retries):
             try:
-                self.client.upload_file(
-                    Filename=local_path,
-                    Bucket=bucket,
-                    Key=key,
-                    ExtraArgs={'ACL': 'public-read', 'ContentType': 'image/png'}
-                )
+                # Azure Blob Storage upload
+                blob_client = self.client.get_blob_client(container=container, blob=key)
+                with open(local_path, "rb") as data:
+                    blob_client.upload_blob(
+                        data,
+                        overwrite=True,
+                        content_settings=ContentSettings(content_type='image/png')
+                    )
                 
                 # Generate CDN URL
-                cdn_url = self._generate_cdn_url(bucket, key)
+                cdn_url = self._generate_cdn_url(container, key)
                 return cdn_url
                 
-            except ClientError as e:
+            except Exception as e:
                 if attempt == retries - 1:
                     raise Exception(f"Failed to upload {local_path} after {retries} attempts: {e}")
                 print(f"⚠️  Upload attempt {attempt + 1} failed, retrying...")
         
-    def _generate_cdn_url(self, bucket: str, key: str) -> str:
+    def _generate_cdn_url(self, container: str, key: str) -> str:
         """Generate public CDN URL for uploaded file"""
-        if self.provider == "r2":
-            # Use custom domain if configured, otherwise R2 public URL
-            public_url = os.getenv("R2_PUBLIC_URL", f"https://pub-{bucket}.r2.dev")
-            return f"{public_url}/{key}"
+        # Use custom CDN domain if configured, otherwise default blob endpoint
+        account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+        custom_cdn = os.getenv("AZURE_STORAGE_CDN_URL")
         
-        elif self.provider == "s3":
-            region = os.getenv("AWS_REGION", "us-east-1")
-            return f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
+        if custom_cdn:
+            return f"{custom_cdn}/{container}/{key}"
+        else:
+            return f"https://{account_name}.blob.core.windows.net/{container}/{key}"
     
     def upload_directory(
         self, 
         images_dir: str, 
-        bucket: str, 
+        container: str, 
         base_path: str = "diagrams"
     ) -> Tuple[Dict[str, str], Dict]:
         """
-        Upload all PNG files in a directory
+        Upload all PNG files in a directory to Azure Blob Storage
         
         Args:
             images_dir: Directory containing PNG files
-            bucket: Storage bucket name
-            base_path: Path prefix in bucket (e.g., "diagrams/9701_s25_qp_13")
+            container: Storage container name
+            base_path: Path prefix in container (e.g., "diagrams/9701_s25_qp_13")
             
         Returns:
             Tuple of (cdn_mapping, report)
@@ -129,12 +100,12 @@ class StorageUploader:
         errors = []
         uploaded_count = 0
         
-        print(f"📤 Uploading {len(png_files)} images to {self.provider.upper()}...")
+        print(f"📤 Uploading {len(png_files)} images to Azure Blob Storage...")
         
         for img_path in png_files:
             try:
                 key = f"{base_path}/{img_path.name}"
-                cdn_url = self.upload_file(str(img_path), bucket, key)
+                cdn_url = self.upload_file(str(img_path), container, key)
                 cdn_mapping[img_path.name] = cdn_url
                 uploaded_count += 1
                 print(f"  ✅ {img_path.name} → {cdn_url}")
@@ -154,6 +125,45 @@ class StorageUploader:
         
         return cdn_mapping, report
 
+def main():
+    """CLI entry point"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Upload images to Azure Blob Storage")
+    parser.add_argument("images_dir", help="Directory containing PNG images")
+    parser.add_argument("--container", required=True, help="Azure Storage container name")
+    parser.add_argument("--base-path", default="diagrams", help="Base path in container")
+    parser.add_argument("--output", help="Output JSON file for CDN mapping")
+    
+    args = parser.parse_args()
+    
+    # Upload
+    uploader = StorageUploader()
+    cdn_mapping, report = uploader.upload_directory(
+        images_dir=args.images_dir,
+        container=args.container,
+        base_path=args.base_path
+    )
+    
+    # Save CDN mapping
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_path, 'w') as f:
+            json.dump({
+                "cdn_mapping": cdn_mapping,
+                "report": report
+            }, f, indent=2)
+        
+        print(f"\n💾 CDN mapping saved to: {output_path}")
+    
+    # Exit with error code if any uploads failed
+    sys.exit(0 if report["failed"] == 0 else 1)
+
+if __name__ == "__main__":
+    main()
+
 
 def main():
     """CLI entry point"""
@@ -161,7 +171,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="Upload images to cloud storage")
     parser.add_argument("images_dir", help="Directory containing PNG images")
-    parser.add_argument("--provider", choices=["r2", "s3"], default="r2", help="Storage provider")
+    parser.add_argument("--provider", choices=["r2", "s3", "azure"], default="r2", help="Storage provider")
     parser.add_argument("--bucket", required=True, help="Storage bucket name")
     parser.add_argument("--base-path", default="diagrams", help="Base path in bucket")
     parser.add_argument("--output", help="Output JSON file for CDN mapping")

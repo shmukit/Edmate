@@ -6,7 +6,7 @@ pdfplumber>=0.10.0  # Table detection (future)
 Pillow>=10.0.0  # Image processing
 
 # Cloud Storage
-boto3>=1.28.0  # AWS S3 and Cloudflare R2
+azure-storage-blob>=12.19.0  # Azure Blob Storage
 
 # Database
 psycopg2-binary>=2.9.0  # PostgreSQL adapter

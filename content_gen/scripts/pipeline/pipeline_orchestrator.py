@@ -23,7 +23,6 @@ from processing.import_to_db import DatabaseImporter, create_schema
 class PipelineOrchestrator:
     def __init__(
         self,
-        storage_provider: str = "r2",
         storage_bucket: str = None,
         db_connection: str = None
     ):
@@ -31,16 +30,14 @@ class PipelineOrchestrator:
         Initialize pipeline orchestrator
         
         Args:
-            storage_provider: "r2" or "s3"
-            storage_bucket: Storage bucket name
+            storage_bucket: Azure Storage container name
             db_connection: Database connection string
         """
-        self.storage_provider = storage_provider
         self.storage_bucket = storage_bucket
         self.db_connection = db_connection
         
         # Initialize components
-        self.uploader = StorageUploader(provider=storage_provider) if storage_bucket else None
+        self.uploader = StorageUploader() if storage_bucket else None
         
     def process_pdf(
         self,
@@ -241,8 +238,8 @@ def main():
     parser.add_argument("--topics", nargs="+", help="Topic tags")
     
     # Storage
-    parser.add_argument("--storage-provider", choices=["r2", "s3"], help="Storage provider")
-    parser.add_argument("--storage-bucket", help="Storage bucket name")
+    parser.add_argument("--storage-provider", choices=["azure"], default="azure", help="Storage provider")
+    parser.add_argument("--storage-bucket", help="Azure Storage container name")
     parser.add_argument("--cleanup-images", action="store_true", help="Delete local images after upload")
     
     # Database
@@ -264,7 +261,6 @@ def main():
     
     # Initialize orchestrator
     orchestrator = PipelineOrchestrator(
-        storage_provider=args.storage_provider or "r2",
         storage_bucket=args.storage_bucket,
         db_connection=db_url
     )

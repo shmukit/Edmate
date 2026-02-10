@@ -32,27 +32,25 @@ python scripts/import_to_db.py \
 
 ## Usage
 
-### Single PDF Processing
+### Single PDF Processing (Azure)
 ```bash
-python scripts/pipeline_orchestrator.py \
-  --single-pdf "path/to/9701_s25_qp_13.pdf" \
+python scripts/pipeline/pipeline_orchestrator.py \
+  --single-pdf "data/inputs/9701_s25_qp_13.pdf" \
   --output-dir "data/extracted" \
   --subject Biology \
-  --storage-provider r2 \
-  --storage-bucket edmate-diagrams \
+  --storage-bucket edmate \
   --db-url "postgresql://user:pass@host:5432/edmate"
 ```
 
 ### Batch Processing
 ```bash
-python scripts/pipeline_orchestrator.py \
+python scripts/pipeline/pipeline_orchestrator.py \
   --input-dir "data/inputs" \
   --output-dir "data/extracted" \
   --subject Chemistry \
   --difficulty Medium \
   --topics "Organic Chemistry" "Alkenes" \
-  --storage-provider r2 \
-  --storage-bucket edmate-diagrams \
+  --storage-bucket edmate \
   --db-url "postgresql://user:pass@host:5432/edmate" \
   --cleanup-images
 ```
@@ -65,12 +63,11 @@ python scripts/smart_extract.py
 # Or edit the __main__ section with your PDF path
 ```
 
-#### Upload Images Only
+#### Upload Images Only (Azure)
 ```bash
-python scripts/upload_to_storage.py \
+python scripts/processing/upload_to_storage.py \
   data/extracted/images \
-  --provider r2 \
-  --bucket edmate-diagrams \
+  --container edmate \
   --base-path "diagrams/9701_s25_qp_13" \
   --output data/extracted/cdn_mapping.json
 ```
@@ -123,15 +120,9 @@ content_gen/
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `R2_ACCOUNT_ID` | Yes (R2) | Cloudflare account ID |
-| `R2_ACCESS_KEY_ID` | Yes (R2) | R2 access key |
-| `R2_SECRET_ACCESS_KEY` | Yes (R2) | R2 secret key |
-| `R2_BUCKET_NAME` | Yes (R2) | R2 bucket name |
-| `R2_PUBLIC_URL` | No | Custom CDN domain |
-| `AWS_ACCESS_KEY_ID` | Yes (S3) | AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | Yes (S3) | AWS secret key |
-| `AWS_S3_BUCKET` | Yes (S3) | S3 bucket name |
-| `AWS_REGION` | No | AWS region (default: us-east-1) |
+| `AZURE_STORAGE_ACCOUNT_NAME` | Yes | Azure storage account name |
+| `AZURE_STORAGE_ACCOUNT_KEY` | Yes | Azure storage access key |
+| `AZURE_STORAGE_CDN_URL` | No | Optional custom CDN domain for Azure |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 
 ---
