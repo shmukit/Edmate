@@ -1,1 +1,10 @@
 content_gen/tools/PDF-Extract-Kit
+
+# Environment variables
+.env
+content_gen/.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/

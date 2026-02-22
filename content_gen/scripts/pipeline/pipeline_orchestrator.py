@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
 from processing.upload_to_storage import StorageUploader
 from processing.import_to_db import DatabaseImporter, create_schema
+from processing.content_generator import ContentGenerator
 
 
 class PipelineOrchestrator:
@@ -38,6 +39,7 @@ class PipelineOrchestrator:
         
         # Initialize components
         self.uploader = StorageUploader() if storage_bucket else None
+        self.generator = ContentGenerator(provider="openai")  # Use OpenAI for standard processing
         
     def process_pdf(
         self,
@@ -94,6 +96,18 @@ class PipelineOrchestrator:
             report["errors"].append(f"Extraction failed: {e}")
             print(f"  ❌ Extraction failed: {e}")
             return report
+        
+        # Step 1.5: Generate Content using LLM
+        try:
+            print("\n🤖 Step 1.5: Generating detailed explanations using LLM...")
+            # Use the extractor's outputs_dir to ensure consistency
+            text_path = extractor.outputs_dir / f"{pdf_name}_processed.txt"
+            self.generator.process_and_update_file(text_path, subject)
+            print(f"  ✅ Content generated for {pdf_name}")
+        except Exception as e:
+            report["errors"].append(f"Content generation failed: {e}")
+            print(f"  ❌ Content generation failed: {e}")
+            # Continue pipeline even if generation fails, as extraction is still useful
         
         # Step 2: Upload to storage
         cdn_mapping = {}
