@@ -25,7 +25,7 @@ except ImportError:
 # Load prompts
 try:
     import sys
-    sys.path.insert(0, str(Path(__file__).parent.parent))
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
     from scripts.prompts import CONTENT_GENERATION_PROMPT, FORMATTING_PROMPT
 except ImportError:
     CONTENT_GENERATION_PROMPT = ""
