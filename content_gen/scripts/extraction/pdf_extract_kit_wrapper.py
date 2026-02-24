@@ -339,8 +339,7 @@ class PDFExtractKitWrapper:
                 f.write("[EXPLANATION_PLACEHOLDER]\n\n")
                 f.write("Option Wise Explanation (Detailed)\n\n")
                 f.write("[OPTION_EXPLANATION_PLACEHOLDER]\n\n")
-                f.write("### 🧠 Concept Gap Analysis and Flashcards: For every individual wrong option (e.g., A, B, C, D), identify the conceptual gap that led to that specific incorrect choice.\n\n")
-                f.write("Following the gap analysis, provide 2-3 separate tailored flashcards for each option.\n\n")
+                f.write("### 🧠 Concept Gap Analysis and Flashcards\n\n")
                 f.write("[FLASHCARDS_PLACEHOLDER]\n\n")
                 f.write("-" * 50 + "\n\n")
     

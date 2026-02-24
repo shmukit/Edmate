@@ -170,9 +170,13 @@ class ContentGenerator:
         """
         results = {}
         
-        # Log response
+        # Log response (keep all for debugging)
         log_dir = Path("content_gen/logs")
         log_dir.mkdir(parents=True, exist_ok=True)
+        with open(log_dir / "all_llm_responses.log", "a", encoding="utf-8") as f:
+            f.write(f"\n\n{'='*50}\nBatch: {q_indices}\n{'='*50}\n")
+            f.write(response)
+        
         with open(log_dir / "llm_response_last.txt", "w", encoding="utf-8") as f:
             f.write(response)
 
@@ -199,21 +203,21 @@ class ContentGenerator:
                 # Robust fallback for uncooperative LLMs
                 if not explanation_body:
                     if "Detailed Explanation" in content:
-                        parts = re.split(r'(?i)Detailed Explanation:?\s*', content)
+                        parts = re.split(r'(?i)Detailed Explanation.*?\n', content)
                         if len(parts) > 1:
-                            explanation_body = re.split(r'(?i)Option Wise|###|---', parts[1])[0].strip()
+                            explanation_body = re.split(r'(?i)Option Wise|Concept Gap|###|---', parts[1])[0].strip()
                     elif "Explanation" in content:
-                         parts = re.split(r'(?i)Explanation:?\s*', content)
+                         parts = re.split(r'(?i)Explanation.*?\n', content)
                          if len(parts) > 1:
-                            explanation_body = re.split(r'(?i)Option Wise|###|---', parts[1])[0].strip()
+                            explanation_body = re.split(r'(?i)Option Wise|Concept Gap|###|---', parts[1])[0].strip()
 
                 if not options_body and "Option Wise" in content:
-                    parts = re.split(r'(?i)Option Wise Explanation:?\s*', content)
+                    parts = re.split(r'(?i)Option Wise Explanation.*?\n', content)
                     if len(parts) > 1:
                         options_body = re.split(r'(?i)Concept Gap|###|---', parts[1])[0].strip()
 
-                if not gap_body and "Concept Gap" in content:
-                    parts = re.split(r'(?i)Concept Gap Analysis:?\s*', content)
+                if not gap_body and ("Concept Gap" in content or "Flashcards" in content):
+                    parts = re.split(r'(?i)Concept Gap Analysis|Flashcards.*?\n', content)
                     if len(parts) > 1:
                         gap_body = parts[1].strip()
 
