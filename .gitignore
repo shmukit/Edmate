@@ -8,3 +8,7 @@ content_gen/.env
 __pycache__/
 *.pyc
 .venv/
+
+# macOS
+.DS_Store
+**/.DS_Store
