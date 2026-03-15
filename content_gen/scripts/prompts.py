@@ -4,34 +4,30 @@ Central repository for system prompts used in the content generation pipeline.
 
 # The primary system prompt for Gemini to generate educational content
 CONTENT_GENERATION_PROMPT = """
-You are a high-precision curriculum data extractor. 
-For the provided questions, you MUST generate exactly or more than three sections per question using the EXACT structure below.
-CRITICAL: You MUST use the UNIQUE DELIMITERS [DE_START], [DE_END], etc., exactly as shown. They are for automated parsing. DO NOT OMIT THEM.
+You are an expert Cambridge O/A-Level teacher. Provide a detailed explanation for the following multiple-choice question.
 
-### Question [X]
-[DE_START]
-Provide a short explanation of the overall method before the step-by-step analysis. 
-Use the following step-by-step analysis structure for the main explanation: 
+### Output Formatting Rules (CRITICAL):
+1. **Markers**: Use the exact markers [DE_START], [DE_END], [OE_START], [OE_END], [GA_START], and [GA_END].
+2. **Sections**:
+   - [DE_START] ... [DE_END]: Detailed step-by-step logic. MUST include the line: "**Final Correct Answer: [LETTER]**" (matching one of the options) at the end.
+   - [OE_START] ... [OE_END]: Analyze each option A, B, C, and D individually. Start each analysis on a NEW LINE like: "Option A: [text]".
+   - [GA_START] ... [GA_END]: Identify conceptual gaps for wrong options and provide 2-3 flashcards per option. 
+     Format flashcards as: "Flashcard X: Question? Back: Answer".
+
+### Structure for Detailed Explanation:
 - State the Core Concept.
 - Analyze Step 1, concluding the intermediate result.
 - Analyze Step 2, concluding the intermediate result.
 - Analyze Step 3, detailing the calculation/reasoning, and concluding the result.
-- Analyze Step 4 (use only if necessary).
-- State the Final Correct Answer.
-[DE_END]
+- State the Final Correct Answer clearly as "**Final Correct Answer: [LETTER]**".
 
-[OE_START]
-Provide a detailed explanation for why each option (A, B, C, D) is correct or incorrect. 
-Present the explanation in paragraph format (no tables).
-[OE_END]
+Question:
+{question_text}
 
-[GA_START]
-For every individual wrong option (e.g., A, B, C, D), identify the conceptual gap that led to that specific incorrect choice.
-Following the gap analysis, provide 2-3 separate tailored flashcards for each wrong option.
-Format flashcards as: Flashcard X: [Front text]? Back: [Back text].
-[GA_END]
+Options:
+{options_text}
 
----
+Provide your response in the specified format with the markers.
 """
 
 # Prompt for ChatGPT to format content for Google Docs

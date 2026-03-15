@@ -76,7 +76,7 @@ class ContentGenerator:
             raise ValueError(f"Missing API key for {self.provider}. Please set {self.provider.upper()}_API_KEY.")
         return key
 
-    def generate_for_questions(self, questions: List[Dict], subject: str) -> List[Dict]:
+    def generate_for_questions(self, questions: List[Dict], subject: str, batch_size: int = 5) -> List[Dict]:
         """
         Generate detailed analysis for a list of questions.
         
@@ -93,8 +93,6 @@ class ContentGenerator:
         print(f"🧠 Generating content for {len(questions)} questions using {self.provider}...")
         
         # In a real scenario, we might batch these to save tokens/time
-        # For now, let's process them in smaller batches or individually if complex
-        batch_size = 5
         updated_questions = []
         
         for i in range(0, len(questions), batch_size):
@@ -164,7 +162,7 @@ class ContentGenerator:
             return mock_resp
         return ""
 
-    def _parse_response(self, response: str, q_indices: List[int]) -> Dict[int, Dict]:
+    def _parse_response(self, response: str, batch_indices: List[int]) -> Dict[int, Dict]:
         """
         Parses the LLM output back into a structured dictionary using strict markers.
         """
@@ -174,66 +172,73 @@ class ContentGenerator:
         log_dir = Path("content_gen/logs")
         log_dir.mkdir(parents=True, exist_ok=True)
         with open(log_dir / "all_llm_responses.log", "a", encoding="utf-8") as f:
-            f.write(f"\n\n{'='*50}\nBatch: {q_indices}\n{'='*50}\n")
+            f.write(f"\n\n{'='*50}\nBatch: {batch_indices}\n{'='*50}\n")
             f.write(response)
         
         with open(log_dir / "llm_response_last.txt", "w", encoding="utf-8") as f:
             f.write(response)
 
-        # Split by "### Question X" or "**Question X**" or "Question X"
-        sections = re.split(r'(?i)\n(?:###|\*\*|#)?\s*Question\s*[:\s]*(\d+)', "\n" + response)
+        # More robust splitting: handles ### Question 1, --- Question 1 ---, **Question 1**, etc.
+        # It also looks for "Question 1" even if it's the very first text in the response.
+        header_pattern = r'(?i)(?:^|\n)(?:[#\-\*]+)?\s*Question\s*[:\s]*(\d+)\s*(?:[#\-\*]+)?'
+        sections = re.split(header_pattern, response)
         
+        # Fallback: if we only have 1 question and we couldn't find a clear header, 
+        # assume the whole response (or from the first marker) belongs to the first question.
+        if len(sections) < 3 and len(batch_indices) == 1:
+            results[batch_indices[0]] = self._parse_single_content(response)
+            return results
+
         for i in range(1, len(sections), 2):
             try:
                 q_num = int(sections[i])
                 content = sections[i+1]
-                
-                # 1. Detailed Explanation
-                de_match = re.search(r'(?is)\[DE_START\]\s*(.*?)\s*\[DE_END\]', content)
-                explanation_body = de_match.group(1).strip() if de_match else ""
-                
-                # 2. Option Wise Explanation
-                oe_match = re.search(r'(?is)\[OE_START\]\s*(.*?)\s*\[OE_END\]', content)
-                options_body = oe_match.group(1).strip() if oe_match else ""
-                
-                # 3. Gap Analysis
-                ga_match = re.search(r'(?is)\[GA_START\]\s*(.*?)\s*\[GA_END\]', content)
-                gap_body = ga_match.group(1).strip() if ga_match else ""
-                
-                # Robust fallback for uncooperative LLMs
-                if not explanation_body:
-                    if "Detailed Explanation" in content:
-                        parts = re.split(r'(?i)Detailed Explanation.*?\n', content)
-                        if len(parts) > 1:
-                            explanation_body = re.split(r'(?i)Option Wise|Concept Gap|###|---', parts[1])[0].strip()
-                    elif "Explanation" in content:
-                         parts = re.split(r'(?i)Explanation.*?\n', content)
-                         if len(parts) > 1:
-                            explanation_body = re.split(r'(?i)Option Wise|Concept Gap|###|---', parts[1])[0].strip()
-
-                if not options_body and "Option Wise" in content:
-                    parts = re.split(r'(?i)Option Wise Explanation.*?\n', content)
-                    if len(parts) > 1:
-                        options_body = re.split(r'(?i)Concept Gap|###|---', parts[1])[0].strip()
-
-                if not gap_body and ("Concept Gap" in content or "Flashcards" in content):
-                    parts = re.split(r'(?i)Concept Gap Analysis|Flashcards.*?\n', content)
-                    if len(parts) > 1:
-                        gap_body = parts[1].strip()
-
-                # Final desperation fallback
-                if not explanation_body and len(content.strip()) > 50:
-                    explanation_body = content.strip()
-
-                results[q_num] = {
-                    "explanation_generated": explanation_body or "[PARSING_FAILED]",
-                    "options_explanation_generated": options_body,
-                    "flashcards_generated": gap_body
-                }
+                results[q_num] = self._parse_single_content(content)
             except (ValueError, IndexError):
                 continue
                 
         return results
+
+    def _parse_single_content(self, content: str) -> Dict:
+        """Helper to parse markers from a single question block."""
+        # 1. Detailed Explanation
+        de_match = re.search(r'(?is)\[DE_START\]\s*(.*?)\s*\[DE_END\]', content)
+        explanation_body = de_match.group(1).strip() if de_match else ""
+        
+        # 2. Option Wise Explanation
+        oe_match = re.search(r'(?is)\[OE_START\]\s*(.*?)\s*\[OE_END\]', content)
+        options_body = oe_match.group(1).strip() if oe_match else ""
+        
+        # 3. Gap Analysis
+        ga_match = re.search(r'(?is)\[GA_START\]\s*(.*?)\s*\[GA_END\]', content)
+        gap_body = ga_match.group(1).strip() if ga_match else ""
+        
+        # Robust fallback for uncooperative LLMs or misplaced markers
+        if not explanation_body:
+            # Look for content between Question header and first marker or section title
+            parts = re.split(r'(?is)\[[A-Z_]+_START\]|Explanation|Analysis', content)
+            if len(parts) > 1 and len(parts[0].strip()) > 50:
+                explanation_body = parts[0].strip()
+
+        if not options_body and "Option" in content:
+            parts = re.split(r'(?is)\[OE_START\]|Option Wise', content)
+            if len(parts) > 1:
+                options_body = re.split(r'(?is)\[[A-Z_]+_START\]|Concept Gap|###|---', parts[1])[0].strip()
+
+        if not gap_body and ("Gap" in content or "Flashcards" in content):
+            parts = re.split(r'(?is)\[GA_START\]|Concept Gap|Flashcards', content)
+            if len(parts) > 1:
+                gap_body = re.split(r'(?is)###|---', parts[1])[0].strip()
+
+        # Final desperation fallback
+        if not explanation_body and len(content.strip()) > 100:
+            explanation_body = content.strip()
+
+        return {
+            "explanation_generated": explanation_body or "[PARSING_FAILED]",
+            "options_explanation_generated": options_body,
+            "flashcards_generated": gap_body
+        }
 
     def process_and_update_file(self, file_path: Path, subject: str):
         """

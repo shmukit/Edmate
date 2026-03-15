@@ -12,3 +12,9 @@ __pycache__/
 # macOS
 .DS_Store
 **/.DS_Store
+
+# Logs
+**/logs/
+*.log
+content_gen/content_gen/logs/
+llm_response_last.txt
