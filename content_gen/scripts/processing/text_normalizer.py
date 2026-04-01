@@ -94,29 +94,29 @@ def _apply_sub_sup_html(text: str) -> str:
         Use a state-machine regex to identify token boundaries.
     """
 
-    # Handle braced groups first: ^{...} and _{...}
-    text = re.sub(r'\^\{([^}]*)\}', lambda m: f'<sup>{m.group(1)}</sup>', text)
-    text = re.sub(r'_\{([^}]*)\}', lambda m: f'<sub>{m.group(1)}</sub>', text)
 
-    # Handle unbraced superscripts: ^<token>
-    # Token = digits, signs (+/-/–), and letter sequences like "2+" or "27" or "n"
-    # Stop at space, punctuation (except +/-), or another ^ or _
-    def sup_replace(m):
-        token = m.group(1)
-        return f'<sup>{token}</sup>'
+    # ── Electron configuration notation: 1s^22s^22p^6 ──────────────────
+    # These look like: <digit><orbital_letter(s/p/d/f)>^<exponent><next_token>
+    # Problem: naive greedy regex captures "^22s" as the exponent.
+    # Fix: first insert a space boundary between the exponent digit(s) and the
+    # next shell number+orbital combination, so "^22s" → "^2 2s".
+    #
+    # Pattern: a caret, some digits, then immediately a digit followed by s/p/d/f
+    # We insert a space: ^2 → <sup>2</sup>, and "2s" stays as-is.
+    text = re.sub(r'\^([0-9]+)(?=\d[spdf])', lambda m: f'<sup>{m.group(1)}</sup>', text)
 
-    def sub_replace(m):
-        token = m.group(1)
-        return f'<sub>{token}</sub>'
+    # Remaining unbraced superscripts: ^<digits+signs>  e.g. ^2+  ^–1  ^27
+    # (Do NOT capture trailing letters to avoid eating orbital symbols)
+    text = re.sub(r'\^([0-9–\+\-]+)', lambda m: f'<sup>{m.group(1)}</sup>', text)
 
-    # Superscript: ^ followed by digits+signs, optionally one letter suffix like n, x
-    # e.g.  ^2+  ^27  ^–1  ^n   but NOT ^22s (should be ^2 then 2s)
-    text = re.sub(r'\^([0-9–\+\-]+[a-zA-Z]?|[a-zA-Z])', sup_replace, text)
+    # Pure single-letter superscript (e.g. ^n) only when not followed by a digit
+    text = re.sub(r'\^([a-zA-Z])(?!\d)', lambda m: f'<sup>{m.group(1)}</sup>', text)
 
-    # Subscript: _ followed by digits only (e.g. CH_4, H_2O → CH<sub>4</sub>, H<sub>2</sub>O)
-    text = re.sub(r'_([0-9]+)', sub_replace, text)
+    # Subscript: _ followed by digits only (e.g. CH_4, H_2O → CH<sub>4</sub>)
+    text = re.sub(r'_([0-9]+)', lambda m: f'<sub>{m.group(1)}</sub>', text)
 
     return text
+
 
 
 def _wrap_html(text: str) -> str:
