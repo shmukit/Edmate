@@ -35,7 +35,7 @@ TABLES = [
 
 def get_db():
     try:
-        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor, connect_timeout=3)
     except Exception as e:
         print(f"DB connection error: {e}")
         return None

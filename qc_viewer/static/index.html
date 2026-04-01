@@ -713,14 +713,10 @@ async function loadFlashcards(topicId, subtopicId, questionIdentifier) {
   const container = document.getElementById('flashcardContainer');
   if (!container) return;
 
+  let isFallback = false;
   if (!topicId || topicId === 'unknown-topic') {
-    container.innerHTML = `
-      <div class="fc-empty">
-        <div class="fc-empty-icon">🃏</div>
-        <p>No question-specific flashcards yet.<br>
-        The AI pipeline hasn't mapped this question to a topic — run content generation to produce dedicated flashcards.</p>
-      </div>`;
-    return;
+    isFallback = true;
+    topicId = 'unknown-topic';
   }
 
   container.innerHTML = '<div class="loading-text">Loading flashcards…</div>';
@@ -744,17 +740,23 @@ async function loadFlashcards(topicId, subtopicId, questionIdentifier) {
     fcCards = cards;
     fcIndex = 0;
     fcFlipped = false;
-    renderFlashcardViewer(container);
+    renderFlashcardViewer(container, isFallback);
     typesetMath();
   } catch {
     container.innerHTML = '<p style="color:var(--text-dim);font-size:.9rem">Could not load flashcards.</p>';
   }
 }
 
-function renderFlashcardViewer(container) {
+function renderFlashcardViewer(container, isFallback) {
   const total = fcCards.length;
+  
+  const fallbackWarning = isFallback ? 
+    `<div style="color: #ffcc00; font-size: 0.85rem; text-align: center; margin-bottom: 12px; font-weight: 500;">
+       ⚠️ Note: Showing fallback flashcards. This question has not been explicitly mapped to a specific topic yet.
+     </div>` : '';
 
   container.innerHTML = `
+    ${fallbackWarning}
     <div class="fc-wrapper">
 
       <!-- progress pips -->
