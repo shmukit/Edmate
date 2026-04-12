@@ -3,11 +3,19 @@ import re
 import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from dotenv import load_dotenv
+from typing import List, Optional
+import shutil
+import json
+import uuid
+
+# Import local services
+from content_gen.scripts.processing.gemini_extractor import GeminiExtractor
+from content_gen.scripts.processing.database_service import DatabaseService
 
 # Load environment variables from content_gen/.env
 env_path = Path(__file__).parent.parent / "content_gen" / ".env"
@@ -167,6 +175,75 @@ async def get_stats():
     finally:
         conn.close()
 
+
+# ───── AUTOMATION ENDPOINTS ─────
+
+DRAFTS_DIR = Path("qc_viewer/drafts")
+DRAFTS_DIR.mkdir(parents=True, exist_ok=True)
+
+@app.post("/api/automate/upload")
+async def upload_pdf(file: UploadFile = File(...)):
+    """Uploads a PDF and creates a draft record"""
+    draft_id = str(uuid.uuid4())
+    save_path = DRAFTS_DIR / f"{draft_id}.pdf"
+    
+    with open(save_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Create initial draft entry
+    draft_meta = {
+        "id": draft_id,
+        "filename": file.filename,
+        "status": "UPLOADED",
+        "created_at": str(shutil.os.path.getctime(save_path))
+    }
+    
+    with open(DRAFTS_DIR / f"{draft_id}.json", "w") as f:
+        json.dump(draft_meta, f)
+        
+    return draft_meta
+
+@app.post("/api/automate/process/{draft_id}")
+async def process_draft(draft_id: str):
+    """Triggers Gemini extraction for a specific draft"""
+    pdf_path = DRAFTS_DIR / f"{draft_id}.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="Draft PDF not found")
+        
+    try:
+        extractor = GeminiExtractor()
+        results = extractor.process_pdf(str(pdf_path))
+        
+        # Update draft with results
+        results["status"] = "PROCESSED"
+        results["id"] = draft_id
+        
+        with open(DRAFTS_DIR / f"{draft_id}.json", "w") as f:
+            json.dump(results, f)
+            
+        return results
+    except Exception as e:
+        print(f"Processing Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/automate/drafts")
+async def list_drafts():
+    """Returns all current drafts"""
+    drafts = []
+    for f in DRAFTS_DIR.glob("*.json"):
+        with open(f, "r") as json_file:
+            drafts.append(json.load(json_file))
+    return drafts
+
+@app.post("/api/automate/inject")
+async def inject_question(q_data: dict):
+    """Injects a single verified question into the unified table"""
+    db = DatabaseService()
+    try:
+        db.inject_question(q_data)
+        return {"status": "success", "message": "Question injected into unified table"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Serve static files (must be last)
 app.mount("/", StaticFiles(directory="qc_viewer/static", html=True), name="static")

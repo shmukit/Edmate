@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edmate | AI Automation Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --bg: #0f172a;
+            --sidebar-bg: rgba(15, 23, 42, 0.98);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --accent: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        aside {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            background: var(--card-bg);
+            border: 2px dashed var(--card-border);
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone.dragging {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .upload-zone p {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .upload-zone span {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Drafts List */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .draft-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .draft-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .draft-card:hover {
+            border-color: var(--primary-light);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .draft-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .draft-info p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-processed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .status-uploaded { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+        .status-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: scale(1.03);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Progress Animation */
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Review Panel */
+        .review-panel {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 1000;
+            padding: 40px;
+        }
+
+        .review-panel.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .panel-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .card-render {
+            background: white;
+            color: #334155;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .card-render h2 { color: var(--bg); margin-bottom: 15px; }
+        .card-render img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-light);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            background: #1e293b;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    <div class="review-panel" id="reviewPanel">
+        <div class="panel-column">
+            <div class="review-header">
+                <h2>Extracted Questions</h2>
+                <button class="btn btn-outline" onclick="closeReview()">Back to Hub</button>
+            </div>
+            <div id="reviewQuestionsList"></div>
+        </div>
+        <div class="panel-column">
+            <div class="review-header">
+                <h2>Live Preview</h2>
+                <span id="currentQNum" class="subtitle">Select a question to preview</span>
+            </div>
+            <div id="previewCard" class="card-render">
+                <div class="subtitle">Rendered view of the database-ready HTML content will appear here...</div>
+            </div>
+        </div>
+    </div>
+    <aside>
+        <div class="logo">Edmate AI</div>
+        <nav>
+            <a href="index.html" class="nav-item">
+                <span>🔍</span> Standard Viewer
+            </a>
+            <a href="automate.html" class="nav-item active">
+                <span>⚡</span> Automation Hub
+            </a>
+            <a href="#" class="nav-item">
+                <span>📊</span> Analytics
+            </a>
+            <a href="#" class="nav-item">
+                <span>⚙️</span> Settings
+            </a>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Automation Hub</h1>
+                <p class="subtitle">AI-powered PDF extraction for O/A-Level content generation.</p>
+            </header>
+
+            <div class="upload-zone" id="dropZone">
+                <input type="file" id="fileInput" hidden accept=".pdf">
+                <span class="upload-icon">📄</span>
+                <p id="uploadText">Click to upload or drag and drop</p>
+                <span id="uploadSubtext">Maximum file size: 50MB</span>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>Recent Processing Drafts</h2>
+                <button class="btn btn-outline" onclick="fetchDrafts()">Refresh</button>
+            </div>
+
+            <div class="draft-list" id="draftList">
+                <div class="loading-text">Loading drafts...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const draftList = document.getElementById('draftList');
+
+        // Drag and Drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragging');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            const files = e.dataTransfer.files;
+            if (files.length) handleUpload(files[0]);
+        });
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleUpload(e.target.files[0]);
+        });
+
+        async function handleUpload(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const container = document.getElementById('progressContainer');
+            const bar = document.getElementById('progressBar');
+            const text = document.getElementById('uploadText');
+            
+            container.style.display = 'block';
+            text.textContent = 'Uploading: 0%';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/automate/upload', true);
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    bar.style.width = percent + '%';
+                    text.textContent = `Uploading: ${percent}%`;
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const result = JSON.parse(xhr.responseText);
+                    showToast('✅ Upload complete. Initializing extraction...');
+                    fetchDrafts();
+                    triggerProcess(result.id);
+                    // Reset upload zone
+                    setTimeout(() => {
+                        container.style.display = 'none';
+                        bar.style.width = '0%';
+                        text.textContent = 'Click to upload or drag and drop';
+                    }, 2000);
+                } else {
+                    showToast('❌ Upload failed: ' + xhr.statusText, 'danger');
+                }
+            };
+
+            xhr.onerror = () => showToast('❌ Network error during upload', 'danger');
+            xhr.send(formData);
+        }
+
+        function showToast(msg, type = 'primary') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            t.style.borderColor = type === 'danger' ? 'var(--danger)' : 'var(--primary)';
+            setTimeout(() => t.style.display = 'none', 4000);
+        }
+
+        async function fetchDrafts() {
+            try {
+                const response = await fetch('/api/automate/drafts');
+                const drafts = await response.json();
+                renderDrafts(drafts);
+            } catch (error) {
+                console.error('Fetch failed:', error);
+            }
+        }
+
+        let currentDraftData = null;
+
+        function renderDrafts(drafts) {
+            if (!drafts.length) {
+                draftList.innerHTML = '<div class="subtitle">No drafts yet. Upload a PDF to start.</div>';
+                return;
+            }
+
+            draftList.innerHTML = drafts.map(d => `
+                <div class="draft-card">
+                    <div class="draft-info">
+                        <h3>${d.filename}</h3>
+                        <p>ID: ${d.id.substring(0, 8)} | Generated: ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span class="status-badge status-${d.status.toLowerCase()}">${d.status}</span>
+                        ${d.status === 'UPLOADED' ? 
+                            `<button class="btn btn-primary" onclick="triggerProcess('${d.id}')">Process AI</button>` : 
+                            `<button class="btn btn-outline" onclick="openReview('${d.id}')">Review & Inject</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function triggerProcess(id) {
+            const btn = document.querySelector(`[onclick="triggerProcess('${id}')"]`);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="loader" style="display:inline-block; margin-right:8px; width:12px; height:12px; border-width:1px;"></span> Processing...`;
+            }
+            
+            try {
+                const response = await fetch(`/api/automate/process/${id}`, { method: 'POST' });
+                const result = await response.json();
+                if (response.ok) {
+                    showToast('✨ AI Extraction completed for ' + (result.filename || 'PDF'));
+                } else {
+                    showToast('❌ AI Error: ' + (result.detail || 'Service Error'), 'danger');
+                }
+                fetchDrafts();
+            } catch (error) {
+                console.error('Process failed:', error);
+                showToast('❌ AI Service unreachable', 'danger');
+            }
+        }
+
+        async function openReview(id) {
+            try {
+                // In production this would fetch the specific draft
+                const response = await fetch('/api/automate/drafts');
+                const drafts = await response.json();
+                currentDraftData = drafts.find(d => d.id === id);
+                
+                document.getElementById('reviewPanel').classList.add('active');
+                renderReviewList(currentDraftData.questions || []);
+            } catch (error) {
+                console.error('Failed to load review:', error);
+            }
+        }
+
+        function renderReviewList(questions) {
+            const list = document.getElementById('reviewQuestionsList');
+            list.innerHTML = questions.map((q, i) => `
+                <div class="draft-card" onclick="previewQuestion(${i})" style="cursor:pointer; margin-bottom:10px;">
+                    <div>
+                        <b style="color:var(--primary-light)">Q${q.question_number}</b>: ${q.text.substring(0, 60)}...
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="injectQuestion(${i}, event)" style="padding: 4px 10px; font-size:0.7rem;">Inject</button>
+                </div>
+            `).join('');
+        }
+
+        function previewQuestion(index) {
+            const q = currentDraftData.questions[index];
+            document.getElementById('currentQNum').textContent = `Question ${q.question_number}`;
+            const preview = document.getElementById('previewCard');
+            
+            // Generate basic HTML structure for preview
+            preview.innerHTML = `
+                <h2>Question ${q.question_number}</h2>
+                <div class="q-content">${q.text}</div>
+                ${q.diagram_base64 ? `<img src="${q.diagram_base64}" />` : ''}
+                <div style="margin-top:20px; border-top: 1px solid #ddd; padding-top:10px;">
+                    <b>Options:</b>
+                    <ul>
+                        <li>A: ${q.options.A}</li>
+                        <li>B: ${q.options.B}</li>
+                        <li>C: ${q.options.C}</li>
+                        <li>D: ${q.options.D}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        async function injectQuestion(index, event) {
+            event.stopPropagation();
+            const q = currentDraftData.questions[index];
+            try {
+                const response = await fetch('/api/automate/inject', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(q)
+                });
+                const result = await response.json();
+                alert('Successfully injected to questions table!');
+            } catch (error) {
+                alert('Injection failed. Ensure Database is connected.');
+            }
+        }
+
+        function closeReview() {
+            document.getElementById('reviewPanel').classList.remove('active');
+        }
+
+        // Initial Load
+        fetchDrafts();
+    </script>
+</body>
+</html>

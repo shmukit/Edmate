@@ -1,0 +1,2352 @@
+{
+  "_prisma_migrations": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "checksum",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "finished_at",
+        "type": "timestamp with time zone",
+        "nullable": "YES"
+      },
+      {
+        "name": "migration_name",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "logs",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "rolled_back_at",
+        "type": "timestamp with time zone",
+        "nullable": "YES"
+      },
+      {
+        "name": "started_at",
+        "type": "timestamp with time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "applied_steps_count",
+        "type": "integer",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "bcs_pdf_question": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "class_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "subject_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_id",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "name": "main_question",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "stimulus",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "statements",
+        "type": "json",
+        "nullable": "YES"
+      },
+      {
+        "name": "combination_question",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "json",
+        "nullable": "NO"
+      },
+      {
+        "name": "option_a",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_b",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_c",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_d",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_answer",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "original_filename",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "page_number",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "created_date",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "verified",
+        "type": "integer",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "assessments": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "subtopicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "questionType",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "numberOfQuestions",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "duration",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "name": "difficulty",
+        "type": "USER-DEFINED",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "examBoard",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "subtopicId",
+        "foreign_table": "subtopics",
+        "foreign_column": "id"
+      },
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "assessment_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "assessmentId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "order",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "assessmentId",
+        "foreign_table": "assessments",
+        "foreign_column": "id"
+      },
+      {
+        "column": "questionId",
+        "foreign_table": "questions",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "flags_report": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionIdentifier",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "reportText",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "detailsText",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "questionId",
+        "foreign_table": "questions",
+        "foreign_column": "id"
+      },
+      {
+        "column": "userId",
+        "foreign_table": "users",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "biology_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "chemistry_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "drafts": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "data",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "flashcards": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopicId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "frontText",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "backText",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionId",
+        "type": "uuid",
+        "nullable": "YES"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "subtopicId",
+        "foreign_table": "subtopics",
+        "foreign_column": "id"
+      },
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "igcse_biology_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "assessment_attempts": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "assessmentId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "score",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "correct",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "incorrect",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "unanswered",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "accuracy",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "timeSpent",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "status",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "startedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "completedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "assessmentId",
+        "foreign_table": "assessments",
+        "foreign_column": "id"
+      },
+      {
+        "column": "userId",
+        "foreign_table": "users",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "answers": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "attemptId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "selectedOptions",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "textAnswer",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isCorrect",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "timeSpent",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "attemptId",
+        "foreign_table": "assessment_attempts",
+        "foreign_column": "id"
+      },
+      {
+        "column": "questionId",
+        "foreign_table": "questions",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "igcse_chemistry_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "physics_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "igcse_physics_questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "difficulty_level",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subject_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "topic_id",
+        "type": "character varying",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopic_id",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_explanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "other_contents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summary_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailed_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quick_explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "year",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "exam_board",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "institute_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "is_verified",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "questions": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "type",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "correctOptions",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionExplanations",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "otherContents",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "summaryExplanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "detailedExplanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "quickExplanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "difficultyLevel",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "year",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "session",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "variant",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "grade",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "examBoard",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "instituteName",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "question_identifier",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isValidated",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "optionAConceptGap",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionBConceptGap",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionCConceptGap",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionDConceptGap",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionAFlashcardsId",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionBFlashcardsId",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionCFlashcardsId",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "optionDFlashcardsId",
+        "type": "ARRAY",
+        "nullable": "YES"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "subtopicId",
+        "foreign_table": "subtopics",
+        "foreign_column": "id"
+      },
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "progress": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "subtopicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "totalQuestions",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "correctAnswers",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "totalTimeSpent",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "lastAttemptAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "name": "accuracy",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "averageTime",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "subtopicId",
+        "foreign_table": "subtopics",
+        "foreign_column": "id"
+      },
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      },
+      {
+        "column": "userId",
+        "foreign_table": "users",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "resources": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "fileUrl",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "fileType",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "grade",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "examBoard",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "self_assessments": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicIds",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "subtopicIds",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "questionType",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "numberOfQuestions",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "duration",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "name": "difficultyLevels",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "timingEnabled",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "fetchFromWeakness",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "pastPaperQuestionsOnly",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "isDraft",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      },
+      {
+        "column": "userId",
+        "foreign_table": "users",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "syllabus_notes": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subtopicId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "grade",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "examBoard",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "content",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "keywords",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subtopicId",
+        "foreign_table": "subtopics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "ssc_question": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "class_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "subject_name",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_id",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "name": "main_question",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "source",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "stimulus",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "statements",
+        "type": "json",
+        "nullable": "YES"
+      },
+      {
+        "name": "combination_question",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "options",
+        "type": "json",
+        "nullable": "NO"
+      },
+      {
+        "name": "option_a",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_b",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_c",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "option_d",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "correct_answer",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "original_filename",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "explanation",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "question_identifier",
+        "type": "character varying",
+        "nullable": "YES"
+      },
+      {
+        "name": "created_date",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "verified",
+        "type": "integer",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "subtopics": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "slug",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "topicId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "topicId",
+        "foreign_table": "topics",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "topics": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "slug",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "subjectId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "subjectId",
+        "foreign_table": "subjects",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "self_assessment_attempts": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "selfAssessmentId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "score",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "correct",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "incorrect",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "unanswered",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "accuracy",
+        "type": "double precision",
+        "nullable": "NO"
+      },
+      {
+        "name": "timeSpent",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "status",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "startedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "completedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "selfAssessmentId",
+        "foreign_table": "self_assessments",
+        "foreign_column": "id"
+      },
+      {
+        "column": "userId",
+        "foreign_table": "users",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "subjects": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "slug",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "users": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "email",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "mobile",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "role",
+        "type": "USER-DEFINED",
+        "nullable": "NO"
+      },
+      {
+        "name": "grade",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "examBoard",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isActive",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "name": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": []
+  },
+  "self_assessment_answers": {
+    "columns": [
+      {
+        "name": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "attemptId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "questionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "name": "selectedOptions",
+        "type": "ARRAY",
+        "nullable": "YES"
+      },
+      {
+        "name": "textAnswer",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "name": "isCorrect",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "name": "timeSpent",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "name": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "fks": [
+      {
+        "column": "attemptId",
+        "foreign_table": "self_assessment_attempts",
+        "foreign_column": "id"
+      },
+      {
+        "column": "questionId",
+        "foreign_table": "questions",
+        "foreign_column": "id"
+      }
+    ]
+  }
+}
