@@ -22,14 +22,27 @@ try:
 except ImportError:
     def load_dotenv(): pass
 
+# Try to import Opik for observability
+try:
+    import opik
+    from opik import track
+    from opik.integrations.openai import track_openai
+except ImportError:
+    opik = None
+    track = lambda project_name=None: (lambda f: f)
+    track_openai = lambda client, project_name=None: client
+
 # Load prompts
 try:
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-    from scripts.prompts import CONTENT_GENERATION_PROMPT, FORMATTING_PROMPT
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from scripts.prompts import CONTENT_GENERATION_PROMPT, FORMATTING_PROMPT, JSON_GENERATION_PROMPT
 except ImportError:
     CONTENT_GENERATION_PROMPT = ""
     FORMATTING_PROMPT = ""
+    JSON_GENERATION_PROMPT = ""
 
 class ContentGenerator:
     """
@@ -59,6 +72,9 @@ class ContentGenerator:
                 raise ImportError("openai not installed")
             self.client = OpenAI(api_key=self.api_key)
             self.model_name = model_name or "gpt-4o"
+            # Wrap OpenAI client with Opik for auto-tracking
+            if opik:
+                self.client = track_openai(self.client, project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
             
         elif self.provider == "mock":
             print("⚠️ Using Mock Generator (no API calls)")
@@ -76,6 +92,13 @@ class ContentGenerator:
             raise ValueError(f"Missing API key for {self.provider}. Please set {self.provider.upper()}_API_KEY.")
         return key
 
+    def _encode_image(self, image_path: str) -> str:
+        """Helper to convert local image to base64 string"""
+        import base64
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
+
+    @track(project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
     def generate_for_questions(self, questions: List[Dict], subject: str, batch_size: int = 5) -> List[Dict]:
         """
         Generate detailed analysis for a list of questions.
@@ -140,16 +163,77 @@ class ContentGenerator:
             
         return prompt + data_block
 
-    def _call_llm(self, prompt: str) -> str:
-        """Executes the LLM call based on the provider"""
+    @track(name="llm_call", project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
+    def _call_llm(self, prompt: str, images: Optional[List[str]] = None) -> str:
+        """
+        Executes the LLM call based on the provider.
+        
+        Args:
+            prompt: Text prompt
+            images: Optional list of base64 encoded images or image paths
+        """
         if self.provider == "gemini":
-            response = self.model.generate_content(prompt)
+            # Handle multimodal if images are provided
+            if images:
+                # Assuming images are paths for simplicity in this implementation
+                content = [prompt]
+                for img_path in images:
+                    if os.path.exists(img_path):
+                        img_data = genai.upload_file(img_path)
+                        content.append(img_data)
+                response = self.model.generate_content(content)
+            else:
+                response = self.model.generate_content(prompt)
+            
+            # Log metadata to Opik
+            if opik:
+                usage = {
+                    "prompt_tokens": response.usage_metadata.prompt_token_count,
+                    "completion_tokens": response.usage_metadata.candidates_token_count,
+                    "total_tokens": response.usage_metadata.total_token_count
+                }
+                metadata = {"usage": usage}
+                if images:
+                    metadata["images_count"] = len(images)
+                    # Log base64 images if the user requested it earlier
+                    metadata["images_base64"] = [self._encode_image(p) if os.path.exists(p) else p for p in images] 
+                opik.log_metadata(metadata)
+                
             return response.text
         elif self.provider == "openai":
+            # For OpenAI, images are handled via messages structure
+            if images:
+                messages = [{
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt}
+                    ]
+                }]
+                for img_path in images:
+                    if os.path.exists(img_path):
+                        b64_img = self._encode_image(img_path)
+                        messages[0]["content"].append({
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"}
+                        })
+                    else:
+                        # Fallback for URLs
+                        messages[0]["content"].append({
+                            "type": "image_url",
+                            "image_url": {"url": img_path}
+                        })
+            else:
+                messages = [{"role": "user", "content": prompt}]
+                
+            # Use JSON Mode for experiments if requested
+            is_json = "JSON" in prompt
             response = self.client.chat.completions.create(
                 model=self.model_name,
-                messages=[{"role": "user", "content": prompt}]
+                messages=messages,
+                response_format={"type": "json_object"} if is_json else None
             )
+            
+            # OpenAI costs are tracked automatically by track_openai
             return response.choices[0].message.content
         elif self.provider == "mock":
             # Return a formatted string that the parser can understand

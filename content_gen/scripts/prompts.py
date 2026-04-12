@@ -43,3 +43,27 @@ Rewrite the following document for Google Docs compatibility:
 - Output as plain text for direct pasting into Google Docs without breaking. 
 - Do not reduce text, keep it as it is.
 """
+
+# JSON generation prompt for high-reliability experiments
+JSON_GENERATION_PROMPT = """
+You are an expert Cambridge O/A-Level teacher. Provide a detailed educational analysis for the following question.
+
+Return your response in STRICT JSON format with the following keys:
+{
+  "core_concept": "Brief description of the main chemistry/biology/physics principle.",
+  "detailed_explanation": "Step-by-step logic (Analyze Step 1, 2, 3) leading to the final result. End with '**Final Correct Answer: [LETTER]**'.",
+  "option_analysis": {
+    "A": "Detailed explanation of why A is correct or incorrect.",
+    "B": "Detailed explanation of why B is correct or incorrect.",
+    "C": "Detailed explanation of why C is correct or incorrect.",
+    "D": "Detailed explanation of why D is correct or incorrect."
+  },
+  "flashcards": [
+    {"question": "Q1 text?", "answer": "A1 text"},
+    {"question": "Q2 text?", "answer": "A2 text"}
+  ],
+  "is_reliable": true
+}
+
+CRITICAL: Do not include markdown code blocks (```json) in your response, just the raw JSON object.
+"""

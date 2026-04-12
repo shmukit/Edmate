@@ -102,16 +102,33 @@ async def get_questions(table: str, paper_code: str):
 
 
 @app.get("/api/flashcards")
-async def get_flashcards(topic_id: str, subtopic_id: str = None):
+async def get_flashcards(topic_id: str, subtopic_id: str = None, question_id: str = None):
     conn = get_db()
     if not conn:
         raise HTTPException(status_code=500, detail="Database connection failed")
     try:
         with conn.cursor() as cur:
+            # 1. Prioritize results for the specific question
+            if question_id:
+                cur.execute(
+                    'SELECT id, "frontText", "backText" FROM flashcards'
+                    ' WHERE "questionId" = %s AND "isActive" = true'
+                    ' ORDER BY "id"',
+                    (question_id,)
+                )
+                q_cards = cur.fetchall()
+                if q_cards:
+                    # Return cards with a metadata flag
+                    for card in q_cards:
+                        card['is_specific'] = True
+                    return q_cards
+
+            # 2. Fallback to topic-level results
             if subtopic_id:
                 cur.execute(
                     'SELECT id, "frontText", "backText" FROM flashcards'
                     ' WHERE "topicId" = %s AND "subtopicId" = %s AND "isActive" = true'
+                    ' AND "questionId" IS NULL'  # Prioritize generic ones for fallback
                     " ORDER BY \"createdAt\" LIMIT 20",
                     (topic_id, subtopic_id),
                 )
@@ -119,10 +136,14 @@ async def get_flashcards(topic_id: str, subtopic_id: str = None):
                 cur.execute(
                     'SELECT id, "frontText", "backText" FROM flashcards'
                     ' WHERE "topicId" = %s AND "isActive" = true'
+                    ' AND "questionId" IS NULL'  # Prioritize generic ones for fallback
                     " ORDER BY \"createdAt\" LIMIT 20",
                     (topic_id,),
                 )
-            return cur.fetchall()
+            fallback_cards = cur.fetchall()
+            for card in fallback_cards:
+                card['is_specific'] = False
+            return fallback_cards
     finally:
         conn.close()
 

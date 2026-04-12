@@ -177,8 +177,20 @@ main { flex:1; overflow-y:auto; padding:36px; background:radial-gradient(ellipse
 .opt-analysis-label { font-size:0.78rem; font-weight:700; color:var(--primary-light); margin-bottom:6px; }
 
 /* Diagram */
-.diagram-wrap { margin:20px 0; text-align:center; }
-.diagram-wrap img { max-width:100%; border-radius:12px; border:1px solid var(--border); }
+.diagram-wrap { 
+  margin:20px 0; 
+  text-align:center; 
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+.diagram-wrap img { 
+  max-width:100%; 
+  border-radius:12px; 
+  border:1px solid var(--border); 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
 
 /* Empty states */
 .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:55vh; color:var(--text-dim); text-align:center; gap:10px; }
@@ -640,14 +652,21 @@ function renderQuestion(q, table) {
     oeHtml = '<p style="color:var(--text-dim);font-size:.9rem">No option analysis generated yet.</p>';
   }
 
-  // Diagram
-  const diagramHtml = q.diagrams
-    ? `<div class="diagram-wrap"><img src="${q.diagrams}" alt="Question diagram"></div>`
-    : '';
+  // Multi-Diagram Support
+  let diagramHtml = '';
+  if (q.diagrams) {
+    const images = q.diagrams.split('\n').filter(u => u.trim());
+    if (images.length > 0) {
+      diagramHtml = `<div class="diagram-wrap">
+        ${images.map(url => `<img src="${url.trim()}" alt="Question diagram">`).join('')}
+      </div>`;
+    }
+  }
 
-  // Explanation
-  const explanationHtml = q.summary_explanation
-    ? markdownToHtml(q.summary_explanation)
+  // Explanation - Prioritize Detailed over Summary
+  const rawExp = q.detailed_explanation || q.summary_explanation;
+  const explanationHtml = rawExp
+    ? markdownToHtml(rawExp)
     : '<p style="color:var(--text-dim)">No explanation generated yet. Run the AI pipeline for this paper.</p>';
 
   view.innerHTML = `
@@ -698,7 +717,7 @@ function renderQuestion(q, table) {
       tab.classList.add('active');
       view.querySelector(`#${tab.dataset.tab}`).classList.add('active');
       if (tab.dataset.tab === 'tab-flashcards') {
-        loadFlashcards(q.topic_id, q.subtopic_id, q.question_identifier);
+        loadFlashcards(q.topic_id, q.subtopic_id, q.id);
       }
       typesetMath();
     };
@@ -709,29 +728,32 @@ function renderQuestion(q, table) {
 }
 
 // ── Flashcard modal UX ────────────────────────────────────────────
-async function loadFlashcards(topicId, subtopicId, questionIdentifier) {
+async function loadFlashcards(topicId, subtopicId, questionId) {
   const container = document.getElementById('flashcardContainer');
   if (!container) return;
 
   let isFallback = false;
+  // If no topic_id, we can't reliably load specific cards
   if (!topicId || topicId === 'unknown-topic') {
-    isFallback = true;
     topicId = 'unknown-topic';
+    isFallback = true;
   }
 
   container.innerHTML = '<div class="loading-text">Loading flashcards…</div>';
   try {
     let url = `${API}/flashcards?topic_id=${encodeURIComponent(topicId)}`;
-    if (subtopicId) url += `&subtopic_id=${encodeURIComponent(subtopicId)}`;
+    if (subtopicId && subtopicId !== 'undefined') url += `&subtopic_id=${encodeURIComponent(subtopicId)}`;
+    if (questionId) url += `&question_id=${encodeURIComponent(questionId)}`;
+    
     const res = await fetch(url);
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const cards = await res.json();
 
     if (!cards.length) {
       container.innerHTML = `
         <div class="fc-empty">
           <div class="fc-empty-icon">🃏</div>
-          <p>No flashcards found for this topic yet.</p>
+          <p>No flashcards found for this question yet.</p>
         </div>`;
       return;
     }
@@ -740,23 +762,34 @@ async function loadFlashcards(topicId, subtopicId, questionIdentifier) {
     fcCards = cards;
     fcIndex = 0;
     fcFlipped = false;
-    renderFlashcardViewer(container, isFallback);
+    
+    // Check if the first card is a specific one
+    const isSpecific = cards.length > 0 && cards[0].is_specific;
+    
+    renderFlashcardViewer(container, isFallback, isSpecific);
     typesetMath();
-  } catch {
+  } catch (e) {
+    console.error('Flashcard Load Error:', e);
     container.innerHTML = '<p style="color:var(--text-dim);font-size:.9rem">Could not load flashcards.</p>';
   }
 }
 
-function renderFlashcardViewer(container, isFallback) {
+function renderFlashcardViewer(container, isFallback, isSpecific) {
   const total = fcCards.length;
   
-  const fallbackWarning = isFallback ? 
-    `<div style="color: #ffcc00; font-size: 0.85rem; text-align: center; margin-bottom: 12px; font-weight: 500;">
-       ⚠️ Note: Showing fallback flashcards. This question has not been explicitly mapped to a specific topic yet.
-     </div>` : '';
+  const statusIndicator = isSpecific ? 
+    `<div style="background:rgba(52,211,153,0.1); color:#34d399; padding:8px 12px; border-radius:10px; font-size:0.75rem; text-align:center; margin-bottom:16px; font-weight:600; border:1px solid rgba(52,211,153,0.2); display:flex; align-items:center; justify-content:center; gap:6px;">
+       <span style="font-size:1rem">✨</span> Question-Specific AI Flashcards (${total})
+     </div>` :
+    (isFallback ? 
+      `<div style="background:rgba(251,191,36,0.1); color:#fbbf24; padding:8px 12px; border-radius:10px; font-size:0.75rem; text-align:center; margin-bottom:16px; font-weight:600; border:1px solid rgba(251,191,36,0.2); display:flex; align-items:center; justify-content:center; gap:6px;">
+         <span style="font-size:1rem">⚠️</span> Topic Fallback (${total} generic cards)
+       </div>` : 
+      ''
+    );
 
   container.innerHTML = `
-    ${fallbackWarning}
+    ${statusIndicator}
     <div class="fc-wrapper">
 
       <!-- progress pips -->
