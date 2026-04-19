@@ -17,7 +17,7 @@ def export_to_txt(json_path: Path, txt_path: Path):
             content = q.get("generated_content", {})
             
             f.write(f"Question {q_num}Question and Options in Text Format\n\n")
-            f.write(f"{q['question_text']}\n\n")
+            f.write(f"{q.get('text', q.get('question_text', ''))}\n\n")
             
             opts = q["options"]
             opt_str = f"A. {opts.get('A')} B. {opts.get('B')} C. {opts.get('C')} D. {opts.get('D')}"

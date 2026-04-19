@@ -20,6 +20,8 @@
             --text-dim: #94a3b8;
             --accent: #10b981;
             --danger: #ef4444;
+            --sidebar-width: 320px;
+            --settings-width: 340px;
         }
 
         * {
@@ -39,13 +41,25 @@
 
         /* Sidebar Styling */
         aside {
-            width: 320px;
+            width: var(--sidebar-width);
             background: var(--sidebar-bg);
             border-right: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
             padding: 24px;
             backdrop-filter: blur(12px);
+            z-index: 50;
+        }
+
+        .settings-panel {
+            width: var(--settings-width);
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--card-border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
         }
 
         .logo {
@@ -301,22 +315,56 @@
             transition: width 0.3s;
         }
 
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 16px 24px;
-            background: #1e293b;
-            border-left: 4px solid var(--primary);
-            border-radius: 8px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none;
-            z-index: 2000;
-            animation: slideIn 0.3s ease-out;
-        }
         @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+        /* Settings UI Components */
+        .settings-group { margin-bottom: 20px; }
+        .settings-label { color: var(--text-dim); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; display: block; }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        select {
+            width: 100%;
+            background: #1e293b;
+            color: white;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+            outline: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -384,6 +432,62 @@
             </div>
         </div>
     </main>
+
+    <div class="settings-panel">
+        <h2 style="font-family:'Outfit'; font-size:1.4rem;">Pipeline Settings</h2>
+        
+        <div class="settings-group">
+            <span class="settings-label">LLM Provider</span>
+            <select id="providerSelect">
+                <option value="gemini">Google Gemini (Vertex AI)</option>
+                <option value="openai">OpenAI (GPT-4o)</option>
+            </select>
+        </div>
+
+        <div class="settings-group">
+            <span class="settings-label">Extraction Modalities</span>
+            <div class="toggle-container">
+                <span>Core Concept</span>
+                <label class="switch"><input type="checkbox" id="mod_core_concept" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-container">
+                <span>Detailed Explanation</span>
+                <label class="switch"><input type="checkbox" id="mod_detailed_explanation" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-container">
+                <span>Option Analysis</span>
+                <label class="switch"><input type="checkbox" id="mod_option_analysis" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-container">
+                <span>Flashcards</span>
+                <label class="switch"><input type="checkbox" id="mod_flashcards" checked><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <span class="settings-label">Target Language</span>
+            <select id="languageSelect">
+                <option value="English">English</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+            </select>
+        </div>
+
+        <div class="settings-group">
+            <span class="settings-label">Curriculum</span>
+            <select id="curriculumSelect">
+                <option value="Cambridge O/Level">Cambridge O/Level</option>
+                <option value="Cambridge A/Level">Cambridge A/Level</option>
+                <option value="SAT/AP">SAT/AP</option>
+                <option value="National Curriculum">National Curriculum</option>
+            </select>
+        </div>
+
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--card-border);">
+            <p style="font-size:0.75rem; color:var(--text-dim);">Engine: v2.0 (Modular)</p>
+        </div>
+    </div>
 
     <script>
         const dropZone = document.getElementById('dropZone');
@@ -505,8 +609,26 @@
                 btn.innerHTML = `<span class="loader" style="display:inline-block; margin-right:8px; width:12px; height:12px; border-width:1px;"></span> Processing...`;
             }
             
+            // Collect configuration from UI
+            const modalities = [];
+            if (document.getElementById('mod_core_concept').checked) modalities.push('core_concept');
+            if (document.getElementById('mod_detailed_explanation').checked) modalities.push('detailed_explanation');
+            if (document.getElementById('mod_option_analysis').checked) modalities.push('option_analysis');
+            if (document.getElementById('mod_flashcards').checked) modalities.push('flashcards');
+
+            const config = {
+                provider: document.getElementById('providerSelect').value,
+                modalities: modalities,
+                language: document.getElementById('languageSelect').value,
+                curriculum: document.getElementById('curriculumSelect').value
+            };
+
             try {
-                const response = await fetch(`/api/automate/process/${id}`, { method: 'POST' });
+                const response = await fetch(`/api/automate/process/${id}`, { 
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(config)
+                });
                 const result = await response.json();
                 if (response.ok) {
                     showToast('✨ AI Extraction completed for ' + (result.filename || 'PDF'));

@@ -14,7 +14,7 @@ import json
 import uuid
 
 # Import local services
-from content_gen.scripts.processing.gemini_extractor import GeminiExtractor
+from content_gen.scripts.processing.automation_engine import AutomationEngine
 from content_gen.scripts.processing.database_service import DatabaseService
 
 # Load environment variables from content_gen/.env
@@ -204,19 +204,36 @@ async def upload_pdf(file: UploadFile = File(...)):
     return draft_meta
 
 @app.post("/api/automate/process/{draft_id}")
-async def process_draft(draft_id: str):
-    """Triggers Gemini extraction for a specific draft"""
+async def process_draft(draft_id: str, config: dict = None):
+    """Triggers Modular AI extraction for a specific draft"""
     pdf_path = DRAFTS_DIR / f"{draft_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="Draft PDF not found")
         
+    # Default configuration if none provided
+    if config is None:
+        config = {
+            "provider": "gemini",
+            "model_id": "gemini-2.5-flash",
+            "modalities": ["core_concept", "detailed_explanation", "option_analysis", "flashcards"],
+            "language": "English",
+            "curriculum": "Cambridge O/Level"
+        }
+        
     try:
-        extractor = GeminiExtractor()
-        results = extractor.process_pdf(str(pdf_path))
+        engine = AutomationEngine(
+            provider=config.get("provider", "gemini"),
+            model_id=config.get("model_id")
+        )
+        questions = engine.process_pdf(str(pdf_path), config)
         
         # Update draft with results
-        results["status"] = "PROCESSED"
-        results["id"] = draft_id
+        results = {
+            "id": draft_id,
+            "status": "PROCESSED",
+            "questions": questions,
+            "config": config # Save config used for reproducibility
+        }
         
         with open(DRAFTS_DIR / f"{draft_id}.json", "w") as f:
             json.dump(results, f)
