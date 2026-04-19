@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <radialGradient id="bg" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0a0818"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Circle background -->
+  <circle cx="16" cy="16" r="15.5" fill="url(#bg)"/>
+
+  <!-- Amber ring border -->
+  <circle cx="16" cy="16" r="14.5" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+
+  <!-- Clean, bold lightning bolt — single shape, high contrast -->
+  <!-- Top section: 19,5 → 11,17 → 16,17 → 13,27 → 21,15 → 16,15 → close -->
+  <polygon
+    points="19,5 10,18 15.5,18 12.5,27 22,14 16.5,14"
+    fill="#fbbf24"
+  />
+
+  <!-- Small glint highlight on bolt tip for depth -->
+  <polygon
+    points="19,5 17,5 11,17 12.5,17"
+    fill="#fff3b0"
+    opacity="0.5"
+  />
+</svg>

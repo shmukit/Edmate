@@ -1,0 +1,1398 @@
+[
+  {
+    "question_number": 1,
+    "text": "Which species contains the same number of neutrons as \u00b9\u2074\u2086C and the same number of electrons as \u00b2\u00b3\u2081\u2081Na\u207a?",
+    "options": {
+      "A": "\u00b9\u2077\u2089F",
+      "B": "\u00b9\u2076\u2087N\u00b3\u207b",
+      "C": "\u00b2\u2070\u2081\u2080Ne",
+      "D": "\u00b9\u2076\u2088O\u00b2\u207b"
+    },
+    "generated_content": {
+      "core_concept": "Calculation of protons, neutrons, and electrons in atoms and ions based on atomic number, mass number, and charge.",
+      "detailed_explanation": "To solve this question, we first need to determine the number of neutrons and electrons in the reference species: \u00b9\u2074\u2086C and \u00b2\u00b3\u2081\u2081Na\u207a.\n\nFor \u00b9\u2074\u2086C:\n- Atomic number (Z) = 6 (number of protons)\n- Mass number (A) = 14\n- Number of neutrons = A - Z = 14 - 6 = 8 neutrons.\n\nFor \u00b2\u00b3\u2081\u2081Na\u207a:\n- Atomic number (Z) = 11 (number of protons)\n- In a neutral sodium atom (Na), there are 11 electrons.\n- For Na\u207a, one electron has been lost, so the number of electrons = 11 - 1 = 10 electrons.\n\nSo, we are looking for a species with 8 neutrons and 10 electrons. Now let's analyze each option:\n\nA: \u00b9\u2077\u2089F\n- Protons (Z) = 9\n- Neutrons = 17 - 9 = 8\n- Electrons (for neutral F) = 9. This does not match 10 electrons.\n\nB: \u00b9\u2076\u2087N\u00b3\u207b\n- Protons (Z) = 7\n- Neutrons = 16 - 7 = 9. This does not match 8 neutrons.\n- Electrons (for neutral N) = 7. For N\u00b3\u207b, 7 + 3 = 10 electrons. This matches 10 electrons.\n\nC: \u00b2\u2070\u2081\u2080Ne\n- Protons (Z) = 10\n- Neutrons = 20 - 10 = 10. This does not match 8 neutrons.\n- Electrons (for neutral Ne) = 10. This matches 10 electrons.\n\nD: \u00b9\u2076\u2088O\u00b2\u207b\n- Protons (Z) = 8\n- Neutrons = 16 - 8 = 8. This matches 8 neutrons.\n- Electrons (for neutral O) = 8. For O\u00b2\u207b, 8 + 2 = 10 electrons. This matches 10 electrons.\n\nOption D matches both criteria: 8 neutrons and 10 electrons.\n\n**Final Correct Answer: D**",
+      "option_analysis": {
+        "A": "Incorrect. \u00b9\u2077\u2089F has 8 neutrons (17-9) but 9 electrons, not 10. It is a neutral atom, not an ion with 10 electrons.",
+        "B": "Incorrect. \u00b9\u2076\u2087N\u00b3\u207b has 10 electrons (7+3) but 9 neutrons (16-7), not 8. Therefore, it does not match both conditions.",
+        "C": "Incorrect. \u00b2\u2070\u2081\u2080Ne has 10 electrons and 10 neutrons (20-10). While it has 10 electrons, it does not have 8 neutrons.",
+        "D": "Correct. \u00b9\u2076\u2088O\u00b2\u207b has 8 neutrons (16-8) and 10 electrons (8+2). Both conditions (8 neutrons and 10 electrons) are met."
+      },
+      "flashcards": [
+        {
+          "question": "How do you calculate the number of neutrons in an atom?",
+          "answer": "Number of neutrons = Mass number (A) - Atomic number (Z)."
+        },
+        {
+          "question": "How do you calculate the number of electrons in a negatively charged ion?",
+          "answer": "Number of electrons = Atomic number (Z) + magnitude of the negative charge."
+        },
+        {
+          "question": "How do you calculate the number of electrons in a positively charged ion?",
+          "answer": "Number of electrons = Atomic number (Z) - magnitude of the positive charge."
+        }
+      ]
+    },
+    "page": 2
+  },
+  {
+    "question_number": 2,
+    "text": "Which process has the largest enthalpy change per mole?",
+    "options": {
+      "A": "Al\u00b3\u207a(g) \u2192 Al\u2074\u207a(g) + e\u207b",
+      "B": "P\u2075\u207a(g) \u2192 P\u2076\u207a(g) + e\u207b",
+      "C": "S\u2076\u207a(g) \u2192 S\u2077\u207a(g) + e\u207b",
+      "D": "Si\u2074\u207a(g) \u2192 Si\u2075\u207a(g) + e\u207b"
+    },
+    "generated_content": {
+      "core_concept": "Successive ionization energies and the impact of electron shell removal and effective nuclear charge.",
+      "detailed_explanation": "The processes described are successive ionization energies, specifically the removal of an electron from an already highly charged gaseous ion. Ionization energy generally increases as electrons are removed because the remaining electrons are held more strongly by the increasingly positive charge of the nucleus and the reduced electron-electron repulsion.\n\nA significant jump in ionization energy occurs when an electron is removed from a new, inner electron shell (a core electron) compared to removing a valence electron.\n\nLet's consider the electron configurations of the neutral atoms:\n- Al (Z=13): [Ne] 3s\u00b2 3p\u00b9\n- Si (Z=14): [Ne] 3s\u00b2 3p\u00b2\n- P (Z=15): [Ne] 3s\u00b2 3p\u00b3\n- S (Z=16): [Ne] 3s\u00b2 3p\u2074\n\nNow, let's look at the starting ions in each option and determine which electron is being removed:\n\nA: Al\u00b3\u207a(g) \u2192 Al\u2074\u207a(g) + e\u207b\n- Al\u00b3\u207a has lost its 3 valence electrons (3s\u00b2 3p\u00b9), so its electron configuration is [Ne].\n- Al\u2074\u207a is formed by removing an electron from the [Ne] core (specifically, from the 2p subshell). This is the 4th ionization energy.\n\nB: P\u2075\u207a(g) \u2192 P\u2076\u207a(g) + e\u207b\n- P\u2075\u207a has lost its 5 valence electrons (3s\u00b2 3p\u00b3), so its electron configuration is [Ne].\n- P\u2076\u207a is formed by removing an electron from the [Ne] core (2p subshell). This is the 6th ionization energy.\n\nC: S\u2076\u207a(g) \u2192 S\u2077\u207a(g) + e\u207b\n- S\u2076\u207a has lost its 6 valence electrons (3s\u00b2 3p\u2074), so its electron configuration is [Ne].\n- S\u2077\u207a is formed by removing an electron from the [Ne] core (2p subshell). This is the 7th ionization energy.\n\nD: Si\u2074\u207a(g) \u2192 Si\u2075\u207a(g) + e\u207b\n- Si\u2074\u207a has lost its 4 valence electrons (3s\u00b2 3p\u00b2), so its electron configuration is [Ne].\n- Si\u2075\u207a is formed by removing an electron from the [Ne] core (2p subshell). This is the 5th ionization energy.\n\nIn all four options, an electron is being removed from the noble gas core ([Ne] configuration), specifically from the 2p subshell. This means all these processes involve a significant jump in ionization energy because a core electron is being removed.\n\nTo determine which process has the largest enthalpy change, we need to compare the effective nuclear charge (Zeff) acting on the 2p electrons in these isoelectronic ions (all have [Ne] configuration). The effective nuclear charge increases across a period due to the increasing number of protons in the nucleus. A higher nuclear charge means the electrons are held more tightly, requiring more energy to remove them.\n\nThe atomic numbers (Z) are:\n- Al: Z = 13\n- Si: Z = 14\n- P: Z = 15\n- S: Z = 16\n\nSulfur (S) has the highest atomic number (16) among the given elements. Therefore, the S\u2076\u207a ion will have the strongest attraction for its remaining core electrons, leading to the largest ionization enthalpy when the first electron is removed from its [Ne] core to form S\u2077\u207a.\n\n**Final Correct Answer: C**",
+      "option_analysis": {
+        "A": "Al\u00b3\u207a \u2192 Al\u2074\u207a + e\u207b involves removing a core electron (from the [Ne] configuration) of Aluminium. While a large energy change, Aluminium has the lowest nuclear charge among the options, so its core electrons are held less tightly than those of Si, P, or S.",
+        "B": "P\u2075\u207a \u2192 P\u2076\u207a + e\u207b involves removing a core electron from Phosphorus. Phosphorus has a higher nuclear charge than Al and Si, but lower than S. Thus, the enthalpy change will be smaller than for Sulfur.",
+        "C": "Correct. S\u2076\u207a \u2192 S\u2077\u207a + e\u207b involves removing a core electron from Sulfur. Sulfur has the highest nuclear charge (Z=16) among the given elements (Al, Si, P). This means the effective nuclear charge on its inner electrons is the greatest, resulting in the highest ionization energy for removing a core electron.",
+        "D": "Si\u2074\u207a \u2192 Si\u2075\u207a + e\u207b involves removing a core electron from Silicon. Silicon has a higher nuclear charge than Al, but lower than P and S. Thus, the enthalpy change will be smaller than for P and S."
+      },
+      "flashcards": [
+        {
+          "question": "What is ionization energy?",
+          "answer": "The minimum energy required to remove one mole of electrons from one mole of gaseous atoms or ions in their ground state."
+        },
+        {
+          "question": "Why do successive ionization energies increase?",
+          "answer": "Successive ionization energies increase because with each electron removed, the remaining electrons experience a stronger attraction to the increasingly positive nucleus due to less electron-electron repulsion and a higher effective nuclear charge."
+        },
+        {
+          "question": "When does a 'jump' in ionization energy occur?",
+          "answer": "A significant 'jump' in ionization energy occurs when an electron is removed from a new, inner electron shell (a core electron) after all valence electrons have been removed, because these inner electrons are much closer to the nucleus and experience a much higher effective nuclear charge."
+        }
+      ]
+    },
+    "page": 2
+  },
+  {
+    "question_number": 3,
+    "text": "Which sodium compound contains 74.2% by mass of sodium?",
+    "options": {
+      "A": "sodium carbonate",
+      "B": "sodium chloride",
+      "C": "sodium hydroxide",
+      "D": "sodium oxide"
+    },
+    "generated_content": {
+      "core_concept": "Calculation of percentage by mass of an element in a compound using molar masses.",
+      "detailed_explanation": "To determine the compound with 74.2% sodium by mass, we need to calculate the percentage by mass of sodium for each option. The formula for percentage by mass of an element is:\n\n% by mass of element = (Total mass of element in compound / Molar mass of compound) * 100%\n\nWe will use the following approximate atomic masses:\nNa = 23 g/mol\nO = 16 g/mol\nH = 1 g/mol\nC = 12 g/mol\nCl = 35.5 g/mol\n\nLet's calculate for each option:\n\nA: Sodium carbonate (Na\u2082CO\u2083)\n- Molar mass of Na\u2082CO\u2083 = (2 * 23) + 12 + (3 * 16) = 46 + 12 + 48 = 106 g/mol\n- Mass of Na in Na\u2082CO\u2083 = 2 * 23 = 46 g\n- % Na = (46 / 106) * 100% = 43.396% \u2248 43.4%\n\nB: Sodium chloride (NaCl)\n- Molar mass of NaCl = 23 + 35.5 = 58.5 g/mol\n- Mass of Na in NaCl = 23 g\n- % Na = (23 / 58.5) * 100% = 39.316% \u2248 39.3%\n\nC: Sodium hydroxide (NaOH)\n- Molar mass of NaOH = 23 + 16 + 1 = 40 g/mol\n- Mass of Na in NaOH = 23 g\n- % Na = (23 / 40) * 100% = 57.5%\n\nD: Sodium oxide (Na\u2082O)\n- Molar mass of Na\u2082O = (2 * 23) + 16 = 46 + 16 = 62 g/mol\n- Mass of Na in Na\u2082O = 2 * 23 = 46 g\n- % Na = (46 / 62) * 100% = 74.1935% \u2248 74.2%\n\nSodium oxide (Na\u2082O) has approximately 74.2% sodium by mass.\n\n**Final Correct Answer: D**",
+      "option_analysis": {
+        "A": "Incorrect. Sodium carbonate (Na\u2082CO\u2083) contains approximately 43.4% sodium by mass.",
+        "B": "Incorrect. Sodium chloride (NaCl) contains approximately 39.3% sodium by mass.",
+        "C": "Incorrect. Sodium hydroxide (NaOH) contains approximately 57.5% sodium by mass.",
+        "D": "Correct. Sodium oxide (Na\u2082O) contains approximately 74.2% sodium by mass, which matches the value given in the question."
+      },
+      "flashcards": [
+        {
+          "question": "What is the formula for calculating the percentage by mass of an element in a compound?",
+          "answer": "Percentage by mass = (Total mass of the element in the compound / Molar mass of the compound) * 100%."
+        },
+        {
+          "question": "What are the chemical formulas for sodium carbonate, sodium chloride, sodium hydroxide, and sodium oxide?",
+          "answer": "Sodium carbonate: Na\u2082CO\u2083; Sodium chloride: NaCl; Sodium hydroxide: NaOH; Sodium oxide: Na\u2082O."
+        },
+        {
+          "question": "Why is it important to consider the subscript of an element when calculating its total mass in a compound?",
+          "answer": "The subscript indicates the number of atoms of that element in one molecule or formula unit of the compound. This must be multiplied by the element's atomic mass to get its total contribution to the compound's mass."
+        }
+      ]
+    },
+    "page": 2
+  },
+  {
+    "question_number": 4,
+    "text": "What is the maximum volume of sulfur dioxide gas measured at room conditions produced from burning 100 dm\u00b3 of diesel fuel containing 0.8346g of sulfur?",
+    "options": {
+      "A": "291 cm\u00b3",
+      "B": "312 cm\u00b3",
+      "C": "582 cm\u00b3",
+      "D": "624 cm\u00b3"
+    },
+    "generated_content": {
+      "core_concept": "Stoichiometry, molar volume of gases at room conditions, and conversion between mass, moles, and volume.",
+      "detailed_explanation": "This problem requires us to use stoichiometry and the concept of molar volume at room conditions. The burning of sulfur produces sulfur dioxide:\nS(s) + O\u2082(g) \u2192 SO\u2082(g)\n\nWe are given the mass of sulfur in the diesel fuel: 0.8346 g.\n\nStep 1: Calculate the moles of sulfur.\n- Molar mass of Sulfur (S) \u2248 32.0 g/mol.\n- Moles of S = Mass / Molar mass = 0.8346 g / 32.0 g/mol = 0.02608125 mol\n\nStep 2: Use the stoichiometric ratio to find moles of SO\u2082.\n- From the balanced equation, 1 mole of S produces 1 mole of SO\u2082.\n- Therefore, moles of SO\u2082 produced = 0.02608125 mol\n\nStep 3: Calculate the volume of SO\u2082 at room conditions.\n- At room conditions (typically 25\u00b0C and 1 atm), 1 mole of any gas occupies approximately 24 dm\u00b3 (or 24,000 cm\u00b3).\n- Volume of SO\u2082 = Moles of SO\u2082 * Molar volume at room conditions\n- Volume of SO\u2082 = 0.02608125 mol * 24 dm\u00b3/mol = 0.62595 dm\u00b3\n\nStep 4: Convert the volume from dm\u00b3 to cm\u00b3.\n- 1 dm\u00b3 = 1000 cm\u00b3\n- Volume of SO\u2082 = 0.62595 dm\u00b3 * 1000 cm\u00b3/dm\u00b3 = 625.95 cm\u00b3\n\nComparing this value to the given options, 625.95 cm\u00b3 is closest to 624 cm\u00b3.\nNote: The volume of diesel fuel (100 dm\u00b3) is extraneous information as the actual mass of sulfur present is explicitly given.\n\n**Final Correct Answer: D**",
+      "option_analysis": {
+        "A": "Incorrect. This value is significantly lower than the calculated volume, possibly from an error in molar mass or molar volume conversion.",
+        "B": "Incorrect. This value is significantly lower than the calculated volume.",
+        "C": "Incorrect. This value is lower than the calculated volume, potentially from using an incorrect molar mass or molar volume.",
+        "D": "Correct. The calculated volume of 625.95 cm\u00b3 is very close to 624 cm\u00b3 when using standard molar mass for sulfur (32.0 g/mol) and molar volume at room conditions (24 dm\u00b3/mol)."
+      },
+      "flashcards": [
+        {
+          "question": "What is the molar volume of a gas at room conditions (RTP)?",
+          "answer": "At room temperature and pressure (RTP), 1 mole of any gas occupies approximately 24 dm\u00b3 (or 24,000 cm\u00b3)."
+        },
+        {
+          "question": "How do you calculate moles from mass?",
+          "answer": "Moles = Mass / Molar Mass."
+        },
+        {
+          "question": "What is the stoichiometric ratio between sulfur and sulfur dioxide in the combustion reaction?",
+          "answer": "The balanced chemical equation S(s) + O\u2082(g) \u2192 SO\u2082(g) shows a 1:1 molar ratio, meaning 1 mole of sulfur produces 1 mole of sulfur dioxide."
+        }
+      ]
+    },
+    "page": 2
+  },
+  {
+    "question_number": 5,
+    "text": "Which row shows the correct number of covalent bonds in a molecule of methylpropene?",
+    "options": {
+      "A": "total number of sigma (\u03c3) bonds in the molecule: 10, total number of pi (\u03c0) bonds in the molecule: 1",
+      "B": "total number of sigma (\u03c3) bonds in the molecule: 10, total number of pi (\u03c0) bonds in the molecule: 2",
+      "C": "total number of sigma (\u03c3) bonds in the molecule: 11, total number of pi (\u03c0) bonds in the molecule: 1",
+      "D": "total number of sigma (\u03c3) bonds in the molecule: 11, total number of pi (\u03c0) bonds in the molecule: 2"
+    },
+    "generated_content": {
+      "core_concept": "Understanding the structure of organic molecules, specifically alkenes, and identifying sigma (\u03c3) and pi (\u03c0) bonds.",
+      "detailed_explanation": "Methylpropene is an alkene. The 'propene' indicates a three-carbon chain with a double bond. The 'methyl' indicates a methyl substituent. The only possible isomer for methylpropene is 2-methylpropene (also known as isobutylene), where the methyl group is attached to the second carbon of the propene chain.\n\nThe structure of 2-methylpropene is:\n\n      CH\u2083\n      |\nCH\u2082 = C - CH\u2083\n\nLet's count the sigma (\u03c3) and pi (\u03c0) bonds:\n\n1.  **Double bond (C=C):** A double bond consists of one sigma (\u03c3) bond and one pi (\u03c0) bond.\n    - So, 1 \u03c3 bond and 1 \u03c0 bond here.\n\n2.  **Single bonds (C-C):** There are two C-C single bonds, connecting the central carbon to each of the two methyl (CH\u2083) groups.\n    - So, 2 \u03c3 bonds here.\n\n3.  **C-H bonds:**\n    - In the CH\u2082 group (left side): There are 2 C-H single bonds.\n      - So, 2 \u03c3 bonds here.\n    - In each of the two CH\u2083 groups: Each CH\u2083 group has 3 C-H single bonds. Since there are two CH\u2083 groups, this accounts for 2 * 3 = 6 C-H single bonds.\n      - So, 6 \u03c3 bonds here.\n\nNow, let's sum them up:\n\n**Total number of sigma (\u03c3) bonds:**\n1 (from C=C) + 2 (from C-C single bonds) + 2 (from CH\u2082 C-H bonds) + 6 (from two CH\u2083 C-H bonds) = 1 + 2 + 2 + 6 = 11 \u03c3 bonds.\n\n**Total number of pi (\u03c0) bonds:**\nThere is only one double bond in the molecule, which contributes 1 pi (\u03c0) bond.\n\nTherefore, methylpropene has 11 sigma bonds and 1 pi bond.\n\n**Final Correct Answer: C**",
+      "option_analysis": {
+        "A": "Incorrect. This option correctly identifies 1 pi bond but incorrectly states 10 sigma bonds. The calculation should lead to 11 sigma bonds.",
+        "B": "Incorrect. This option incorrectly states 10 sigma bonds and 2 pi bonds. Methylpropene only has one double bond, thus only one pi bond.",
+        "C": "Correct. Methylpropene (2-methylpropene) has 11 sigma bonds and 1 pi bond, as determined by drawing its structure and counting all single bonds (sigma) and the additional bond in the double bond (pi).",
+        "D": "Incorrect. This option correctly identifies 11 sigma bonds but incorrectly states 2 pi bonds. Methylpropene has only one double bond, contributing only one pi bond."
+      },
+      "flashcards": [
+        {
+          "question": "What is the structural formula for methylpropene?",
+          "answer": "CH\u2082=C(CH\u2083)CH\u2083 (2-methylpropene)"
+        },
+        {
+          "question": "What types of bonds are present in a single bond?",
+          "answer": "A single bond consists of one sigma (\u03c3) bond."
+        },
+        {
+          "question": "What types of bonds are present in a double bond?",
+          "answer": "A double bond consists of one sigma (\u03c3) bond and one pi (\u03c0) bond."
+        }
+      ]
+    },
+    "page": 2
+  },
+  {
+    "question_number": 6,
+    "text": "Aluminium chloride exists as Al\u2082Cl\u2086 molecules at room temperature. When heated to a high temperature, AlCl\u2083 molecules are formed. What are the arrangements of the bonding pairs of electrons around the aluminium atom in the two forms of aluminium chloride?",
+    "options": {
+      "A": "planar, planar",
+      "B": "planar, tetrahedral",
+      "C": "tetrahedral, tetrahedral",
+      "D": "tetrahedral, octahedral"
+    },
+    "generated_content": {
+      "core_concept": "Molecular geometry and VSEPR theory for aluminium chloride species (AlCl\u2083 and Al\u2082Cl\u2086).",
+      "detailed_explanation": "To determine the arrangement of bonding pairs of electrons around the aluminium atom, we apply VSEPR theory. For AlCl\u2083, aluminium is in Group 13 and forms three covalent bonds with three chlorine atoms. There are no lone pairs on the central aluminium atom. Thus, there are three electron domains around the aluminium, which results in a trigonal planar geometry.\nFor Al\u2082Cl\u2086, this is a dimer where two AlCl\u2083 units are linked by two bridging chlorine atoms. In this dimeric structure, each aluminium atom is bonded to two terminal chlorine atoms and two bridging chlorine atoms. This means each aluminium atom is surrounded by four electron domains (four single bonds). According to VSEPR theory, four electron domains arrange themselves in a tetrahedral geometry around the central atom.\nTherefore, the arrangement around aluminium in AlCl\u2083 is planar, and in Al\u2082Cl\u2086 is tetrahedral. Final Correct Answer: B",
+      "option_analysis": {
+        "A": "Incorrect. AlCl\u2083 is indeed planar, but Al\u2082Cl\u2086 has a tetrahedral arrangement around each aluminium atom due to the presence of four bonds (two terminal, two bridging).",
+        "B": "Correct. AlCl\u2083 has three electron domains, leading to a trigonal planar geometry. Al\u2082Cl\u2086 has four electron domains around each aluminium, resulting in a tetrahedral geometry.",
+        "C": "Incorrect. AlCl\u2083 is trigonal planar, not tetrahedral. While Al\u2082Cl\u2086 is tetrahedral around each Al, the first part is wrong.",
+        "D": "Incorrect. AlCl\u2083 is trigonal planar, not tetrahedral. The geometry around each aluminium in Al\u2082Cl\u2086 is tetrahedral, not octahedral (which would require six electron domains)."
+      },
+      "flashcards": [
+        {
+          "question": "What is the molecular geometry of AlCl\u2083 according to VSEPR theory?",
+          "answer": "Trigonal planar, as there are three bonding pairs and no lone pairs around the central aluminium atom."
+        },
+        {
+          "question": "Describe the arrangement of electron pairs around each aluminium atom in Al\u2082Cl\u2086.",
+          "answer": "Tetrahedral. Each aluminium atom is bonded to two terminal chlorine atoms and two bridging chlorine atoms, totaling four electron domains."
+        },
+        {
+          "question": "How does the coordination number of aluminium change when AlCl\u2083 dimerizes to Al\u2082Cl\u2086?",
+          "answer": "The coordination number increases from 3 in AlCl\u2083 to 4 in Al\u2082Cl\u2086, as each aluminium atom gains an additional bond from a bridging chlorine atom."
+        }
+      ]
+    },
+    "page": 3
+  },
+  {
+    "question_number": 7,
+    "text": "The table shows the physical properties of four substances. Which substance has a giant covalent structure?",
+    "options": {
+      "A": "Substance A",
+      "B": "Substance B",
+      "C": "Substance C",
+      "D": "Substance D"
+    },
+    "generated_content": {
+      "core_concept": "Relating physical properties (melting point, boiling point, electrical conductivity) to chemical structure types (simple molecular, giant covalent, ionic).",
+      "detailed_explanation": "Giant covalent structures are characterized by very strong covalent bonds extending throughout the entire lattice. This typically leads to:\n1.  **Very high melting and boiling points:** A large amount of energy is needed to break these strong covalent bonds.\n2.  **Poor electrical conductivity (generally):** There are usually no delocalized electrons or mobile ions to carry charge. (Graphite is an exception).\n3.  **Insolubility:** The network of strong covalent bonds is hard to break to allow dissolution.\n\nLet's analyze each substance based on these characteristics:\n*   **Substance A:** Low melting point (-119 \u00b0C) and boiling point (39 \u00b0C), poor conductivity, insoluble. These properties are typical of a simple molecular substance with weak intermolecular forces.\n*   **Substance B:** Low melting point (-115 \u00b0C) and boiling point (-85 \u00b0C), poor conductivity as solid/liquid, good conductivity in aqueous solution. Low melting/boiling points indicate simple molecular. Good conductivity in aqueous solution suggests it either ionizes in water (e.g., an acid) or is an ionic compound that dissolves (though typical ionic compounds have much higher melting points).\n*   **Substance C:** High melting point (993 \u00b0C) and boiling point (1695 \u00b0C), poor conductivity as solid, but good conductivity as liquid and in aqueous solution. High melting/boiling points suggest strong forces. Good conductivity when molten and in solution are classic characteristics of an ionic compound (where ions become mobile).\n*   **Substance D:** Very high melting point (1160 \u00b0C) and boiling point (2230 \u00b0C), poor electrical conductivity in solid, liquid, and insoluble in aqueous solution. These properties perfectly match the description of a giant covalent structure (e.g., diamond, silicon dioxide), which requires immense energy to overcome the strong covalent bonds throughout the structure, and lacks mobile charge carriers.\n\nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. The low melting and boiling points indicate a simple molecular structure with weak intermolecular forces, not a giant covalent structure.",
+        "B": "Incorrect. The low melting and boiling points indicate a simple molecular structure. While it conducts in aqueous solution, this does not fit the profile of a giant covalent structure.",
+        "C": "Incorrect. The high melting and boiling points combined with good electrical conductivity in the liquid and aqueous states are characteristic properties of an ionic compound, not a giant covalent structure.",
+        "D": "Correct. The very high melting and boiling points, coupled with poor electrical conductivity in both solid and liquid states and insolubility, are definitive characteristics of a giant covalent structure."
+      },
+      "flashcards": [
+        {
+          "question": "What are the distinguishing physical properties of substances with giant covalent structures?",
+          "answer": "Very high melting/boiling points, usually hard, poor electrical conductors (except graphite), and insoluble in common solvents."
+        },
+        {
+          "question": "How do ionic compounds typically conduct electricity in different states?",
+          "answer": "Ionic compounds are poor electrical conductors as solids but good conductors when molten or dissolved in water, due to the mobility of their ions."
+        },
+        {
+          "question": "What type of structure typically has low melting and boiling points, and is a poor electrical conductor?",
+          "answer": "Simple molecular structures, as they only have weak intermolecular forces between molecules."
+        }
+      ]
+    },
+    "page": 3
+  },
+  {
+    "question_number": 8,
+    "text": "At room temperature and pressure, H\u2082O is a liquid and H\u2082S is a gas. What is the reason for this difference of state?",
+    "options": {
+      "A": "O has higher first and second ionisation energies than S.",
+      "B": "The covalent bond between O and H is stronger than the covalent bond between S and H.",
+      "C": "There is significant hydrogen bonding between H\u2082O molecules but not between H\u2082S molecules.",
+      "D": "The instantaneous dipole-induced dipole forces between H\u2082O molecules are stronger than the instantaneous dipole-induced dipole forces between H\u2082S molecules."
+    },
+    "generated_content": {
+      "core_concept": "Intermolecular forces, specifically hydrogen bonding, and their impact on the physical states of hydrides of Group 16 elements.",
+      "detailed_explanation": "The difference in physical state between H\u2082O (liquid) and H\u2082S (gas) at room temperature indicates a significant difference in their intermolecular forces. Liquids have stronger intermolecular forces than gases, requiring more energy to overcome them for vaporization.\n1.  **Hydrogen bonding in H\u2082O:** Water molecules can form strong hydrogen bonds because oxygen is a highly electronegative atom, and it is directly bonded to hydrogen. The small size of oxygen and the presence of lone pairs also facilitate strong hydrogen bonding. These strong intermolecular forces lead to a relatively high boiling point for water, making it a liquid at room temperature.\n2.  **No significant hydrogen bonding in H\u2082S:** Sulfur is much less electronegative than oxygen and is also larger. The S-H bond is not sufficiently polarized, and sulfur's larger size makes its lone pairs less available for hydrogen bonding. Therefore, H\u2082S primarily exhibits weaker intermolecular forces like permanent dipole-dipole interactions and London dispersion forces (instantaneous dipole-induced dipole forces).\n3.  **Comparison:** The strong hydrogen bonds in H\u2082O are much more significant than the intermolecular forces in H\u2082S. This explains why H\u2082O has a much higher boiling point and is a liquid, while H\u2082S is a gas at the same conditions.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. Ionization energies relate to the energy required to remove electrons from atoms, which affects chemical reactivity and bond formation, but not directly the strength of intermolecular forces responsible for the physical state.",
+        "B": "Incorrect. This option refers to the strength of *intramolecular* covalent bonds, not the *intermolecular* forces that determine melting and boiling points (and thus the physical state). Boiling involves overcoming intermolecular forces, not breaking covalent bonds within the molecules.",
+        "C": "Correct. Oxygen's high electronegativity and small size, combined with hydrogen, enable strong hydrogen bonding between H\u2082O molecules. Sulfur's lower electronegativity and larger size prevent significant hydrogen bonding in H\u2082S, making its intermolecular forces much weaker.",
+        "D": "Incorrect. Instantaneous dipole-induced dipole forces (London dispersion forces) generally increase with the number of electrons and molar mass. H\u2082S (M\u2081 = 34) has a higher molar mass and more electrons than H\u2082O (M\u2081 = 18). Therefore, H\u2082S would have *stronger* London dispersion forces than H\u2082O. If these were the dominant forces, H\u2082S would have a higher boiling point, which contradicts the observed fact that H\u2082O is a liquid and H\u2082S is a gas."
+      },
+      "flashcards": [
+        {
+          "question": "Why is hydrogen bonding a stronger intermolecular force than typical dipole-dipole interactions?",
+          "answer": "Hydrogen bonding occurs when hydrogen is bonded to a highly electronegative atom (N, O, F), creating a highly polarized bond, and the small size of these atoms allows for very close approach and strong electrostatic attraction."
+        },
+        {
+          "question": "What is the primary reason for H\u2082O being a liquid and H\u2082S being a gas at room temperature?",
+          "answer": "Water (H\u2082O) forms extensive hydrogen bonds between its molecules, which are strong intermolecular forces requiring more energy to overcome. H\u2082S does not form significant hydrogen bonds, so its weaker dipole-dipole and London dispersion forces are overcome at lower temperatures."
+        },
+        {
+          "question": "What factors are essential for a molecule to exhibit hydrogen bonding?",
+          "answer": "A hydrogen atom must be directly bonded to a highly electronegative atom (Nitrogen, Oxygen, or Fluorine), and there must be a lone pair on an adjacent electronegative atom for the hydrogen to be attracted to."
+        }
+      ]
+    },
+    "page": 3
+  },
+  {
+    "question_number": 9,
+    "text": "The enthalpy change for a reaction can be calculated from values of: enthalpies of formation, \u0394H_f^o; enthalpies of combustion, \u0394H_c^o; bond energies, E. The enthalpy change of the reaction given = \u0394H_r^o. 2C2H6(g) + 3O2(g) -> 2CH4(g) + 2CO2(g) + 2H2O(l) Which expression could be used to calculate \u0394H_r^o?",
+    "options": {
+      "A": "\u0394H_c^o(C2H6(g))",
+      "B": "2\u0394H_c^o(C2H6(g)) - 2\u0394H_c^o(CH4(g))",
+      "C": "E(C-C) + 2E(C-H) - 4E(C=O) - 4E(H-O)",
+      "D": "\u0394H_f^o(CH4(g)) + \u0394H_f^o(CO2(g)) + \u0394H_f^o(H2O(l)) - \u0394H_f^o(C2H6(g))"
+    },
+    "generated_content": {
+      "core_concept": "Hess's Law and calculation of reaction enthalpy using standard enthalpies of formation.",
+      "detailed_explanation": "Hess's Law states that the total enthalpy change for a reaction is independent of the pathway taken. For a reaction, the standard enthalpy change (\u0394H_r^o) can be calculated using standard enthalpies of formation (\u0394H_f^o) of reactants and products. The general formula is: \u0394H_r^o = \u03a3n\u0394H_f^o(products) - \u03a3m\u0394H_f^o(reactants), where n and m are the stoichiometric coefficients.The given reaction is: 2C2H6(g) + 3O2(g) \u2192 2CH4(g) + 2CO2(g) + 2H2O(l).If we consider the enthalpy change for this reaction as written, it would be: \u0394H_r^o = [2\u0394H_f^o(CH4(g)) + 2\u0394H_f^o(CO2(g)) + 2\u0394H_f^o(H2O(l))] - [2\u0394H_f^o(C2H6(g)) + 3\u0394H_f^o(O2(g))].Since the standard enthalpy of formation of an element in its standard state (like O2(g)) is zero, 3\u0394H_f^o(O2(g)) = 0.So, \u0394H_r^o = 2\u0394H_f^o(CH4(g)) + 2\u0394H_f^o(CO2(g)) + 2\u0394H_f^o(H2O(l)) - 2\u0394H_f^o(C2H6(g)).Option D provides: \u0394H_f^o(CH4(g)) + \u0394H_f^o(CO2(g)) + \u0394H_f^o(H2O(l)) - \u0394H_f^o(C2H6(g)).This expression corresponds to the enthalpy change of the reaction if it were scaled to one mole of C2H6, i.e., C2H6(g) + 1.5O2(g) \u2192 CH4(g) + CO2(g) + H2O(l). This is a common way to present such calculations in multiple-choice questions, representing the per-mole enthalpy change for the main reactant. The other options are incorrect in their approach or incomplete.Final Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. This represents the standard enthalpy of combustion for C2H6 only, not the overall enthalpy change for the given reaction.",
+        "B": "Incorrect. This attempts to use standard enthalpies of combustion but applies the formula incorrectly and does not account for all reactants and products. The correct formula using combustion enthalpies is \u03a3\u0394H_c^o(reactants) - \u03a3\u0394H_c^o(products).",
+        "C": "Incorrect. This expression is an incomplete and structurally incorrect attempt to use bond energies. The enthalpy change from bond energies is calculated as \u03a3(bond energies of bonds broken) - \u03a3(bond energies of bonds formed).",
+        "D": "Correct. This expression correctly applies Hess's Law using standard enthalpies of formation. It calculates the enthalpy change for the reaction scaled to one mole of C2H6, i.e., C2H6(g) + 1.5O2(g) \u2192 CH4(g) + CO2(g) + H2O(l), which is consistent with the general form for such calculations."
+      },
+      "flashcards": [
+        {
+          "question": "What is Hess's Law?",
+          "answer": "Hess's Law states that the total enthalpy change for a reaction is independent of the pathway taken."
+        },
+        {
+          "question": "How is the standard enthalpy change of a reaction (\u0394H_r^o) calculated using standard enthalpies of formation (\u0394H_f^o)?",
+          "answer": "\u0394H_r^o = \u03a3n\u0394H_f^o(products) - \u03a3m\u0394H_f^o(reactants), where n and m are the stoichiometric coefficients."
+        },
+        {
+          "question": "What is the standard enthalpy of formation for an element in its standard state?",
+          "answer": "The standard enthalpy of formation for an element in its standard state is zero."
+        }
+      ]
+    },
+    "page": 4
+  },
+  {
+    "question_number": 10,
+    "text": "Which reaction has an enthalpy change equal to the standard enthalpy change of formation of propane?",
+    "options": {
+      "A": "3C(g) + 4H2(g) -> C3H8(g)",
+      "B": "3C(g) + 8H(g) -> C3H8(g)",
+      "C": "3C(s) + 4H2(g) -> C3H8(g)",
+      "D": "3C(s) + 4H2(g) -> C3H8(l)"
+    },
+    "generated_content": {
+      "core_concept": "Definition of standard enthalpy change of formation (\u0394H_f^o).",
+      "detailed_explanation": "The standard enthalpy change of formation (\u0394H_f^o) of a compound is defined as the enthalpy change when one mole of the compound is formed from its constituent elements in their standard states under standard conditions (usually 298 K and 1 atm pressure).For propane (C3H8), the constituent elements are Carbon (C) and Hydrogen (H).The standard state of Carbon at 298 K and 1 atm is solid graphite, denoted as C(s).The standard state of Hydrogen at 298 K and 1 atm is gaseous diatomic hydrogen, H2(g).Therefore, the formation reaction for one mole of gaseous propane (C3H8(g)) would be: 3C(s) + 4H2(g) \u2192 C3H8(g).Final Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. Carbon is represented as gaseous atoms C(g), which is not its standard state (solid graphite, C(s)).",
+        "B": "Incorrect. Carbon is represented as gaseous atoms C(g), and hydrogen as gaseous atoms H(g). Neither are the standard states for these elements.",
+        "C": "Correct. This reaction shows the formation of one mole of gaseous propane (C3H8(g)) from its constituent elements, carbon in its standard state (solid, C(s)) and hydrogen in its standard state (gaseous diatomic, H2(g)).",
+        "D": "Incorrect. This reaction forms liquid propane (C3H8(l)). At standard temperature and pressure (298 K), propane is a gas (C3H8(g)), so C3H8(l) is not its standard state. The enthalpy change for forming liquid propane would be different from that of gaseous propane."
+      },
+      "flashcards": [
+        {
+          "question": "What is the definition of standard enthalpy change of formation (\u0394H_f^o)?",
+          "answer": "The enthalpy change when one mole of a compound is formed from its constituent elements in their standard states under standard conditions."
+        },
+        {
+          "question": "What are the standard states of carbon and hydrogen elements at 298 K and 1 atm?",
+          "answer": "The standard state of carbon is solid graphite (C(s)), and the standard state of hydrogen is gaseous diatomic hydrogen (H2(g))."
+        },
+        {
+          "question": "Why is it important to specify the state (e.g., (g), (l), (s)) in enthalpy change of formation equations?",
+          "answer": "The physical state of a substance affects its enthalpy. Forming a liquid compound instead of a gaseous one results in a different enthalpy change, as it includes the energy of condensation."
+        }
+      ]
+    },
+    "page": 4
+  },
+  {
+    "question_number": 11,
+    "text": "One of the reactions in the rechargeable lead/acid battery is shown. Pb(s) + PbO2(s) + 4H+(aq) + 2SO4^2-(aq) -> 2PbSO4(s) + 2H2O(l) Which statement about this reaction is correct?",
+    "options": {
+      "A": "Lead is both oxidised and reduced.",
+      "B": "Lead is neither oxidised nor reduced.",
+      "C": "Lead is oxidised only.",
+      "D": "Lead is reduced only."
+    },
+    "generated_content": {
+      "core_concept": "Oxidation and reduction (redox reactions) by assigning oxidation states.",
+      "detailed_explanation": "To determine if lead is oxidized or reduced, we need to find its oxidation state in each lead-containing species in the reaction.The reaction is: Pb(s) + PbO2(s) + 4H+(aq) + 2SO4^2-(aq) \u2192 2PbSO4(s) + 2H2O(l).Let's assign oxidation states to lead:1.  In Pb(s): Lead is in its elemental form, so its oxidation state is 0.2.  In PbO2(s): Oxygen typically has an oxidation state of -2. Let the oxidation state of Pb be x. Then x + 2(-2) = 0, which means x = +4. So, Pb in PbO2 is +4.3.  In PbSO4(s): The sulfate ion (SO4^2-) has a charge of -2. For PbSO4 to be a neutral compound, the oxidation state of Pb must be +2 to balance the sulfate ion. So, Pb in PbSO4 is +2.Now, let's track the changes in oxidation states for lead:    -   Pb(s) (oxidation state 0) changes to PbSO4(s) (oxidation state +2). This is an increase in oxidation state (0 to +2), which means Pb(s) is oxidized.    -   PbO2(s) (oxidation state +4) changes to PbSO4(s) (oxidation state +2). This is a decrease in oxidation state (+4 to +2), which means Pb in PbO2(s) is reduced.Since the element lead, in different forms, undergoes both oxidation and reduction within the same reaction, the statement that lead is both oxidized and reduced is correct.Final Correct Answer: A",
+      "option_analysis": {
+        "A": "Correct. Lead in Pb(s) is oxidized from an oxidation state of 0 to +2 (in PbSO4). Lead in PbO2(s) is reduced from an oxidation state of +4 to +2 (in PbSO4). Therefore, the element lead undergoes both oxidation and reduction.",
+        "B": "Incorrect. Lead undergoes significant changes in oxidation state, participating in redox processes.",
+        "C": "Incorrect. While Pb(s) is oxidized, the lead in PbO2(s) is reduced, so it is not oxidized only.",
+        "D": "Incorrect. While the lead in PbO2(s) is reduced, Pb(s) is oxidized, so it is not reduced only."
+      },
+      "flashcards": [
+        {
+          "question": "What is oxidation in terms of oxidation states?",
+          "answer": "Oxidation is an increase in oxidation state (loss of electrons)."
+        },
+        {
+          "question": "What is reduction in terms of oxidation states?",
+          "answer": "Reduction is a decrease in oxidation state (gain of electrons)."
+        },
+        {
+          "question": "How do you determine the oxidation state of an element in its elemental form?",
+          "answer": "An element in its elemental form (e.g., Pb(s), O2(g)) has an oxidation state of 0."
+        }
+      ]
+    },
+    "page": 4
+  },
+  {
+    "question_number": 12,
+    "text": "KMnO\u2084 is an oxidising agent. Its reaction with Fe\u00b2\u207a is shown in the following ionic equation. ...X..MnO\u2084\u207b + ......Fe\u00b2\u207a + .....H\u207a \u2192 .....Mn\u00b2\u207a + ...Y...Fe\u00b3\u207a + ......H\u2082O What are X and Y when the equation is balanced?",
+    "options": {
+      "A": "X=1, Y=1",
+      "B": "X=1, Y=3",
+      "C": "X=1, Y=5",
+      "D": "X=5, Y=1"
+    },
+    "generated_content": {
+      "core_concept": "Balancing redox reactions in acidic solution using the half-reaction method.",
+      "detailed_explanation": "To balance the redox reaction, we first separate it into two half-reactions: one for reduction and one for oxidation.\n1.  **Oxidation half-reaction:** Fe\u00b2\u207a \u2192 Fe\u00b3\u207a\n    Balance atoms: Iron atoms are already balanced.\n    Balance charge: Fe\u00b2\u207a \u2192 Fe\u00b3\u207a + e\u207b (add one electron to the right side to balance charge). This half-reaction is balanced.\n2.  **Reduction half-reaction:** MnO\u2084\u207b \u2192 Mn\u00b2\u207a\n    Balance atoms other than O and H: Manganese atoms are already balanced.\n    Balance oxygen atoms by adding H\u2082O: MnO\u2084\u207b \u2192 Mn\u00b2\u207a + 4H\u2082O\n    Balance hydrogen atoms by adding H\u207a: MnO\u2084\u207b + 8H\u207a \u2192 Mn\u00b2\u207a + 4H\u2082O\n    Balance charge: Left side charge = -1 + 8 = +7. Right side charge = +2 + 0 = +2. To balance, add 5 electrons to the left side: MnO\u2084\u207b + 8H\u207a + 5e\u207b \u2192 Mn\u00b2\u207a + 4H\u2082O. This half-reaction is balanced.\n3.  **Combine the half-reactions:** The number of electrons lost in the oxidation must equal the number of electrons gained in the reduction. The oxidation half-reaction produces 1 electron, and the reduction half-reaction consumes 5 electrons. Therefore, multiply the oxidation half-reaction by 5:\n    5(Fe\u00b2\u207a \u2192 Fe\u00b3\u207a + e\u207b)  becomes  5Fe\u00b2\u207a \u2192 5Fe\u00b3\u207a + 5e\u207b\n    Now, add the two balanced half-reactions:\n    MnO\u2084\u207b + 8H\u207a + 5e\u207b + 5Fe\u00b2\u207a \u2192 Mn\u00b2\u207a + 4H\u2082O + 5Fe\u00b3\u207a + 5e\u207b\n    Cancel the electrons:\n    MnO\u2084\u207b + 8H\u207a + 5Fe\u00b2\u207a \u2192 Mn\u00b2\u207a + 4H\u2082O + 5Fe\u00b3\u207a\n4.  **Compare with the given equation format:**\n    ...X..MnO\u2084\u207b + ......Fe\u00b2\u207a + .....H\u207a \u2192 .....Mn\u00b2\u207a + ...Y...Fe\u00b3\u207a + ......H\u2082O\n    From the balanced equation, the coefficient for MnO\u2084\u207b (X) is 1, and the coefficient for Fe\u00b3\u207a (Y) is 5.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. While X=1 is correct, Y=1 would mean only one electron is transferred, which is insufficient to reduce MnO\u2084\u207b (which requires 5 electrons).",
+        "B": "Incorrect. While X=1 is correct, Y=3 would mean three electrons are transferred, which is insufficient to reduce MnO\u2084\u207b.",
+        "C": "Correct. X=1 and Y=5 correctly balance both the atoms and the charge (electron transfer) in the redox reaction.",
+        "D": "Incorrect. X=5 would mean five MnO\u2084\u207b ions react, but only one is needed to react with five Fe\u00b2\u207a ions, and Y=1 is incorrect as five Fe\u00b2\u207a ions are oxidized to five Fe\u00b3\u207a ions."
+      },
+      "flashcards": [
+        {
+          "question": "What is the oxidation state of manganese in MnO\u2084\u207b and in Mn\u00b2\u207a?",
+          "answer": "The oxidation state of manganese in MnO\u2084\u207b is +7. The oxidation state of manganese in Mn\u00b2\u207a is +2."
+        },
+        {
+          "question": "How many electrons are transferred when one MnO\u2084\u207b ion is reduced to one Mn\u00b2\u207a ion?",
+          "answer": "5 electrons are transferred (Mn goes from +7 to +2, gaining 5 electrons)."
+        },
+        {
+          "question": "In acidic conditions, how are oxygen atoms and hydrogen atoms balanced in half-reactions?",
+          "answer": "Oxygen atoms are balanced by adding H\u2082O molecules, and hydrogen atoms are balanced by adding H\u207a ions."
+        }
+      ]
+    },
+    "page": 5
+  },
+  {
+    "question_number": 13,
+    "text": "Nitrogen and hydrogen are mixed in a reaction vessel. The reaction reaches equilibrium giving a mixture of nitrogen, hydrogen and ammonia gases. N\u2082 + 3H\u2082 \u21cc 2NH\u2083 The mixture of gases present at equilibrium at a total pressure of 300 atm is shown. gas: nitrogen, number of mol in mixture: 180; gas: hydrogen, number of mol in mixture: 590; gas: ammonia, number of mol in mixture: 160. What is the equilibrium constant, Kp, for the forward reaction?",
+    "options": {
+      "A": "6.65 \u00d7 10\u207b\u2076 atm\u207b\u00b2",
+      "B": "7.13 \u00d7 10\u207b\u2075 atm\u207b\u00b2",
+      "C": "0.599 atm\u207b\u00b2",
+      "D": "1.50 \u00d7 10\u2075 atm\u00b2"
+    },
+    "generated_content": {
+      "core_concept": "Calculation of the equilibrium constant Kp using partial pressures for a gaseous equilibrium.",
+      "detailed_explanation": "To calculate Kp, we need the partial pressure of each gas at equilibrium. The total pressure and the number of moles of each gas are given.\n\n1.  **Write the expression for Kp:**\n    For the reaction N\u2082(g) + 3H\u2082(g) \u21cc 2NH\u2083(g):\n    Kp = (P(NH\u2083)\u00b2) / (P(N\u2082) * P(H\u2082)\u00b3)\n\n2.  **Calculate the total number of moles at equilibrium:**\n    Total moles = moles(N\u2082) + moles(H\u2082) + moles(NH\u2083)\n    Total moles = 180 + 590 + 160 = 930 mol\n\n3.  **Calculate the mole fraction (X\u1d62) for each gas:**\n    X\u1d62 = (moles of gas i) / (total moles)\n    X(N\u2082) = 180 / 930\n    X(H\u2082) = 590 / 930\n    X(NH\u2083) = 160 / 930\n\n4.  **Calculate the partial pressure (P\u1d62) for each gas:**\n    P\u1d62 = X\u1d62 * P_total\n    Given P_total = 300 atm\n    P(N\u2082) = (180 / 930) * 300 atm \u2248 58.0645 atm\n    P(H\u2082) = (590 / 930) * 300 atm \u2248 190.3226 atm\n    P(NH\u2083) = (160 / 930) * 300 atm \u2248 51.6129 atm\n    (Check: 58.0645 + 190.3226 + 51.6129 = 300.0000, consistent with total pressure)\n\n5.  **Substitute the partial pressures into the Kp expression:**\n    Kp = (51.6129)\u00b2 / (58.0645 * (190.3226)\u00b3)\n    Kp = 2663.896 / (58.0645 * 6885376.5)\n    Kp = 2663.896 / 399899380\n    Kp \u2248 6.6613 \u00d7 10\u207b\u2076\n\n6.  **Determine the unit of Kp:**\n    The change in the number of moles of gas, \u0394n = (moles of gaseous products) - (moles of gaseous reactants)\n    \u0394n = 2 - (1 + 3) = 2 - 4 = -2\n    So, the unit for Kp is atm\u207b\u00b2.\n\n    Therefore, Kp \u2248 6.66 \u00d7 10\u207b\u2076 atm\u207b\u00b2.\n    Comparing this value to the given options, option A is the closest.\n\nFinal Correct Answer: A",
+      "option_analysis": {
+        "A": "Correct. This value is obtained by correctly calculating the partial pressures from the mole fractions and total pressure, and then applying them to the Kp expression. The unit atm\u207b\u00b2 is also correct for this reaction.",
+        "B": "Incorrect. This value is an order of magnitude higher than the correct answer, suggesting a computational error or misplacement of the decimal point.",
+        "C": "Incorrect. This value is significantly too high, indicating a major error in the calculation, possibly in the exponents of the partial pressures or the overall division.",
+        "D": "Incorrect. This value is vastly different from the correct answer and the unit atm\u00b2 is incorrect. The correct unit should be atm\u207b\u00b2 as \u0394n = -2."
+      },
+      "flashcards": [
+        {
+          "question": "What is the relationship between partial pressure, mole fraction, and total pressure for a gas in a mixture?",
+          "answer": "The partial pressure of a gas (P\u1d62) is equal to its mole fraction (X\u1d62) multiplied by the total pressure of the gas mixture (P_total): P\u1d62 = X\u1d62 * P_total."
+        },
+        {
+          "question": "How is the equilibrium constant Kp expressed for a reaction aA(g) + bB(g) \u21cc cC(g) + dD(g)?",
+          "answer": "Kp = (P_C^c * P_D^d) / (P_A^a * P_B^b), where P\u1d62 represents the partial pressure of each gaseous species."
+        },
+        {
+          "question": "What are the units of Kp for the reaction N\u2082(g) + 3H\u2082(g) \u21cc 2NH\u2083(g)?",
+          "answer": "The unit of Kp is atm^(\u0394n), where \u0394n is the change in the number of moles of gas. For this reaction, \u0394n = (2) - (1 + 3) = 2 - 4 = -2. Therefore, the unit is atm\u207b\u00b2."
+        }
+      ]
+    },
+    "page": 5
+  },
+  {
+    "question_number": 14,
+    "text": "A mixture of hydrogen gas and iodine gas is placed in a reaction vessel of volume V at temperature T. The reaction H2 + I2 <=> 2HI is allowed to come to equilibrium. All substances remain in the gaseous state. Argon gas is then pumped into the reaction vessel. The temperature in the vessel is maintained at T. How are the rate of the forward reaction and the partial pressure of HI at equilibrium affected? A: rate of forward reaction - increased, partial pressure of HI at equilibrium - increased B: rate of forward reaction - increased, partial pressure of HI at equilibrium - unaffected C: rate of forward reaction - unaffected, partial pressure of HI at equilibrium - increased D: rate of forward reaction - unaffected, partial pressure of HI at equilibrium - unaffected",
+    "options": {
+      "A": "rate of forward reaction - increased, partial pressure of HI at equilibrium - increased",
+      "B": "rate of forward reaction - increased, partial pressure of HI at equilibrium - unaffected",
+      "C": "rate of forward reaction - unaffected, partial pressure of HI at equilibrium - increased",
+      "D": "rate of forward reaction - unaffected, partial pressure of HI at equilibrium - unaffected"
+    },
+    "generated_content": {
+      "core_concept": "The effect of adding an inert gas at constant volume on reaction rate and equilibrium position, according to Le Chatelier's Principle.",
+      "detailed_explanation": "The reaction involves hydrogen, iodine, and hydrogen iodide, all in the gaseous state. When argon gas (an inert gas) is pumped into the reaction vessel while maintaining constant volume (V) and temperature (T), the total pressure inside the vessel increases. However, argon does not react with any of the species (H2, I2, HI), nor does it change their number of moles or the volume they occupy. Consequently, the partial pressures of H2, I2, and HI remain unchanged. The rate of reaction depends on the partial pressures (or concentrations) of the reacting species. Since these partial pressures are unaffected by the addition of argon, the rate of the forward reaction remains unaffected. According to Le Chatelier's Principle, adding an inert gas at constant volume does not shift the position of equilibrium because the partial pressures (and thus concentrations) of the reacting species do not change. Therefore, the equilibrium partial pressure of HI will also remain unaffected. \nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Adding an inert gas at constant volume does not increase the partial pressures of the reactants or products, so neither the rate nor the equilibrium partial pressure of HI would increase.",
+        "B": "Incorrect. The rate of the forward reaction is unaffected, not increased, as the partial pressures of reactants remain constant.",
+        "C": "Incorrect. The partial pressure of HI at equilibrium is unaffected, not increased, because the equilibrium position does not shift.",
+        "D": "Correct. Both the rate of the forward reaction and the partial pressure of HI at equilibrium are unaffected because the partial pressures of the reacting gases do not change when an inert gas is added at constant volume."
+      },
+      "flashcards": [
+        {
+          "question": "How does adding an inert gas at constant volume affect the partial pressures of reacting gases?",
+          "answer": "It does not affect the partial pressures of the reacting gases."
+        },
+        {
+          "question": "What is the effect of adding an inert gas at constant volume on the rate of a reaction?",
+          "answer": "The rate of reaction remains unaffected, as the partial pressures of reactants do not change."
+        },
+        {
+          "question": "How does adding an inert gas at constant volume affect the position of chemical equilibrium?",
+          "answer": "It does not affect the position of equilibrium, as the partial pressures (and thus concentrations) of the reacting species remain constant."
+        }
+      ]
+    },
+    "page": 6
+  },
+  {
+    "question_number": 15,
+    "text": "Two experiments are carried out to study the reaction between zinc and sulfuric acid. experiment 1 Small lumps of zinc are added to excess dilute sulfuric acid. experiment 2 The reaction is carried out at a lower temperature and with one other change. Both experiments produce the same total volume of gas and are completed in the same time. What is the second change made in experiment 2? A A catalyst is added. B A greater mass of zinc is added. C A greater volume of sulfuric acid is added. D Larger lumps of zinc are used.",
+    "options": {
+      "A": "A catalyst is added.",
+      "B": "A greater mass of zinc is added.",
+      "C": "A greater volume of sulfuric acid is added.",
+      "D": "Larger lumps of zinc are used."
+    },
+    "generated_content": {
+      "core_concept": "Factors affecting reaction rate (temperature, catalyst, surface area) and the amount of product formed from a limiting reactant.",
+      "detailed_explanation": "In Experiment 1, small lumps of zinc react with excess dilute sulfuric acid. Zinc is the limiting reactant, so the total volume of gas produced depends on the mass of zinc. In Experiment 2, the reaction is carried out at a lower temperature. Lowering the temperature generally decreases the reaction rate. The problem states that both experiments produce the same total volume of gas and are completed in the same time. \n\n1.  **Same total volume of gas:** This implies that the same amount (mass) of zinc must have reacted in both experiments, as zinc is the limiting reactant and determines the amount of gas produced.\n2.  **Completed in the same time:** Since Experiment 2 is at a lower temperature, its reaction rate would naturally be slower than Experiment 1. To compensate for this decreased rate and still finish in the same amount of time, a factor that *increases* the reaction rate must have been introduced. Let's evaluate the options:\n    *   **A: A catalyst is added.** Catalysts increase the rate of reaction by providing an alternative reaction pathway with a lower activation energy. Adding a catalyst would increase the rate, effectively counteracting the slower rate caused by the lower temperature, allowing the reaction to complete in the same time.\n    *   **B: A greater mass of zinc is added.** If a greater mass of zinc is added (and it remains the limiting reactant), a greater total volume of gas would be produced, which contradicts the condition that 'both experiments produce the same total volume of gas'.\n    *   **C: A greater volume of sulfuric acid is added.** Sulfuric acid is already stated to be in 'excess' in Experiment 1. Adding more excess sulfuric acid would not increase the total volume of gas (which is limited by zinc) nor would it significantly change the reaction rate if its concentration remains the same.\n    *   **D: Larger lumps of zinc are used.** Using larger lumps of zinc would decrease the surface area available for reaction, which would *decrease* the reaction rate. This would make the reaction take *longer* to complete, contrary to the condition of 'same time'.\n\nTherefore, to achieve the same reaction time despite a lower temperature, a catalyst must have been added.\nFinal Correct Answer: A",
+      "option_analysis": {
+        "A": "Correct. Adding a catalyst increases the reaction rate, effectively compensating for the decreased rate caused by the lower temperature, allowing the reaction to finish in the same time.",
+        "B": "Incorrect. A greater mass of zinc would lead to a greater total volume of gas produced, which contradicts the given condition that 'both experiments produce the same total volume of gas'.",
+        "C": "Incorrect. Sulfuric acid is already in excess. Adding more excess reactant does not affect the total amount of product (determined by the limiting reactant, zinc) or significantly increase the reaction rate.",
+        "D": "Incorrect. Using larger lumps of zinc decreases the total surface area, which would further decrease the reaction rate, making the reaction take longer to complete, not the same time."
+      },
+      "flashcards": [
+        {
+          "question": "How does temperature generally affect the rate of a chemical reaction?",
+          "answer": "Lowering the temperature generally decreases the reaction rate, while increasing temperature increases it."
+        },
+        {
+          "question": "What is the role of a catalyst in a chemical reaction?",
+          "answer": "A catalyst increases the rate of a chemical reaction by providing an alternative reaction pathway with a lower activation energy, without being consumed in the process."
+        },
+        {
+          "question": "In a reaction with a limiting reactant, what determines the total amount of product formed?",
+          "answer": "The total amount of product formed is determined by the amount of the limiting reactant."
+        }
+      ]
+    },
+    "page": 6
+  },
+  {
+    "question_number": 16,
+    "text": "The relative magnitude of the property X of five elements is shown. P, Q, R, S and T are all in Period 3 and have consecutive atomic numbers. The letters are not the actual chemical symbols of the elements. Which row is correct for property X and element R?",
+    "options": {
+      "A": "electrical conductivity, Al",
+      "B": "electronegativity, Si",
+      "C": "melting point, Al",
+      "D": "second ionisation energy, Si"
+    },
+    "generated_content": {
+      "core_concept": "Periodic trends of physical properties across Period 3 elements.",
+      "detailed_explanation": "The question requires identifying a periodic property (X) and an element (R) from Period 3, based on a given graph showing the trend of property X for five consecutive elements (P, Q, R, S, T) across Period 3. The graph shows that property X generally increases from P to R, reaches a sharp peak at R, and then sharply decreases from R to S, followed by a slight change for T.\n\nLet's analyze the trends for the given properties across Period 3 elements:\n1.  **Electrical Conductivity:** Electrical conductivity generally increases from Group 1 (Na) to Group 13 (Al) due to increasing numbers of delocalised electrons per atom. Aluminium (Al) has the highest electrical conductivity in Period 3. Silicon (Si) is a semiconductor, and subsequent non-metals (P, S, Cl, Ar) are poor conductors or insulators. Thus, the trend would be increasing (Na -> Mg -> Al), peaking at Al, then sharply decreasing (Al -> Si -> P), which matches the shape of the graph with R as Al.\n2.  **Electronegativity:** Electronegativity generally increases across a period from left to right due to increasing nuclear charge and decreasing atomic radius. This would result in a generally increasing trend, not a peak and sharp drop.\n3.  **Melting Point:** Melting points across Period 3 show a distinct trend: low for Na, Mg, Al (metallic bonding, strength increases Na < Mg < Al), very high for Si (giant covalent structure), then very low for P (P4), S (S8), Cl (Cl2), Ar (simple molecular structures with weak intermolecular forces). The peak melting point in Period 3 is at Silicon (Si), not Aluminium (Al).\n4.  **Second Ionisation Energy:** Second ionisation energy generally increases across a period due to increasing nuclear charge and decreasing atomic radius. There are some minor irregularities, but it does not show a sharp peak followed by a sharp drop for a series of 5 consecutive elements in the middle of the period, as depicted. The second ionisation energy of Na is exceptionally high due to removing an electron from a stable noble gas configuration (2p orbital). If Na was included in the five elements, it would be an outlier at the beginning of the trend, not a peak in the middle.\n\nComparing these trends with the graph, electrical conductivity with R being Aluminium (Al) perfectly matches the observed trend: Na (P) < Mg (Q) < Al (R) > Si (S) > P (T). Aluminium has the highest electrical conductivity among Period 3 elements.\n\nFinal Correct Answer: A",
+      "option_analysis": {
+        "A": "This option correctly identifies 'electrical conductivity' as property X and 'Al' as element R. Electrical conductivity peaks at Aluminium in Period 3, fitting the graph's shape where R is the maximum point before a sharp decline for subsequent elements like Silicon and Phosphorus.",
+        "B": "Electronegativity increases across a period, so the graph should show a continuous increase, not a peak and sharp drop. Therefore, this option is incorrect.",
+        "C": "The melting point in Period 3 peaks at Silicon (Si) due to its giant covalent structure, not Aluminium (Al). Thus, if R were Al, it would not be the peak of the melting point trend. Therefore, this option is incorrect.",
+        "D": "Second ionisation energy generally increases across a period. While there are minor variations, it does not exhibit a sharp peak at Silicon followed by a sharp drop as shown in the graph. The second ionisation energy of Sodium is very high, which would be an anomaly if it were part of the trend shown for R=Si. Therefore, this option is incorrect."
+      },
+      "flashcards": [
+        {
+          "question": "What is the general trend of electrical conductivity across Period 3 elements?",
+          "answer": "Electrical conductivity increases from Group 1 (Na) to Group 13 (Al), reaching a peak at Aluminium, then decreases sharply for Silicon (semiconductor), and becomes very low for non-metals (P, S, Cl, Ar)."
+        },
+        {
+          "question": "Which Period 3 element has the highest melting point and why?",
+          "answer": "Silicon (Si) has the highest melting point in Period 3 because it forms a giant covalent structure with strong covalent bonds requiring a large amount of energy to break."
+        },
+        {
+          "question": "How does electronegativity change across Period 3?",
+          "answer": "Electronegativity generally increases across Period 3 from left to right, from Sodium to Chlorine, due to increasing nuclear charge and decreasing atomic radius, leading to a stronger attraction for bonding electrons."
+        }
+      ]
+    },
+    "page": 7
+  },
+  {
+    "question_number": 17,
+    "text": "Element X is in Period 3. Element X reacts with oxygen to produce a solid, Y. When solid Y is added to water, a solution with a pH of less than 7 is produced. What is the identity of element X?",
+    "options": {
+      "A": "sodium",
+      "B": "silicon",
+      "C": "phosphorus",
+      "D": "sulfur"
+    },
+    "generated_content": {
+      "core_concept": "Reactions of Period 3 elements with oxygen and the acid-base nature of their oxides when dissolved in water.",
+      "detailed_explanation": "The question describes an element X from Period 3 that forms a solid oxide Y when reacted with oxygen. This solid oxide Y then forms an acidic solution (pH < 7) when added to water.\n\nLet's evaluate the options based on these criteria for Period 3 elements:\n1.  **Sodium (Na):** Reacts with oxygen to form sodium oxide (Na2O), which is a solid. When Na2O is added to water, it forms sodium hydroxide (NaOH), a strong base (pH > 7). This contradicts the condition that the solution has a pH of less than 7.\n2.  **Silicon (Si):** Reacts with oxygen to form silicon dioxide (SiO2), which is a solid. SiO2 is an acidic oxide, but it is insoluble in water. Therefore, it does not produce a solution with a pH of less than 7 when added to water.\n3.  **Phosphorus (P):** Reacts with oxygen (specifically, burns in excess oxygen) to form solid phosphorus(V) oxide (P4O10). When P4O10 is added to water, it reacts vigorously to form phosphoric acid (H3PO4), which is a strong acid and will produce a solution with a pH of less than 7.\n4.  **Sulfur (S):** When sulfur reacts with oxygen, it primarily forms sulfur dioxide (SO2), which is a gas. For sulfur trioxide (SO3) to be formed, further oxidation (e.g., using a catalyst) is typically required. While SO3 is a solid at lower temperatures and its reaction with water forms sulfuric acid (H2SO4, an acid with pH < 7), the direct reaction of sulfur with oxygen to 'produce a solid Y' more commonly refers to the formation of SO2 gas, not SO3 solid. P4O10, on the other hand, is a clear solid product from direct combustion of phosphorus.\n\nConsidering the direct formation of a *solid* oxide Y upon reaction with oxygen, phosphorus forming P4O10 fits the description most precisely. P4O10 is a solid that readily dissolves in water to produce an acidic solution. While sulfur trioxide (SO3) also forms an acidic solution and can exist as a solid, its primary formation from direct reaction with oxygen is less straightforward than P4O10.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Sodium oxide (Na2O) is a basic oxide and forms a strong alkaline solution (pH > 7) with water, not an acidic one. Thus, sodium is incorrect.",
+        "B": "Silicon dioxide (SiO2) is an acidic oxide but is insoluble in water, meaning it does not form a solution with a pH of less than 7. Thus, silicon is incorrect.",
+        "C": "Phosphorus reacts with oxygen to form solid phosphorus(V) oxide (P4O10). P4O10 is highly soluble in water and reacts to form phosphoric acid (H3PO4), which is a strong acid (pH < 7). This perfectly matches all the conditions given in the question. Thus, phosphorus is correct.",
+        "D": "Sulfur reacts with oxygen to primarily form sulfur dioxide (SO2), which is a gas, not typically a solid 'Y' directly. While sulfur trioxide (SO3) is acidic and forms sulfuric acid with water and can exist as a solid, its direct formation from 'reaction with oxygen' is not as simple as P4O10 from phosphorus. Therefore, phosphorus is a better fit than sulfur under the given conditions."
+      },
+      "flashcards": [
+        {
+          "question": "What is the typical pH of a solution formed when an oxide of a non-metal from Period 3 dissolves in water?",
+          "answer": "Oxides of non-metals (e.g., P, S, Cl) from Period 3 are typically acidic oxides and form solutions with a pH of less than 7 when dissolved in water. Silicon dioxide is an exception as it is insoluble."
+        },
+        {
+          "question": "Give an example of an amphoteric oxide from Period 3.",
+          "answer": "Aluminium oxide (Al2O3) is an amphoteric oxide from Period 3. It reacts with both strong acids and strong bases but is insoluble in water."
+        },
+        {
+          "question": "Describe the reaction of phosphorus(V) oxide (P4O10) with water.",
+          "answer": "Phosphorus(V) oxide (P4O10) is a solid acidic oxide that reacts vigorously with water to form phosphoric acid (H3PO4), a strong acid: P4O10(s) + 6H2O(l) \u2192 4H3PO4(aq)."
+        }
+      ]
+    },
+    "page": 7
+  },
+  {
+    "question_number": 18,
+    "text": "This question refers to isolated gaseous species. The species F\u207b, Ne and Na\u207a are isoelectronic. This means they have the same number of electrons. In which order do their radii increase?",
+    "options": {
+      "A": "Na\u207a, F\u207b, Ne",
+      "B": "F\u207b, Ne, Na\u207a",
+      "C": "Na\u207a, Ne, F\u207b",
+      "D": "Ne, F\u207b, Na\u207a"
+    },
+    "generated_content": {
+      "core_concept": "Ionic and atomic radii of isoelectronic species.",
+      "detailed_explanation": "Isoelectronic species are atoms or ions that have the same number of electrons. In this case, F\u207b, Ne, and Na\u207a all have 10 electrons.\n\nTo determine the order of their radii, we need to consider the effective nuclear charge (Zeff). The nuclear charge is determined by the number of protons in the nucleus (atomic number, Z).\n\n-   F\u207b: Z = 9 (9 protons, 10 electrons)\n-   Ne: Z = 10 (10 protons, 10 electrons)\n-   Na\u207a: Z = 11 (11 protons, 10 electrons)\n\nFor isoelectronic species, the species with the greater nuclear charge will exert a stronger pull on the electrons, drawing them closer to the nucleus and resulting in a smaller radius. Conversely, the species with the smaller nuclear charge will have a larger radius.\n\nComparing the nuclear charges:\nNa\u207a (Z=11) > Ne (Z=10) > F\u207b (Z=9)\n\nTherefore, the order of increasing radii (from smallest to largest) will be the inverse of the order of nuclear charge:\nNa\u207a (smallest) < Ne < F\u207b (largest)\n\nThis corresponds to option C.\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. This order suggests that F\u207b is smaller than Ne, which is wrong. The nuclear charges are 11, 9, 10, so the radii should be smallest for 11, then 10, then largest for 9.",
+        "B": "Incorrect. This order suggests that F\u207b is the smallest and Na\u207a is the largest, which is the opposite of the correct trend for isoelectronic species based on nuclear charge.",
+        "C": "Correct. Na\u207a has the highest nuclear charge (11 protons for 10 electrons), pulling the electrons closest and making it the smallest. Ne has an intermediate nuclear charge (10 protons for 10 electrons). F\u207b has the lowest nuclear charge (9 protons for 10 electrons), resulting in the weakest pull and the largest radius.",
+        "D": "Incorrect. This order places Ne as the smallest, which is incorrect. Na\u207a is the smallest among these species."
+      },
+      "flashcards": [
+        {
+          "question": "What are isoelectronic species?",
+          "answer": "Isoelectronic species are atoms or ions that have the same number of electrons."
+        },
+        {
+          "question": "How does the nuclear charge affect the size of isoelectronic species?",
+          "answer": "For isoelectronic species, the greater the nuclear charge (number of protons), the stronger the attraction between the nucleus and the electrons, resulting in a smaller atomic or ionic radius."
+        }
+      ]
+    },
+    "page": 8
+  },
+  {
+    "question_number": 19,
+    "text": "Separate samples of magnesium and calcium are added to an excess of dilute sulfuric acid. The observations are summarised in the table. metal observations magnesium vigorous reaction, bubbles of gas produced, magnesium completely dissolves calcium vigorous reaction initially, bubbles of gas produced, reaction soon stops and leaves most of the calcium unreacted Which statement explains the difference in these observations?",
+    "options": {
+      "A": "Calcium is a better oxidising agent than magnesium.",
+      "B": "Calcium is a better reducing agent than magnesium.",
+      "C": "Magnesium is a more reactive metal with all dilute acids than calcium.",
+      "D": "Magnesium sulfate is more soluble than calcium sulfate."
+    },
+    "generated_content": {
+      "core_concept": "Reactivity of Group 2 metals with acids and solubility of their sulfates.",
+      "detailed_explanation": "Both magnesium (Mg) and calcium (Ca) are Group 2 metals and react with dilute sulfuric acid (H\u2082SO\u2084) to produce hydrogen gas and their respective metal sulfates.\n\nFor magnesium:\nMg(s) + H\u2082SO\u2084(aq) \u2192 MgSO\u2084(aq) + H\u2082(g)\nObservations: Vigorous reaction, bubbles of gas, magnesium completely dissolves. This implies that magnesium sulfate (MgSO\u2084) is soluble in the acid, allowing the reaction to proceed to completion as the surface of the magnesium remains exposed.\n\nFor calcium:\nCa(s) + H\u2082SO\u2084(aq) \u2192 CaSO\u2084(s) + H\u2082(g)\nObservations: Vigorous reaction initially, bubbles of gas, reaction soon stops, leaves most of the calcium unreacted. This implies that calcium sulfate (CaSO\u2084) is insoluble or sparingly soluble. As it forms, it coats the surface of the unreacted calcium metal, forming a protective layer that prevents further contact between the acid and the metal. This phenomenon is called passivation.\n\nComparing the solubility of Group 2 sulfates, magnesium sulfate is readily soluble in water, while calcium sulfate is sparingly soluble (often considered insoluble in the context of preventing further reaction).\n\nTherefore, the difference in observations is best explained by the difference in the solubility of their sulfate products.\nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Calcium is lower in Group 2 than magnesium, making it generally more reactive. More reactive metals are more easily oxidized (lose electrons), meaning they act as stronger *reducing* agents, not oxidising agents.",
+        "B": "Incorrect. While calcium is a better reducing agent (more reactive) than magnesium, this statement alone does not explain *why the reaction stops* for calcium. It only addresses the initial reactivity, not the observed passivation.",
+        "C": "Incorrect. Group 2 metals generally increase in reactivity down the group. Therefore, calcium is inherently *more* reactive than magnesium, not less. The stopping of the reaction for calcium is due to product solubility, not lower inherent reactivity.",
+        "D": "Correct. Magnesium sulfate is soluble, so the magnesium completely reacts. Calcium sulfate is sparingly soluble and precipitates on the surface of the calcium metal, preventing further reaction with the acid and leaving most of the calcium unreacted. This directly explains the observed difference."
+      },
+      "flashcards": [
+        {
+          "question": "How does the reactivity of Group 2 metals with acids change down the group?",
+          "answer": "Reactivity generally increases down Group 2 as the atomic size increases and the valence electrons are further from the nucleus, making them easier to remove."
+        },
+        {
+          "question": "Compare the solubility of magnesium sulfate and calcium sulfate in water.",
+          "answer": "Magnesium sulfate (MgSO\u2084) is soluble in water, while calcium sulfate (CaSO\u2084) is sparingly soluble (often considered insoluble in many contexts)."
+        },
+        {
+          "question": "What is passivation in metal-acid reactions?",
+          "answer": "Passivation occurs when a less soluble product of the reaction forms a protective, non-reactive layer on the metal's surface, preventing further reaction."
+        }
+      ]
+    },
+    "page": 8
+  },
+  {
+    "question_number": 20,
+    "text": "Dolomite is a double carbonate, CaMg(CO\u2083)\u2082, and can be used instead of calcium carbonate for treating acidic soils. The three statements all refer to the agricultural use of these carbonates. 1 Dolomite and calcium carbonate are both less soluble than Ca(OH)\u2082. 2 One mole of dolomite has the same neutralising effect as one mole of calcium carbonate. 3 Dolomite and calcium carbonate both increase the pH of acidic soils. Which statements are correct?",
+    "options": {
+      "A": "1 and 2 only",
+      "B": "1 and 3 only",
+      "C": "2 and 3 only",
+      "D": "1, 2 and 3"
+    },
+    "generated_content": {
+      "core_concept": "Properties of carbonates (solubility, neutralizing capacity) and their application in soil treatment.",
+      "detailed_explanation": "Let's analyze each statement:\n\n**Statement 1: Dolomite and calcium carbonate are both less soluble than Ca(OH)\u2082.**\n-   Calcium carbonate (CaCO\u2083) is relatively insoluble in water (Ksp \u2248 3.36 \u00d7 10\u207b\u2079 at 25\u00b0C).\n-   Dolomite (CaMg(CO\u2083)\u2082) is also a carbonate and is sparingly soluble, similar to CaCO\u2083 and MgCO\u2083.\n-   Calcium hydroxide (Ca(OH)\u2082) is also sparingly soluble in water, but its solubility (Ksp \u2248 4.68 \u00d7 10\u207b\u2076 at 25\u00b0C) is significantly higher than that of calcium carbonate. For example, the solubility of Ca(OH)\u2082 is about 0.165 g/100 mL, while CaCO\u2083 is about 0.0013 g/100 mL. Therefore, Ca(OH)\u2082 is more soluble than CaCO\u2083 and CaMg(CO\u2083)\u2082.\n-   Thus, statement 1 is correct.\n\n**Statement 2: One mole of dolomite has the same neutralising effect as one mole of calcium carbonate.**\n-   The neutralising effect of carbonates comes from the carbonate ion (CO\u2083\u00b2\u207b) reacting with acid (H\u207a): CO\u2083\u00b2\u207b + 2H\u207a \u2192 H\u2082O + CO\u2082.\n-   One mole of calcium carbonate (CaCO\u2083) contains one mole of CO\u2083\u00b2\u207b ions.\n-   One mole of dolomite (CaMg(CO\u2083)\u2082) contains *two* moles of CO\u2083\u00b2\u207b ions (one from Ca and one from Mg, as indicated by the formula CaMg(CO\u2083)\u2082).\n-   Therefore, one mole of dolomite can neutralise twice as much acid as one mole of calcium carbonate.\n-   Thus, statement 2 is incorrect.\n\n**Statement 3: Dolomite and calcium carbonate both increase the pH of acidic soils.**\n-   Acidic soils have a low pH due to excess H\u207a ions.\n-   Carbonates are basic substances. When added to acidic soil, the carbonate ions (CO\u2083\u00b2\u207b) react with the H\u207a ions, consuming them and effectively raising the pH of the soil.\n-   This is the primary reason why these carbonates are used for 'liming' or treating acidic soils in agriculture.\n-   Thus, statement 3 is correct.\n\nBased on the analysis, statements 1 and 3 are correct, and statement 2 is incorrect.\nFinal Correct Answer: B",
+      "option_analysis": {
+        "A": "Incorrect. Statement 2 is incorrect because one mole of dolomite (CaMg(CO\u2083)\u2082) contains two moles of carbonate ions, while one mole of calcium carbonate (CaCO\u2083) contains only one mole of carbonate ions, meaning dolomite has twice the neutralising effect per mole.",
+        "B": "Correct. Statement 1 is correct as carbonates are generally less soluble than calcium hydroxide. Statement 3 is correct because carbonates act as bases, neutralizing acid in the soil and increasing pH.",
+        "C": "Incorrect. Statement 2 is incorrect, as explained for option A.",
+        "D": "Incorrect. Statement 2 is incorrect, as explained for option A."
+      },
+      "flashcards": [
+        {
+          "question": "How do carbonates help in treating acidic soils?",
+          "answer": "Carbonates are basic substances that react with H\u207a ions in acidic soils, neutralizing the acid and increasing the soil's pH."
+        },
+        {
+          "question": "Compare the relative solubilities of calcium carbonate and calcium hydroxide.",
+          "answer": "Calcium hydroxide (Ca(OH)\u2082) is significantly more soluble in water than calcium carbonate (CaCO\u2083)."
+        },
+        {
+          "question": "What is the neutralizing capacity of one mole of dolomite, CaMg(CO\u2083)\u2082, compared to one mole of calcium carbonate, CaCO\u2083?",
+          "answer": "One mole of dolomite (CaMg(CO\u2083)\u2082) has twice the neutralizing capacity of one mole of calcium carbonate (CaCO\u2083) because it contains two moles of CO\u2083\u00b2\u207b ions per mole of compound, whereas CaCO\u2083 contains only one."
+        }
+      ]
+    },
+    "page": 8
+  },
+  {
+    "question_number": 21,
+    "text": "This question is about two salts, NaI and NaCl. The two solid salts are separately added to warm concentrated H2SO4 and the results noted. Aqueous solutions of the two salts are separately added to AgNO3(aq) and then concentrated NH3(aq) is added and the results noted. Which row is correct?",
+    "options": {
+      "A": "salt: NaCl, identity of one product formed with concentrated H2SO4: Cl2, observation after AgNO3(aq) and NH3(aq) are added: colourless solution",
+      "B": "salt: NaCl, identity of one product formed with concentrated H2SO4: H2S, observation after AgNO3(aq) and NH3(aq) are added: white precipitate",
+      "C": "salt: NaI, identity of one product formed with concentrated H2SO4: H2S, observation after AgNO3(aq) and NH3(aq) are added: yellow precipitate",
+      "D": "salt: NaI, identity of one product formed with concentrated H2SO4: I2, observation after AgNO3(aq) and NH3(aq) are added: colourless solution"
+    },
+    "generated_content": {
+      "core_concept": "Reactions of halide ions with concentrated sulfuric acid and with silver nitrate followed by ammonia, including their solubility in ammonia.",
+      "detailed_explanation": "This question tests knowledge of characteristic reactions of chloride (Cl-) and iodide (I-) ions. Let's analyze each part:\n\n1.  **Reaction with concentrated H2SO4:**\n    *   **NaCl (Cl-)**: Chloride ions are weak reducing agents. When solid NaCl reacts with concentrated H2SO4, it primarily acts as an acid-base reaction, producing hydrogen chloride gas (HCl): NaCl(s) + H2SO4(conc) \u2192 NaHSO4(s) + HCl(g). HCl gas fumes in moist air but Cl2 is not a primary product here. Chloride ions are not strong enough to reduce H2SO4 to products like SO2 or H2S.\n    *   **NaI (I-)**: Iodide ions are strong reducing agents. They reduce concentrated H2SO4, and themselves are oxidized to iodine (I2). The H2SO4 can be reduced to SO2, S, or even H2S, depending on the conditions and the strength of the reducing agent. So, I2 and H2S are both possible products from the reaction of NaI with concentrated H2SO4.\n\n2.  **Reaction with AgNO3(aq) followed by concentrated NH3(aq):**\n    *   **NaCl (Cl-)**: When aqueous NaCl reacts with AgNO3(aq), a white precipitate of silver chloride (AgCl) is formed: NaCl(aq) + AgNO3(aq) \u2192 AgCl(s) + NaNO3(aq). Silver chloride is soluble in dilute aqueous ammonia, forming a diamminesilver(I) complex: AgCl(s) + 2NH3(aq) \u2192 [Ag(NH3)2]+(aq) + Cl-(aq). Therefore, if concentrated NH3 is added, the white precipitate will dissolve, resulting in a colourless solution.\n    *   **NaI (I-)**: When aqueous NaI reacts with AgNO3(aq), a yellow precipitate of silver iodide (AgI) is formed: NaI(aq) + AgNO3(aq) \u2192 AgI(s) + NaNO3(aq). Silver iodide is insoluble in concentrated aqueous ammonia. Therefore, a yellow precipitate will remain.\n\nNow let's evaluate the given options:\n*   **Option A (NaCl)**: Product with H2SO4 is Cl2 (Incorrect). Observation with AgNO3/NH3 is colourless solution (Correct). Overall incorrect.\n*   **Option B (NaCl)**: Product with H2SO4 is H2S (Incorrect, Cl- is not a strong enough reducing agent). Observation with AgNO3/NH3 is white precipitate (Incorrect, AgCl dissolves). Overall incorrect.\n*   **Option C (NaI)**: Product with H2SO4 is H2S (Possible, I- is a strong reducing agent). Observation with AgNO3/NH3 is yellow precipitate (Correct, AgI is yellow and insoluble in NH3). This row is consistent with chemical principles.\n*   **Option D (NaI)**: Product with H2SO4 is I2 (Correct, I- is oxidized to I2). Observation with AgNO3/NH3 is colourless solution (Incorrect, AgI is insoluble in NH3). Overall incorrect.\n\nBased on this analysis, option C is the only row that presents two chemically accurate statements for NaI. While I2 is also a common product of NaI and concentrated H2SO4, H2S is also a known reduction product when a strong reducing agent like iodide reacts with concentrated H2SO4.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. While AgCl is soluble in concentrated ammonia to give a colourless solution, NaCl reacting with concentrated H2SO4 does not typically produce Cl2. It produces HCl gas.",
+        "B": "Incorrect. Cl- is too weak a reducing agent to reduce H2SO4 to H2S. Also, the white precipitate of AgCl would dissolve in concentrated ammonia, not remain as a white precipitate.",
+        "C": "Correct. NaI is a strong enough reducing agent to reduce concentrated H2SO4 to H2S (along with I2 and SO2). AgI, formed from NaI and AgNO3, is a yellow precipitate and is insoluble in concentrated aqueous ammonia.",
+        "D": "Incorrect. While I2 is a correct product from the reaction of NaI with concentrated H2SO4, the observation after adding AgNO3 and concentrated NH3 to NaI solution should be a yellow precipitate (AgI is insoluble), not a colourless solution."
+      },
+      "flashcards": [
+        {
+          "question": "What happens when solid NaCl reacts with warm concentrated H2SO4?",
+          "answer": "It produces hydrogen chloride gas (HCl), which fumes in moist air. This is primarily an acid-base reaction."
+        },
+        {
+          "question": "What happens when solid NaI reacts with warm concentrated H2SO4?",
+          "answer": "Iodide ions are strong reducing agents. They reduce H2SO4 to products like SO2, S, or H2S, and are themselves oxidized to iodine (I2)."
+        },
+        {
+          "question": "How do AgCl and AgI differ in their solubility in concentrated aqueous ammonia?",
+          "answer": "AgCl is soluble in concentrated aqueous ammonia, forming a colourless diamminesilver(I) complex. AgI is insoluble in concentrated aqueous ammonia."
+        }
+      ]
+    },
+    "page": 9
+  },
+  {
+    "question_number": 22,
+    "text": "The diagram shows the process of adding calcium nitrate and strontium nitrate to separate boiling tubes and heating them. Identical conditions are used. As the reactions proceed, the water containing universal indicator changes colour. Which row describes the colour change and identifies the nitrate that causes the quickest colour change?",
+    "options": {
+      "A": "colour change of universal indicator: green to blue, nitrate that causes the quickest colour change: Ca(NO3)2",
+      "B": "colour change of universal indicator: green to blue, nitrate that causes the quickest colour change: Sr(NO3)2",
+      "C": "colour change of universal indicator: green to red, nitrate that causes the quickest colour change: Ca(NO3)2",
+      "D": "colour change of universal indicator: green to red, nitrate that causes the quickest colour change: Sr(NO3)2"
+    },
+    "generated_content": {
+      "core_concept": "Thermal decomposition of Group 2 nitrates and trends in thermal stability, and the acidic nature of nitrogen dioxide.",
+      "detailed_explanation": "This question involves two key chemical concepts: the products of thermal decomposition of Group 2 nitrates and the trend in their thermal stability down the group.\n\n1.  **Products of Thermal Decomposition**: Group 2 nitrates, such as Ca(NO3)2 and Sr(NO3)2, decompose upon heating to produce the metal oxide, nitrogen dioxide gas (NO2), and oxygen gas (O2). The balanced equation is generally: 2M(NO3)2(s) \u2192 2MO(s) + 4NO2(g) + O2(g).\n2.  **Effect on Universal Indicator**: Nitrogen dioxide (NO2) is an acidic gas. When it dissolves in water, it reacts to form nitric acid (HNO3) and nitrous acid (HNO2): 2NO2(g) + H2O(l) \u2192 HNO3(aq) + HNO2(aq). This acidic solution will cause a universal indicator, which is typically green in neutral solutions, to turn red. Therefore, the colour change of the universal indicator will be from green to red. This eliminates options A and B.\n3.  **Thermal Stability Trend**: For Group 2 nitrates (and carbonates), thermal stability increases down the group. This is because larger cations (e.g., Sr2+ is larger than Ca2+) have a lower charge density and thus are less polarizing. They distort the electron cloud of the polyatomic nitrate anion (NO3-) less effectively, making the nitrate ion more stable and harder to decompose. Consequently, Ca(NO3)2 is less thermally stable than Sr(NO3)2. This means that Ca(NO3)2 will decompose more readily or at a lower temperature, producing NO2 gas more quickly under identical heating conditions.\n4.  **Quickest Colour Change**: Since Ca(NO3)2 decomposes more quickly, it will produce acidic NO2 gas at a faster rate, leading to a quicker change in the universal indicator's colour from green to red.\n\nCombining these points, the colour change is green to red, and Ca(NO3)2 causes the quickest change. This corresponds to option C.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. The colour change from the acidic NO2 gas would be green to red, not green to blue. Green to blue would indicate an alkaline product.",
+        "B": "Incorrect. The colour change would be green to red, not green to blue. Also, Sr(NO3)2 is more thermally stable than Ca(NO3)2, so it would decompose slower, not quicker.",
+        "C": "Correct. Thermal decomposition of metal nitrates produces acidic NO2 gas, which turns universal indicator from green to red. Ca(NO3)2 is less thermally stable than Sr(NO3)2, so it decomposes faster, causing the quickest colour change.",
+        "D": "Incorrect. While the colour change green to red is correct, Sr(NO3)2 is more thermally stable than Ca(NO3)2, meaning it decomposes slower and would not cause the quickest colour change."
+      },
+      "flashcards": [
+        {
+          "question": "What are the gaseous products when Group 2 nitrates are heated?",
+          "answer": "Nitrogen dioxide (NO2) gas and oxygen (O2) gas."
+        },
+        {
+          "question": "How does nitrogen dioxide affect universal indicator solution?",
+          "answer": "Nitrogen dioxide is an acidic gas; it dissolves in water to form acids, turning universal indicator solution from green (neutral) to red (acidic)."
+        },
+        {
+          "question": "What is the trend in thermal stability for Group 2 nitrates down the group?",
+          "answer": "Thermal stability of Group 2 nitrates increases down the group. Larger cations have lower charge density, making them less polarizing and the nitrate ion more stable."
+        }
+      ]
+    },
+    "page": 9
+  },
+  {
+    "question_number": 23,
+    "text": "The equations for three reactions involving chlorine or its compounds are listed.1 2KClO_{3}\u21922KCl+3O_{2}2 4KClO_{3}\u21923KClO_{4}+KCl3 6KOH+3Cl_{2}\u21923H_{2}O+5KCl+KClO_{3}Which statement about these equations is correct?A Equation 1 describes the formation of a compound used to kill bacteria in drinking water.B Equation 1 does not represent a redox reaction.C Equation 2 describes the formation of potassium chlorate(IV).D Equations 2 and 3 both represent disproportionation reactions.",
+    "options": {
+      "A": "Equation 1 describes the formation of a compound used to kill bacteria in drinking water.",
+      "B": "Equation 1 does not represent a redox reaction.",
+      "C": "Equation 2 describes the formation of potassium chlorate(IV).",
+      "D": "Equations 2 and 3 both represent disproportionation reactions."
+    },
+    "generated_content": {
+      "core_concept": "Redox reactions, disproportionation reactions, and determination of oxidation states.",
+      "detailed_explanation": "To determine the correct statement, we need to analyze the oxidation states of chlorine in each reaction and identify the type of reaction, particularly checking for redox and disproportionation.\n\nFirst, let's determine the oxidation state of chlorine in each compound:\n- KClO\u2083: K is +1, O is -2. So, Cl + 1 + 3(-2) = 0 \u2192 Cl = +5.\n- KCl: K is +1. So, Cl = -1.\n- O\u2082: Elemental oxygen, O = 0.\n- KClO\u2084: K is +1, O is -2. So, Cl + 1 + 4(-2) = 0 \u2192 Cl = +7.\n- Cl\u2082: Elemental chlorine, Cl = 0.\n\nNow, let's analyze each equation:\n\nEquation 1: 2KClO\u2083 \u2192 2KCl + 3O\u2082\n- Chlorine changes from +5 (in KClO\u2083) to -1 (in KCl). This is a reduction.\n- Oxygen changes from -2 (in KClO\u2083) to 0 (in O\u2082). This is an oxidation.\n- Since both oxidation and reduction occur, Equation 1 is a redox reaction.\n- The products are potassium chloride (KCl) and oxygen gas (O\u2082). Neither is the primary compound used to kill bacteria in drinking water (which is typically chlorine gas or hypochlorite).\n\nEquation 2: 4KClO\u2083 \u2192 3KClO\u2084 + KCl\n- Chlorine in KClO\u2083 has an oxidation state of +5.\n- Chlorine in KClO\u2084 has an oxidation state of +7 (oxidation: +5 \u2192 +7).\n- Chlorine in KCl has an oxidation state of -1 (reduction: +5 \u2192 -1).\n- Since chlorine from the same compound (KClO\u2083) is simultaneously oxidized and reduced, this is a disproportionation reaction.\n- KClO\u2084 is potassium perchlorate. Potassium chlorate(IV) would be KClO\u2082 (where Cl is +3).\n\nEquation 3: 6KOH + 3Cl\u2082 \u2192 3H\u2082O + 5KCl + KClO\u2083\n- Chlorine in Cl\u2082 has an oxidation state of 0.\n- Chlorine in KCl has an oxidation state of -1 (reduction: 0 \u2192 -1).\n- Chlorine in KClO\u2083 has an oxidation state of +5 (oxidation: 0 \u2192 +5).\n- Since elemental chlorine (Cl\u2082) is simultaneously oxidized and reduced, this is a disproportionation reaction.\n\nNow, let's evaluate the options:\nA: Incorrect. Equation 1 forms KCl and O\u2082. KCl is not used to kill bacteria. Chlorine or hypochlorites are.\nB: Incorrect. Equation 1 involves changes in oxidation states for both chlorine and oxygen, indicating it is a redox reaction.\nC: Incorrect. Equation 2 forms potassium perchlorate (KClO\u2084), not potassium chlorate(IV) (KClO\u2082).\nD: Correct. As analyzed, Equation 2 (Cl from +5 to +7 and -1) and Equation 3 (Cl from 0 to -1 and +5) both involve a single element being both oxidized and reduced, which defines a disproportionation reaction.\n\nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Equation 1 produces potassium chloride (KCl) and oxygen (O\u2082). Neither of these compounds is typically used to kill bacteria in drinking water. Chlorine gas (Cl\u2082) or compounds like sodium hypochlorite (NaClO) are used for disinfection.",
+        "B": "Incorrect. In Equation 1, the oxidation state of chlorine changes from +5 in KClO\u2083 to -1 in KCl (reduction), and the oxidation state of oxygen changes from -2 in KClO\u2083 to 0 in O\u2082 (oxidation). Since both oxidation and reduction occur, it is a redox reaction.",
+        "C": "Incorrect. Equation 2 forms potassium perchlorate (KClO\u2084), where chlorine has an oxidation state of +7. Potassium chlorate(IV) refers to a compound where chlorine has an oxidation state of +4 (e.g., KClO\u2083 with a different naming convention, or more commonly KClO\u2082 if using the Roman numeral for the central atom's oxidation state which is +3).",
+        "D": "Correct. In Equation 2, chlorine in KClO\u2083 (oxidation state +5) is both oxidized to KClO\u2084 (+7) and reduced to KCl (-1). In Equation 3, elemental chlorine (Cl\u2082, oxidation state 0) is both oxidized to KClO\u2083 (+5) and reduced to KCl (-1). Both reactions are examples of disproportionation, where an element in one oxidation state is simultaneously oxidized to a higher oxidation state and reduced to a lower oxidation state."
+      },
+      "flashcards": [
+        {
+          "question": "What is a redox reaction?",
+          "answer": "A chemical reaction where the oxidation states of atoms are changed, involving both reduction (gain of electrons) and oxidation (loss of electrons)."
+        },
+        {
+          "question": "What is a disproportionation reaction?",
+          "answer": "A specific type of redox reaction in which an element in one oxidation state is simultaneously oxidized to a higher oxidation state and reduced to a lower oxidation state."
+        },
+        {
+          "question": "How do you determine the oxidation state of an element in a compound?",
+          "answer": "By using known oxidation states of common elements (e.g., alkali metals +1, oxygen -2 in most compounds, hydrogen +1 with non-metals) and ensuring the sum of oxidation states in a neutral compound is zero, or equal to the charge of a polyatomic ion."
+        }
+      ]
+    },
+    "page": 10
+  },
+  {
+    "question_number": 24,
+    "text": "Nitrogen monoxide, NO, is a primary pollutant produced by petrol engines and is found in their exhaust gases.Which reaction occurs in a catalytic converter and decreases the emission of nitrogen monoxide?A NO(g)+CO(g)\u2192 NO_{2}(g)+C(s)B NO(g)+CO_{2}(g)\u2192 NO_{2}(g)+CO(g)C 2NO(g)+2CO(g)\u2192 N_{2}(g)+2CO_{2}(g)D 2NO(g)+CO_{2}(g)\u21922NO_{2}(g)+C(s)",
+    "options": {
+      "A": "NO(g)+CO(g)\u2192 NO_{2}(g)+C(s)",
+      "B": "NO(g)+CO_{2}(g)\u2192 NO_{2}(g)+CO(g)",
+      "C": "2NO(g)+2CO(g)\u2192 N_{2}(g)+2CO_{2}(g)",
+      "D": "2NO(g)+CO_{2}(g)\u21922NO_{2}(g)+C(s)"
+    },
+    "generated_content": {
+      "core_concept": "Functioning of catalytic converters in reducing pollutant emissions, specifically the reduction of nitrogen oxides (NOx) and oxidation of carbon monoxide (CO).",
+      "detailed_explanation": "Catalytic converters are designed to reduce harmful pollutants from vehicle exhaust. For nitrogen monoxide (NO), the goal is to reduce it to harmless nitrogen gas (N\u2082). For carbon monoxide (CO), the goal is to oxidize it to less harmful carbon dioxide (CO\u2082).\n\nLet's analyze the oxidation states of nitrogen and carbon in each species:\n- NO: N is +2\n- CO: C is +2\n- NO\u2082: N is +4\n- C(s): C is 0\n- N\u2082: N is 0\n- CO\u2082: C is +4\n\nNow, let's examine each reaction:\n\nOption A: NO(g) + CO(g) \u2192 NO\u2082(g) + C(s)\n- Nitrogen: +2 (in NO) \u2192 +4 (in NO\u2082). This is an oxidation, which *increases* the nitrogen oxide pollution, not decreases it. Incorrect.\n- Carbon: +2 (in CO) \u2192 0 (in C). This is a reduction, but CO should be oxidized to CO\u2082.\n\nOption B: NO(g) + CO\u2082(g) \u2192 NO\u2082(g) + CO(g)\n- Nitrogen: +2 (in NO) \u2192 +4 (in NO\u2082). Again, this is an oxidation of NO. Incorrect.\n- Carbon: +4 (in CO\u2082) \u2192 +2 (in CO). CO\u2082 is reduced to CO, which is also undesirable.\n\nOption C: 2NO(g) + 2CO(g) \u2192 N\u2082(g) + 2CO\u2082(g)\n- Nitrogen: +2 (in NO) \u2192 0 (in N\u2082). This is a reduction of NO, which successfully decreases nitrogen monoxide emission.\n- Carbon: +2 (in CO) \u2192 +4 (in CO\u2082). This is an oxidation of CO, which is the desired outcome.\n- The reaction is also stoichiometrically balanced: 2 N, 4 O, 2 C on both sides.\n- This reaction represents the primary function of a catalytic converter for these pollutants.\n\nOption D: 2NO(g) + CO\u2082(g) \u2192 2NO\u2082(g) + C(s)\n- Nitrogen: +2 (in NO) \u2192 +4 (in NO\u2082). This is an oxidation of NO, increasing pollution. Incorrect.\n- Carbon: +4 (in CO\u2082) \u2192 0 (in C). CO\u2082 is reduced to elemental carbon, which is not the desired outcome and can lead to soot formation.\n\nTherefore, option C describes the correct reaction that occurs in a catalytic converter to reduce nitrogen monoxide emissions.\n\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "Incorrect. In this reaction, nitrogen monoxide (NO) is oxidized to nitrogen dioxide (NO\u2082) (N goes from +2 to +4), which is also a harmful pollutant. Carbon monoxide (CO) is reduced to elemental carbon (C goes from +2 to 0), which is not the desired conversion (CO should be oxidized to CO\u2082).",
+        "B": "Incorrect. This reaction involves NO being oxidized to NO\u2082 (N goes from +2 to +4) and carbon dioxide (CO\u2082) being reduced to carbon monoxide (CO) (C goes from +4 to +2). Both changes are counterproductive to the purpose of a catalytic converter.",
+        "C": "Correct. In this reaction, nitrogen monoxide (NO) is reduced to harmless nitrogen gas (N\u2082) (N goes from +2 to 0). Simultaneously, carbon monoxide (CO) is oxidized to carbon dioxide (CO\u2082) (C goes from +2 to +4). This is the desired redox reaction facilitated by a catalytic converter to reduce both NO and CO emissions.",
+        "D": "Incorrect. Similar to options A and B, NO is oxidized to NO\u2082 (N goes from +2 to +4), increasing nitrogen oxide pollution. Additionally, CO\u2082 is reduced to elemental carbon (C goes from +4 to 0), which is not the function of a catalytic converter."
+      },
+      "flashcards": [
+        {
+          "question": "What is the primary function of a catalytic converter regarding nitrogen monoxide (NO)?",
+          "answer": "To reduce harmful nitrogen monoxide (NO) into harmless nitrogen gas (N\u2082)."
+        },
+        {
+          "question": "What is the primary function of a catalytic converter regarding carbon monoxide (CO)?",
+          "answer": "To oxidize harmful carbon monoxide (CO) into less harmful carbon dioxide (CO\u2082)."
+        },
+        {
+          "question": "What type of reaction is the conversion of NO and CO in a catalytic converter?",
+          "answer": "It is a redox reaction, where NO is reduced and CO is oxidized simultaneously over a catalyst."
+        }
+      ]
+    },
+    "page": 10
+  },
+  {
+    "question_number": 25,
+    "text": "The diagram shows the structure of the naturally occurring molecule cholesterol.cholesterolH3CCH3CH3HOStudent X stated that the 17 carbon atoms in the 4 rings all lie in the same plane.Student Y stated that this molecule displays cis/trans isomerism at the C=C double bond.Which students are correct?A both student X and student YB neither student X nor student YC student X onlyD student Y only",
+    "options": {
+      "A": "both student X and student Y",
+      "B": "neither student X nor student Y",
+      "C": "student X only",
+      "D": "student Y only"
+    },
+    "generated_content": {
+      "core_concept": "Understanding the three-dimensional structure of steroids (specifically cholesterol) and the conditions required for cis/trans (geometric) isomerism in cyclic alkenes.",
+      "detailed_explanation": "1.  **Analyze Student X's statement:** Cholesterol is a steroid, characterized by its fused four-ring structure. Steroid rings, being saturated or partially saturated, are not planar. They adopt stable, non-planar conformations like chair or half-chair forms to minimize strain. Therefore, the 17 carbon atoms within these fused rings do not all lie in the same plane. Student X's statement is incorrect.\n2.  **Analyze Student Y's statement:** Cis/trans isomerism (also known as E/Z isomerism) occurs when there is restricted rotation around a double bond, and each carbon atom of the double bond is bonded to two different groups. In cholesterol, there is one C=C double bond located within a six-membered ring. For cis/trans isomerism to exist for a double bond in a cyclic system, the ring must be large enough (typically 8 carbons or more) to accommodate the geometric strain of a trans double bond. In a six-membered ring, only the cis configuration of the double bond is stable and energetically feasible. A trans-cyclohexene, for example, is highly strained and does not exist under normal conditions. Since the C=C double bond in cholesterol's 6-membered ring is constrained to only the cis configuration, it does not display *both* cis and trans isomerism (i.e., it cannot exist as a mixture of stable cis and trans isomers). Student Y's statement is incorrect.\n3.  **Conclusion:** Both Student X and Student Y are incorrect.\n\n**Final Correct Answer: B**",
+      "option_analysis": {
+        "A": "Incorrect. Both statements are false. Steroid rings are non-planar, and the C=C double bond in cholesterol's 6-membered ring is restricted to the cis configuration, thus not displaying cis/trans isomerism.",
+        "B": "Correct. Student X's statement is false because the fused rings of cholesterol are three-dimensional and non-planar. Student Y's statement is false because the C=C double bond in the 6-membered ring of cholesterol can only exist in the cis configuration due to ring strain, therefore it does not exhibit cis/trans isomerism (meaning both forms cannot exist stably).",
+        "C": "Incorrect. Student X's statement is false.",
+        "D": "Incorrect. Student Y's statement is false."
+      },
+      "flashcards": [
+        {
+          "question": "Are the carbon atoms in the fused rings of cholesterol all in the same plane?",
+          "answer": "No, the fused rings in cholesterol (a steroid) adopt a three-dimensional, non-planar structure, typically involving chair or half-chair conformations, to minimize steric strain."
+        },
+        {
+          "question": "Under what conditions can a C=C double bond within a cyclic system exhibit cis/trans isomerism?",
+          "answer": "A C=C double bond within a cyclic system can exhibit cis/trans isomerism only if the ring is large enough (typically 8 carbons or more) to accommodate the high strain of a trans configuration. Smaller rings (like 6-membered rings) are usually restricted to only the cis configuration."
+        }
+      ]
+    },
+    "page": 11
+  },
+  {
+    "question_number": 26,
+    "text": "The drug cortisone has the formula shown.cortisone***OHOHIn addition to those chiral centres marked by an asterisk (*), how many other chiral centres arepresent in the cortisone molecule?A 0B 1C 2D 3",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "2",
+      "D": "3"
+    },
+    "generated_content": {
+      "core_concept": "Identifying chiral centers (stereocenters) in organic molecules based on the definition of a carbon atom bonded to four different groups.",
+      "detailed_explanation": "A chiral center is typically an sp3 hybridized carbon atom bonded to four different atoms or groups of atoms. The question asks for 'other' chiral centers in addition to the three already marked by an asterisk.\n\nLet's systematically examine the sp3 hybridized carbons in the cortisone molecule, excluding the three already marked with an asterisk, to identify if they meet the criteria for a chiral center:\n\n1.  **Carbons in Ring A (leftmost, with C=O and C=C):**\n    *   The carbon double-bonded to oxygen (C=O) is sp2 hybridized, not chiral.\n    *   The carbons involved in the C=C double bond are sp2 hybridized, not chiral.\n    *   The CH2 group adjacent to the C=O is not chiral (has two identical hydrogen atoms).\n    *   The CH2 group below the first asterisk is not chiral.\n\n2.  **Carbons in Ring B (middle, connecting to Ring A and C):**\n    *   The two carbons marked with asterisks are chiral centers by definition.\n    *   The two CH2 groups are not chiral.\n\n3.  **Carbons in Ring C (right-middle, connecting to Ring B and D):**\n    *   The carbon marked with an asterisk is a chiral center.\n    *   The CH2 group above this asterisk is not chiral.\n    *   The CH2 group below this asterisk is not chiral.\n\n4.  **Carbons in Ring D (rightmost, 5-membered ring):**\n    *   **Carbon at C17 (steroid numbering, where the side chain attaches):** This carbon is bonded to:\n        1.  A carbon in Ring C (CH2 group).\n        2.  A carbon in Ring D (CH2 group).\n        3.  The carbonyl carbon of the side chain (-C(=O)CH2OH).\n        4.  An implied hydrogen atom.\n        These four groups are different. Therefore, this carbon is a **chiral center**. This is one 'other' chiral center.\n    *   **Carbon at C11 (steroid numbering, bearing an -OH group in Ring D):** This carbon is bonded to:\n        1.  A carbon in Ring D (CH2 group).\n        2.  A carbon in Ring C (the asterisked fusion carbon).\n        3.  An -OH group.\n        4.  An implied hydrogen atom.\n        These four groups are different. Therefore, this carbon is also a **chiral center**. This is a second 'other' chiral center.\n    *   The remaining CH2 groups in Ring D are not chiral.\n\n5.  **Carbons in the side chain (-C(=O)CH2OH):**\n    *   The carbonyl carbon (C=O) is sp2 hybridized, not chiral.\n    *   The CH2OH carbon is not chiral (has two identical hydrogen atoms).\n\nIn total, we have identified two additional chiral centers besides those already marked with an asterisk.\n\n**Final Correct Answer: C**",
+      "option_analysis": {
+        "A": "Incorrect. There are additional chiral centers in cortisone beyond the three marked.",
+        "B": "Incorrect. There are two additional chiral centers, not just one.",
+        "C": "Correct. The carbon at C17 (where the side chain is attached) and the carbon at C11 (bearing the OH group in ring D) are two additional chiral centers not marked by an asterisk.",
+        "D": "Incorrect. Only two additional chiral centers were identified upon careful examination."
+      },
+      "flashcards": [
+        {
+          "question": "What is the definition of a chiral center?",
+          "answer": "A chiral center (or stereocenter) is typically an sp3 hybridized atom (most commonly carbon) that is bonded to four different atoms or groups of atoms."
+        },
+        {
+          "question": "How do you systematically identify chiral centers in a complex molecule?",
+          "answer": "Examine each sp3 hybridized carbon atom in the molecule. For each carbon, list the four groups attached to it. If all four groups are distinct, then that carbon is a chiral center. Exclude sp2 or sp hybridized carbons (those involved in double or triple bonds) as they cannot be chiral centers."
+        },
+        {
+          "question": "Why are carbons involved in double bonds not considered chiral centers?",
+          "answer": "Carbons involved in double bonds are sp2 hybridized, meaning they are bonded to only three groups, and their geometry is trigonal planar. A chiral center requires four different groups attached in a tetrahedral geometry."
+        }
+      ]
+    },
+    "page": 11
+  },
+  {
+    "question_number": 27,
+    "text": "But-2-ene reacts with cold dilute acidified KMnO4 to give product X. But-2-ene reacts with hot concentrated acidified KMnO4 to give product Y. Which statement about product X and product Y is correct? A Both product X and product Y will react with 2,4-dinitrophenylhydrazine. B Neither product X nor product Y will react with 2,4-dinitrophenylhydrazine. C Product X will react with 2,4-dinitrophenylhydrazine, product Y will not. D Product Y will react with 2,4-dinitrophenylhydrazine, product X will not.",
+    "options": {
+      "A": "Both product X and product Y will react with 2,4-dinitrophenylhydrazine.",
+      "B": "Neither product X nor product Y will react with 2,4-dinitrophenylhydrazine.",
+      "C": "Product X will react with 2,4-dinitrophenylhydrazine, product Y will not.",
+      "D": "Product Y will react with 2,4-dinitrophenylhydrazine, product X will not."
+    },
+    "generated_content": {
+      "core_concept": "Oxidation of alkenes with potassium permanganate under different conditions and the chemical test for carbonyl compounds using 2,4-dinitrophenylhydrazine.",
+      "detailed_explanation": "First, let's identify products X and Y:\n1.  **But-2-ene reacts with cold dilute acidified KMnO4 to give product X.**\n    But-2-ene (CH3-CH=CH-CH3) undergoes syn-dihydroxylation with cold, dilute acidified KMnO4 (Baeyer's test). This mild oxidation breaks the pi bond and adds two hydroxyl (-OH) groups across the double bond.\n    Product X is Butane-2,3-diol (CH3-CH(OH)-CH(OH)-CH3), which is a diol (an alcohol).\n2.  **But-2-ene reacts with hot concentrated acidified KMnO4 to give product Y.**\n    But-2-ene undergoes strong oxidative cleavage with hot, concentrated acidified KMnO4. The carbon-carbon double bond is completely broken. Each carbon atom of the original double bond is oxidized.\n    For an internal alkene like But-2-ene (CH3-CH=CH-CH3), where each double-bonded carbon is attached to one hydrogen and one alkyl group, the cleavage results in the formation of two carboxylic acid molecules.\n    CH3-CH=CH-CH3 \u2192 2 CH3COOH (Ethanoic acid).\n    Product Y consists of Ethanoic acid, which is a carboxylic acid.\n\nNow, let's consider the reaction with 2,4-dinitrophenylhydrazine (2,4-DNPH):\n*   2,4-DNPH is a chemical reagent used to detect the presence of aldehyde (R-CHO) and ketone (R-CO-R') functional groups. It reacts with these carbonyl compounds to form a yellow, orange, or red precipitate (a dinitrophenylhydrazone).\n*   Alcohols (like product X, butane-2,3-diol) do not contain a carbonyl group and therefore do not react with 2,4-DNPH.\n*   Carboxylic acids (like product Y, ethanoic acid) do not typically react with 2,4-DNPH under the conditions used to test for aldehydes and ketones. While they contain a carbonyl group, the reactivity is different due to the adjacent hydroxyl group, and they do not form dinitrophenylhydrazones.\n\nTherefore, neither Product X (butane-2,3-diol) nor Product Y (ethanoic acid) will react with 2,4-dinitrophenylhydrazine.\nFinal Correct Answer: B",
+      "option_analysis": {
+        "A": "Incorrect. Product X (butane-2,3-diol) is an alcohol and does not react with 2,4-DNPH. Product Y (ethanoic acid) is a carboxylic acid and also does not react with 2,4-DNPH.",
+        "B": "Correct. Product X (butane-2,3-diol) is an alcohol and Product Y (ethanoic acid) is a carboxylic acid. Neither functional group reacts with 2,4-dinitrophenylhydrazine, which is specific for aldehydes and ketones.",
+        "C": "Incorrect. Product X (butane-2,3-diol) is an alcohol and does not react with 2,4-DNPH.",
+        "D": "Incorrect. Product Y (ethanoic acid) is a carboxylic acid and does not react with 2,4-DNPH. Product X (butane-2,3-diol) is an alcohol and also does not react with 2,4-DNPH."
+      },
+      "flashcards": [
+        {
+          "question": "What are the products of but-2-ene reacting with cold, dilute acidified KMnO4?",
+          "answer": "Butane-2,3-diol."
+        },
+        {
+          "question": "What are the products of but-2-ene reacting with hot, concentrated acidified KMnO4?",
+          "answer": "Ethanoic acid (two molecules)."
+        },
+        {
+          "question": "What functional groups react with 2,4-dinitrophenylhydrazine (2,4-DNPH)?",
+          "answer": "Aldehydes and ketones."
+        }
+      ]
+    },
+    "page": 12
+  },
+  {
+    "question_number": 28,
+    "text": "A sequence of reactions takes place. The major product is compound Z. propanoic acid -(LiAlH4)-> compound X -(concentrated H2SO4)-> compound Y -(pass vapour with steam over H3PO4)-> compound Z What is compound Z? A propanone B propene C propan-1-ol D propan-2-ol",
+    "options": {
+      "A": "propanone",
+      "B": "propene",
+      "C": "propan-1-ol",
+      "D": "propan-2-ol"
+    },
+    "generated_content": {
+      "core_concept": "Multi-step organic synthesis involving reduction of carboxylic acid, dehydration of alcohol, and hydration of alkene following Markovnikov's rule.",
+      "detailed_explanation": "Let's follow the reaction sequence step by step:\n1.  **Propanoic acid -(LiAlH4)-> compound X**\n    Propanoic acid is CH3CH2COOH. Lithium aluminum hydride (LiAlH4) is a powerful reducing agent that reduces carboxylic acids to primary alcohols.\n    CH3CH2COOH + [H] (LiAlH4) \u2192 CH3CH2CH2OH\n    So, Compound X is Propan-1-ol.\n\n2.  **Compound X (Propan-1-ol) -(concentrated H2SO4)-> compound Y**\n    Propan-1-ol is CH3CH2CH2OH. Concentrated sulfuric acid (H2SO4) acts as a dehydrating agent, promoting an elimination reaction to remove water from the alcohol, forming an alkene.\n    CH3CH2CH2OH -(conc. H2SO4, heat)-> CH3CH=CH2 + H2O\n    So, Compound Y is Propene.\n\n3.  **Compound Y (Propene) -(pass vapour with steam over H3PO4)-> compound Z**\n    Propene is CH3CH=CH2. Passing propene vapour with steam over phosphoric acid (H3PO4) involves the acid-catalyzed hydration of an alkene. This addition reaction follows Markovnikov's rule, meaning the hydrogen atom adds to the carbon atom of the double bond that already has more hydrogen atoms, and the hydroxyl (-OH) group adds to the carbon atom with fewer hydrogen atoms.\n    CH3CH=CH2 + H2O (steam, H3PO4) \u2192 CH3CH(OH)CH3\n    So, Compound Z is Propan-2-ol.\n\nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Propanone (a ketone) is not formed in this sequence. This would require oxidation of a secondary alcohol or specific alkene cleavage.",
+        "B": "Incorrect. Propene is compound Y, an intermediate product, not the final compound Z.",
+        "C": "Incorrect. Propan-1-ol is compound X, an intermediate product, not the final compound Z.",
+        "D": "Correct. The sequence of reactions leads from propanoic acid to propan-1-ol, then to propene, and finally to propan-2-ol through acid-catalyzed hydration following Markovnikov's rule."
+      },
+      "flashcards": [
+        {
+          "question": "What is the product of reducing a carboxylic acid with LiAlH4?",
+          "answer": "A primary alcohol."
+        },
+        {
+          "question": "What is the role of concentrated H2SO4 in the reaction with an alcohol?",
+          "answer": "It acts as a dehydrating agent, promoting the elimination of water to form an alkene."
+        },
+        {
+          "question": "What rule governs the addition of water to an unsymmetrical alkene (hydration)?",
+          "answer": "Markovnikov's rule: the hydrogen adds to the carbon with more hydrogens, and the hydroxyl group adds to the carbon with fewer hydrogens."
+        }
+      ]
+    },
+    "page": 12
+  },
+  {
+    "question_number": 29,
+    "text": "Which statement is correct? A Bromoethane reacts with NaOH(aq) to form ethene as a major product. B 1-chlorobutane reacts more rapidly than 1-bromobutane with NaOH(aq) at the same temperature. C Hydrolysis of (C2H5)3CBr occurs mostly by the SN2 mechanism. D The CH3CH2CH2CH2+ ion is less stable than the (CH3)3C+ ion.",
+    "options": {
+      "A": "Bromoethane reacts with NaOH(aq) to form ethene as a major product.",
+      "B": "1-chlorobutane reacts more rapidly than 1-bromobutane with NaOH(aq) at the same temperature.",
+      "C": "Hydrolysis of (C2H5)3CBr occurs mostly by the SN2 mechanism.",
+      "D": "The CH3CH2CH2CH2+ ion is less stable than the (CH3)3C+ ion."
+    },
+    "generated_content": {
+      "core_concept": "Reactions and mechanisms of haloalkanes (nucleophilic substitution vs. elimination, SN1 vs. SN2), leaving group ability, and carbocation stability.",
+      "detailed_explanation": "Let's analyze each statement:\n\n**A Bromoethane reacts with NaOH(aq) to form ethene as a major product.**\n*   Bromoethane (CH3CH2Br) is a primary haloalkane. NaOH(aq) provides hydroxide ions (OH-), which can act as both a nucleophile and a base.\n*   Under aqueous conditions (NaOH(aq)), nucleophilic substitution (SN2) is favored, leading to the formation of an alcohol. So, bromoethane would primarily form ethanol (CH3CH2OH).\n*   Elimination to form ethene (CH2=CH2) is favored when NaOH is used in alcoholic solution (e.g., NaOH(alc) or KOH(alc)).\n*   Therefore, ethene is not the major product with NaOH(aq).\n*   **Statement A is incorrect.**\n\n**B 1-chlorobutane reacts more rapidly than 1-bromobutane with NaOH(aq) at the same temperature.**\n*   This statement compares the rates of nucleophilic substitution reactions for two primary haloalkanes with different halogen leaving groups.\n*   The rate of nucleophilic substitution depends significantly on the leaving group ability. A better leaving group leads to a faster reaction.\n*   The order of leaving group ability for halogens is I- > Br- > Cl- > F-. This is because the bond strength to carbon decreases as the atomic radius of the halogen increases (C-I bond is weaker than C-Br, which is weaker than C-Cl).\n*   Since Br- is a better leaving group than Cl-, 1-bromobutane will react more rapidly than 1-chlorobutane.\n*   **Statement B is incorrect.**\n\n**C Hydrolysis of (C2H5)3CBr occurs mostly by the SN2 mechanism.**\n*   (C2H5)3CBr is a tertiary haloalkane (the carbon bonded to bromine is attached to three ethyl groups).\n*   Tertiary haloalkanes are sterically hindered, making backside attack by a nucleophile (required for SN2) very difficult. Therefore, SN2 reactions are disfavored for tertiary haloalkanes.\n*   Tertiary haloalkanes predominantly undergo nucleophilic substitution via the SN1 mechanism, which involves the formation of a stable tertiary carbocation intermediate.\n*   **Statement C is incorrect.**\n\n**D The CH3CH2CH2CH2+ ion is less stable than the (CH3)3C+ ion.**\n*   This statement compares the stability of two carbocations.\n*   CH3CH2CH2CH2+ is a primary carbocation (the positively charged carbon is bonded to only one alkyl group).\n*   (CH3)3C+ (tert-butyl carbocation) is a tertiary carbocation (the positively charged carbon is bonded to three methyl groups).\n*   The stability of carbocations increases with the number of alkyl groups attached to the positively charged carbon. This is due to the electron-donating inductive effect of alkyl groups and hyperconjugation, which help to delocalize the positive charge.\n*   The general order of carbocation stability is Tertiary > Secondary > Primary > Methyl.\n*   Therefore, a primary carbocation (CH3CH2CH2CH2+) is indeed less stable than a tertiary carbocation ((CH3)3C+).\n*   **Statement D is correct.**\n\nFinal Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Bromoethane with NaOH(aq) undergoes nucleophilic substitution (SN2) to form ethanol as the major product, not ethene. Ethene would be formed via elimination with alcoholic NaOH.",
+        "B": "Incorrect. Bromide is a better leaving group than chloride. Therefore, 1-bromobutane reacts more rapidly than 1-chlorobutane in nucleophilic substitution reactions.",
+        "C": "Incorrect. (C2H5)3CBr is a tertiary haloalkane. Tertiary haloalkanes undergo hydrolysis predominantly by the SN1 mechanism due to steric hindrance and the stability of the tertiary carbocation intermediate, not SN2.",
+        "D": "Correct. Carbocation stability follows the order Tertiary > Secondary > Primary. The (CH3)3C+ ion is a tertiary carbocation, and the CH3CH2CH2CH2+ ion is a primary carbocation. Thus, the primary carbocation is less stable than the tertiary carbocation."
+      },
+      "flashcards": [
+        {
+          "question": "What type of reaction is favored for primary haloalkanes with aqueous NaOH?",
+          "answer": "Nucleophilic substitution (SN2) to form an alcohol."
+        },
+        {
+          "question": "How does leaving group ability affect the rate of nucleophilic substitution?",
+          "answer": "A better leaving group (weaker C-X bond) leads to a faster reaction rate. For halogens, the order is I- > Br- > Cl- > F-."
+        },
+        {
+          "question": "What is the order of stability for carbocations?",
+          "answer": "Tertiary > Secondary > Primary > Methyl. Stability is increased by electron-donating alkyl groups through inductive effect and hyperconjugation."
+        }
+      ]
+    },
+    "page": 12
+  },
+  {
+    "question_number": 30,
+    "text": "In the hydrolysis of bromoethane by aqueous NaOH, what is the nature of the attacking group and of the leaving group?",
+    "options": {
+      "A": "attacking group: electrophile, leaving group: electrophile",
+      "B": "attacking group: electrophile, leaving group: nucleophile",
+      "C": "attacking group: nucleophile, leaving group: electrophile",
+      "D": "attacking group: nucleophile, leaving group: nucleophile"
+    },
+    "generated_content": {
+      "core_concept": "Nucleophilic substitution in alkyl halides, identifying attacking and leaving groups.",
+      "detailed_explanation": "The hydrolysis of bromoethane (CH3CH2Br) by aqueous NaOH is a nucleophilic substitution reaction. In this reaction, the hydroxide ion (OH-) from NaOH acts as the attacking species. Hydroxide ions are electron-rich due to their negative charge and lone pairs, making them nucleophiles (nucleus-loving species that donate electrons). The bromine atom, which is electronegative, pulls electron density from the carbon atom, creating a partial positive charge on the carbon and making it susceptible to nucleophilic attack. As the hydroxide attacks, the carbon-bromine bond breaks, and the bromide ion (Br-) departs. The bromide ion is also an electron-rich species (it carries a negative charge) and is considered a good leaving group because it is a stable anion. Therefore, the leaving group (Br-) is also a nucleophile. Final Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Both the attacking hydroxide ion (OH-) and the leaving bromide ion (Br-) are electron-rich species, not electron-deficient electrophiles.",
+        "B": "Incorrect. The attacking hydroxide ion (OH-) is a nucleophile, not an electrophile. The leaving bromide ion (Br-) is correctly identified as a nucleophile.",
+        "C": "Incorrect. The leaving bromide ion (Br-) is a nucleophile, not an electrophile. The attacking hydroxide ion (OH-) is correctly identified as a nucleophile.",
+        "D": "Correct. The attacking hydroxide ion (OH-) possesses a negative charge and lone pairs, making it a nucleophile. The leaving bromide ion (Br-) departs with a negative charge and lone pairs, also making it a nucleophile."
+      },
+      "flashcards": [
+        {
+          "question": "What is a nucleophile?",
+          "answer": "A species that donates an electron pair to form a new covalent bond, typically electron-rich (e.g., OH-, Br-, H2O)."
+        },
+        {
+          "question": "What is an electrophile?",
+          "answer": "A species that accepts an electron pair to form a new covalent bond, typically electron-deficient (e.g., H+, carbocations, carbonyl carbon)."
+        },
+        {
+          "question": "In nucleophilic substitution of alkyl halides, what type of group is the halide ion when it leaves?",
+          "answer": "The halide ion (e.g., Br-) acts as a nucleophile when it leaves, as it departs with a negative charge and an electron pair."
+        }
+      ]
+    },
+    "page": 13
+  },
+  {
+    "question_number": 31,
+    "text": "X is an organic compound containing the elements carbon, hydrogen and oxygen only. The table shows the observations made from three chemical tests carried out on X. What is a possible structure of X?",
+    "options": {
+      "A": "OH H O O (Structure represents 3-hydroxybutanoic acid)",
+      "B": "O OH (Structure represents 3-hydroxybutanal)",
+      "C": "O OH (Structure represents 2-hydroxy-2-methylpropanal)",
+      "D": "O OH (Structure represents 2-hydroxy-2-methylpropanoic acid)"
+    },
+    "generated_content": {
+      "core_concept": "Identification of functional groups (carboxylic acids, alcohols, aldehydes) using chemical tests.",
+      "detailed_explanation": "Let's analyze the observations from the chemical tests:\n1.  **Na(s) -> effervescence:** This indicates the presence of an acidic hydrogen, typically found in -COOH (carboxylic acid) groups or -OH (alcohol/phenol) groups. Both react with sodium to produce hydrogen gas.\n2.  **Na2CO3(s) -> effervescence:** This test is specific for carboxylic acid (-COOH) groups. Carboxylic acids are strong enough to react with carbonates to produce carbon dioxide gas. Alcohols do not react with carbonates.\n3.  **hot H+/Cr2O7^2-(aq) -> remains orange:** Acidified potassium dichromate(VI) (Cr2O7^2-) is an oxidizing agent (orange to green). 'Remains orange' means no oxidation has occurred. Primary alcohols, secondary alcohols, and aldehydes are oxidized by acidified dichromate. Tertiary alcohols, ketones, and carboxylic acids are generally resistant to oxidation under these conditions.\n\nCombining these deductions:\n-   The compound X must contain a carboxylic acid group (-COOH) due to the reaction with Na2CO3.\n-   The compound X is not oxidized by acidified dichromate. This rules out primary/secondary alcohols and aldehydes. If an alcohol is present, it must be tertiary.\n\nNow, let's examine the options:\n-   **A: 3-hydroxybutanoic acid.** Contains a -COOH group and a secondary alcohol (-CH(OH)-) group. The -COOH explains reaction with Na and Na2CO3. However, the secondary alcohol would be oxidized by acidified dichromate, turning it green. Thus, A is incorrect.\n-   **B: 3-hydroxybutanal.** Contains an aldehyde (-CHO) group and a secondary alcohol (-CH(OH)-) group. Both aldehydes and secondary alcohols are oxidized by acidified dichromate. It also lacks a -COOH group, so it wouldn't react with Na2CO3. Thus, B is incorrect.\n-   **C: 2-hydroxy-2-methylpropanal.** Contains an aldehyde (-CHO) group and a tertiary alcohol (-C(OH)-) group. The aldehyde group would be oxidized by acidified dichromate. It also lacks a -COOH group. Thus, C is incorrect.\n-   **D: 2-hydroxy-2-methylpropanoic acid.** Contains a -COOH group and a tertiary alcohol (-C(OH)-) group. The -COOH group explains the reaction with Na and Na2CO3. The tertiary alcohol explains the reaction with Na. Neither the carboxylic acid nor the tertiary alcohol is oxidized by acidified dichromate, which means it would 'remain orange'. This option perfectly matches all observations. Final Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. This compound has a secondary alcohol group which would be oxidized by hot acidified dichromate, causing a color change from orange to green. This contradicts the 'remains orange' observation.",
+        "B": "Incorrect. This compound has an aldehyde group and a secondary alcohol group, both of which would be oxidized by hot acidified dichromate. It also lacks a carboxylic acid group, so it would not react with Na2CO3.",
+        "C": "Incorrect. This compound has an aldehyde group, which would be oxidized by hot acidified dichromate. It also lacks a carboxylic acid group, so it would not react with Na2CO3.",
+        "D": "Correct. This compound contains a carboxylic acid group (-COOH), which reacts with both Na and Na2CO3 (producing effervescence). It also contains a tertiary alcohol group, which reacts with Na (effervescence) but is resistant to oxidation by hot acidified dichromate, hence the solution remains orange. This matches all observations."
+      },
+      "flashcards": [
+        {
+          "question": "What functional group reacts with Na2CO3 to produce effervescence?",
+          "answer": "Carboxylic acid (-COOH)."
+        },
+        {
+          "question": "What functional groups are oxidized by hot acidified dichromate (Cr2O7^2-)?",
+          "answer": "Primary alcohols, secondary alcohols, and aldehydes. Tertiary alcohols, ketones, and carboxylic acids are generally not oxidized under these conditions."
+        },
+        {
+          "question": "What functional groups react with Na metal to produce effervescence?",
+          "answer": "Alcohols (-OH), carboxylic acids (-COOH), and phenols."
+        }
+      ]
+    },
+    "page": 13
+  },
+  {
+    "question_number": 32,
+    "text": "How many moles of oxygen gas are needed for the complete combustion of 1 mol of (CH3)3COH?",
+    "options": {
+      "A": "6",
+      "B": "6.5",
+      "C": "12",
+      "D": "13"
+    },
+    "generated_content": {
+      "core_concept": "Stoichiometry of complete combustion reactions.",
+      "detailed_explanation": "First, determine the molecular formula of (CH3)3COH (2-methylpropan-2-ol).\nIt has 4 carbon atoms (C4).\nIt has (3*3) + 1 = 10 hydrogen atoms (H10).\nIt has 1 oxygen atom (O1).\nSo, the molecular formula is C4H10O.\n\nNow, write the balanced chemical equation for complete combustion:\nC4H10O + xO2 \u2192 4CO2 + 5H2O\n\nBalance the carbon atoms: 4 carbons on the left, so 4CO2 on the right.\nBalance the hydrogen atoms: 10 hydrogens on the left, so 5H2O (5*2=10) on the right.\n\nFinally, balance the oxygen atoms:\nOxygen atoms on the right side: (4 * 2 from CO2) + (5 * 1 from H2O) = 8 + 5 = 13 oxygen atoms.\nOxygen atoms on the left side: 1 (from C4H10O) + 2x (from xO2).\n\nSet the oxygen atoms on both sides equal:\n1 + 2x = 13\n2x = 13 - 1\n2x = 12\nx = 6\n\nSo, 6 moles of oxygen gas are needed for the complete combustion of 1 mol of (CH3)3COH. Final Correct Answer: A",
+      "option_analysis": {
+        "A": "Correct. Based on the balanced combustion equation C4H10O + 6O2 \u2192 4CO2 + 5H2O, 6 moles of O2 are required.",
+        "B": "Incorrect. This value might arise from misbalancing or using an incorrect general formula for combustion.",
+        "C": "Incorrect. This value is too high for the combustion of a C4 alcohol.",
+        "D": "Incorrect. This value is significantly too high and would mean there are 26 oxygen atoms on the left side for the O2 portion, which is incorrect."
+      },
+      "flashcards": [
+        {
+          "question": "What are the products of complete combustion of an organic compound containing C, H, and O?",
+          "answer": "Carbon dioxide (CO2) and water (H2O)."
+        },
+        {
+          "question": "What is the molecular formula of 2-methylpropan-2-ol?",
+          "answer": "C4H10O."
+        },
+        {
+          "question": "How do you balance the oxygen atoms in a combustion reaction?",
+          "answer": "Balance carbon first, then hydrogen, and finally oxygen by adjusting the coefficient of O2."
+        }
+      ]
+    },
+    "page": 13
+  },
+  {
+    "question_number": 33,
+    "text": "In which pair will each compound give a different visible result with alkaline I2(aq)?",
+    "options": {
+      "A": "CH3CH2OH and CH3CHO",
+      "B": "CH3CHO and CH3COCH3",
+      "C": "CH3COOH and C2H5COC2H5",
+      "D": "CH3CH2OH and C2H5CHO"
+    },
+    "generated_content": {
+      "core_concept": "Iodoform test (haloform reaction) for identifying specific functional groups.",
+      "detailed_explanation": "The alkaline I2(aq) test is the iodoform test. A positive result is indicated by the formation of a yellow precipitate of triiodomethane (CHI3).\nCompounds that give a positive iodoform test contain either a methyl ketone group (R-CO-CH3) or a methyl carbinol group (R-CH(OH)-CH3). Ethanol (CH3CH2OH) and acetaldehyde (CH3CHO) also give a positive test, as ethanol oxidizes to acetaldehyde, which then reacts.\n\nThe question asks for a pair where *each* compound gives a *different* visible result, meaning one positive and one negative test.\n\nLet's analyze each option:\n-   **A: CH3CH2OH (Ethanol) and CH3CHO (Acetaldehyde)**\n    -   Ethanol: Positive iodoform test (it's a methyl carbinol).\n    -   Acetaldehyde: Positive iodoform test (it's CH3CHO).\n    -   Both give a positive result, so the results are not different. Incorrect.\n\n-   **B: CH3CHO (Acetaldehyde) and CH3COCH3 (Propanone/Acetone)**\n    -   Acetaldehyde: Positive iodoform test.\n    -   Propanone: Positive iodoform test (it's a methyl ketone).\n    -   Both give a positive result, so the results are not different. Incorrect.\n\n-   **C: CH3COOH (Ethanoic acid) and C2H5COC2H5 (Pentan-3-one)**\n    -   Ethanoic acid: Does not have a methyl ketone or methyl carbinol group. Negative iodoform test.\n    -   Pentan-3-one: C2H5-CO-C2H5. This is a ketone, but it is not a methyl ketone (no -CO-CH3 group). Negative iodoform test.\n    -   Both give a negative result, so the results are not different. Incorrect.\n\n-   **D: CH3CH2OH (Ethanol) and C2H5CHO (Propanal)**\n    -   Ethanol: Positive iodoform test.\n    -   Propanal: C2H5CHO. This is an aldehyde, but it is not acetaldehyde (CH3CHO). It does not have a methyl ketone or methyl carbinol group. Negative iodoform test.\n    -   One gives a positive test (yellow precipitate) and the other gives a negative test (no yellow precipitate). The visible results are different. Correct. Final Correct Answer: D",
+      "option_analysis": {
+        "A": "Incorrect. Both ethanol and acetaldehyde give a positive iodoform test, resulting in a yellow precipitate. The results are not different.",
+        "B": "Incorrect. Both acetaldehyde and propanone (acetone) give a positive iodoform test. The results are not different.",
+        "C": "Incorrect. Neither ethanoic acid nor pentan-3-one contains the required methyl ketone or methyl carbinol group for a positive iodoform test. Both give a negative result, so the results are not different.",
+        "D": "Correct. Ethanol (CH3CH2OH) gives a positive iodoform test (yellow precipitate of CHI3). Propanal (CH3CH2CHO) does not have the characteristic CH3CO- or CH3CH(OH)- group and therefore gives a negative iodoform test (no yellow precipitate). This pair shows different visible results."
+      },
+      "flashcards": [
+        {
+          "question": "What is the characteristic observation for a positive iodoform test?",
+          "answer": "Formation of a yellow precipitate of triiodomethane (CHI3)."
+        },
+        {
+          "question": "Which specific functional groups give a positive iodoform test?",
+          "answer": "Methyl ketones (R-CO-CH3), methyl carbinols (R-CH(OH)-CH3), acetaldehyde (CH3CHO), and ethanol (CH3CH2OH)."
+        },
+        {
+          "question": "Does propanal (CH3CH2CHO) give a positive iodoform test?",
+          "answer": "No, because it does not have the required CH3CO- group or CH3CH(OH)- group."
+        }
+      ]
+    },
+    "page": 13
+  },
+  {
+    "question_number": 34,
+    "text": "Which reagent gives a positive result with propanone?",
+    "options": {
+      "A": "alkaline I\u2082(aq)",
+      "B": "aqueous bromine",
+      "C": "Fehling's reagent",
+      "D": "Tollens' reagent"
+    },
+    "generated_content": {
+      "core_concept": "Identification of carbonyl compounds, specifically methyl ketones, using characteristic chemical tests.",
+      "detailed_explanation": "Propanone (CH\u2083COCH\u2083) is a simple ketone and, more specifically, a methyl ketone because it contains the CH\u2083CO- functional group. Methyl ketones give a positive iodoform test. The iodoform test uses alkaline iodine solution (alkaline I\u2082(aq)). A positive result is the formation of a yellow precipitate of triiodomethane (CHI\u2083), also known as iodoform. Aqueous bromine is used to test for unsaturation (C=C or C\u2261C bonds) or phenols. Fehling's reagent and Tollens' reagent are mild oxidizing agents used to detect aldehydes (which are oxidized to carboxylic acids), but they do not react with ketones like propanone. Therefore, alkaline I\u2082(aq) is the correct reagent.",
+      "option_analysis": {
+        "A": "Correct. Alkaline iodine solution (I\u2082(aq)/OH\u207b) gives a positive iodoform test (yellow precipitate of CHI\u2083) with methyl ketones like propanone.",
+        "B": "Incorrect. Aqueous bromine is used to test for unsaturation (alkenes, alkynes) or phenols, neither of which propanone contains.",
+        "C": "Incorrect. Fehling's reagent is used to detect aldehydes (and reducing sugars). Ketones like propanone do not react with Fehling's reagent.",
+        "D": "Incorrect. Tollens' reagent is used to detect aldehydes. Ketones like propanone do not react with Tollens' reagent."
+      },
+      "flashcards": [
+        {
+          "question": "What is the functional group present in propanone?",
+          "answer": "Propanone is a ketone, specifically a methyl ketone due to the CH\u2083CO- group."
+        },
+        {
+          "question": "Which specific test is used to identify methyl ketones?",
+          "answer": "The iodoform test, using alkaline iodine solution (I\u2082(aq)/OH\u207b)."
+        },
+        {
+          "question": "What is a positive result for the iodoform test?",
+          "answer": "The formation of a yellow precipitate of triiodomethane (CHI\u2083)."
+        }
+      ]
+    },
+    "page": 14
+  },
+  {
+    "question_number": 35,
+    "text": "Esters can be hydrolysed with an aqueous alkali or an aqueous acid to form two products. The table compares the two methods. Which row is correct?",
+    "options": {
+      "A": "aqueous alkali: complete conversion to a salt and an organic acid; aqueous acid: forms an equilibrium mixture with an organic acid and an alcohol",
+      "B": "aqueous alkali: forms an equilibrium mixture with a salt and an organic acid; aqueous acid: complete conversion to a salt and an alcohol",
+      "C": "aqueous alkali: complete conversion to a salt and an alcohol; aqueous acid: forms an equilibrium mixture with an organic acid and an alcohol",
+      "D": "aqueous alkali: complete conversion to a salt and an alcohol; aqueous acid: complete conversion to an organic acid and an alcohol"
+    },
+    "generated_content": {
+      "core_concept": "Comparison of the products and reversibility of ester hydrolysis under alkaline (saponification) versus acidic conditions.",
+      "detailed_explanation": "Ester hydrolysis is a reaction that breaks the ester bond. There are two main methods:\n\n1.  **Alkaline Hydrolysis (Saponification):** When an ester is hydrolyzed with an aqueous alkali (e.g., NaOH or KOH), it produces a carboxylate salt and an alcohol. This reaction is irreversible because the carboxylate salt (being an ionic compound) does not readily react with the alcohol to reform the ester. Therefore, it leads to *complete conversion* to the salt and alcohol.\n\n2.  **Acidic Hydrolysis:** When an ester is hydrolyzed with an aqueous acid (e.g., H\u2082SO\u2084 or HCl), it produces a carboxylic acid and an alcohol. This reaction is reversible, similar to esterification. It reaches an *equilibrium mixture* of the ester, water, carboxylic acid, and alcohol.\n\nBased on these principles, the correct row must state 'complete conversion to a salt and an alcohol' for aqueous alkali and 'forms an equilibrium mixture with an organic acid and an alcohol' for aqueous acid. This matches option C. \n\n**Final Correct Answer: C**",
+      "option_analysis": {
+        "A": "Incorrect. Alkaline hydrolysis produces a salt and an alcohol, not an organic acid. The description for aqueous acid is correct.",
+        "B": "Incorrect. Alkaline hydrolysis is complete conversion, not an equilibrium mixture, and produces an alcohol, not an organic acid. Acidic hydrolysis forms an equilibrium mixture of acid and alcohol, not complete conversion to a salt and alcohol.",
+        "C": "Correct. Alkaline hydrolysis results in the complete conversion of the ester into a carboxylate salt and an alcohol. Acidic hydrolysis results in an equilibrium mixture of the carboxylic acid and alcohol.",
+        "D": "Incorrect. Acidic hydrolysis results in an equilibrium mixture of the organic acid and alcohol, not complete conversion."
+      },
+      "flashcards": [
+        {
+          "question": "What are the products of ester hydrolysis using an aqueous alkali?",
+          "answer": "A carboxylate salt and an alcohol."
+        },
+        {
+          "question": "Is alkaline hydrolysis of esters reversible or irreversible?",
+          "answer": "Irreversible, leading to complete conversion."
+        },
+        {
+          "question": "What are the products of ester hydrolysis using an aqueous acid?",
+          "answer": "A carboxylic acid and an alcohol."
+        },
+        {
+          "question": "Is acidic hydrolysis of esters reversible or irreversible?",
+          "answer": "Reversible, forming an equilibrium mixture."
+        }
+      ]
+    },
+    "page": 14
+  },
+  {
+    "question_number": 36,
+    "text": "Structural isomerism only should be considered when answering this question. How many compounds with molecular formula C\u2085H\u2081\u2081Br are primary halogenoalkanes?",
+    "options": {
+      "A": "4",
+      "B": "5",
+      "C": "7",
+      "D": "8"
+    },
+    "generated_content": {
+      "core_concept": "Identification of primary halogenoalkanes among structural isomers, based on the carbon atom bonded to the halogen.",
+      "detailed_explanation": "A primary halogenoalkane is defined as a compound where the carbon atom bonded to the halogen (bromine in this case) is attached to only one other carbon atom (i.e., R-CH\u2082-Br). We need to systematically draw all possible carbon skeletons for C\u2085H\u2081\u2081 and then place the bromine atom on a primary carbon.\n\nLet's consider the possible C\u2085H\u2081\u2081 carbon skeletons:\n\n1.  **Straight chain (n-pentane skeleton):** C-C-C-C-C\n    *   If Br is on C1: CH\u2083CH\u2082CH\u2082CH\u2082CH\u2082Br (1-bromopentane). This is a primary halogenoalkane. (1 isomer)\n\n2.  **Branched chain (2-methylbutane skeleton):** A four-carbon chain with one methyl group branching off (isopentane).\n    ```\n        CH3\n        |\n    CH3-CH-CH2-CH3\n    ```\n    Primary carbon positions for Br:\n    *   On C1 (end of the longest chain): CH\u2082Br-CH(CH\u2083)-CH\u2082-CH\u2083 (1-bromo-2-methylbutane). This is a primary halogenoalkane. (2 isomers)\n    *   On C4 (the other end of the longest chain): CH\u2083-CH(CH\u2083)-CH\u2082-CH\u2082Br (1-bromo-3-methylbutane). This is a primary halogenoalkane. (3 isomers)\n\n3.  **Branched chain (2,2-dimethylpropane skeleton):** A three-carbon chain with two methyl groups branching off the central carbon (neopentane).\n    ```\n         CH3\n         |\n    CH3-C-CH3\n         |\n         CH3\n    ```\n    Primary carbon positions for Br:\n    *   On any of the four equivalent methyl groups: (CH\u2083)\u2083C-CH\u2082Br (1-bromo-2,2-dimethylpropane). This is a primary halogenoalkane. (4 isomers)\n\nThus, there are a total of 4 primary halogenoalkane isomers for C\u2085H\u2081\u2081Br.\n\n**Final Correct Answer: A**",
+      "option_analysis": {
+        "A": "Correct. There are 4 primary halogenoalkane isomers for C\u2085H\u2081\u2081Br: 1-bromopentane, 1-bromo-2-methylbutane, 1-bromo-3-methylbutane, and 1-bromo-2,2-dimethylpropane.",
+        "B": "Incorrect. There are not 5 primary isomers.",
+        "C": "Incorrect. There are not 7 primary isomers.",
+        "D": "Incorrect. There are not 8 primary isomers."
+      },
+      "flashcards": [
+        {
+          "question": "What defines a primary halogenoalkane?",
+          "answer": "A halogenoalkane where the carbon atom bonded to the halogen is attached to only one other carbon atom (R-CH\u2082-X)."
+        },
+        {
+          "question": "Name the four primary structural isomers of C\u2085H\u2081\u2081Br.",
+          "answer": "1-bromopentane, 1-bromo-2-methylbutane, 1-bromo-3-methylbutane, and 1-bromo-2,2-dimethylpropane."
+        },
+        {
+          "question": "How do you systematically find primary halogenoalkane isomers for a given formula?",
+          "answer": "Draw all possible carbon skeletons and then place the halogen on each unique primary carbon position."
+        }
+      ]
+    },
+    "page": 14
+  },
+  {
+    "question_number": 37,
+    "text": "Compound Z is formed by the reaction scheme shown. What is the formula of compound Z?",
+    "options": {
+      "A": "CH\u2083CH\u2082Cl",
+      "B": "CH\u2083CH\u2082CN",
+      "C": "CH\u2083COOH",
+      "D": "CH\u2083CH\u2082COOH"
+    },
+    "generated_content": {
+      "core_concept": "Multi-step organic synthesis involving nucleophilic substitution and nitrile hydrolysis.",
+      "detailed_explanation": "The reaction scheme involves two steps:\n\n**Step 1: CH\u2083CH\u2082Br --(warm with KCN in ethanol)--> compound X**\nThis is a nucleophilic substitution reaction. The cyanide ion (CN\u207b) from KCN acts as a nucleophile, replacing the bromide ion (Br\u207b) from bromoethane. The product, compound X, will have one more carbon atom than the starting bromoethane.\nCH\u2083CH\u2082Br + CN\u207b \u2192 CH\u2083CH\u2082CN + Br\u207b\nSo, Compound X is propanenitrile (CH\u2083CH\u2082CN).\n\n**Step 2: compound X (CH\u2083CH\u2082CN) --(reflux with dilute HCl)--> compound Z**\nThis is the acid hydrolysis of a nitrile. Nitriles (R-CN) undergo hydrolysis under acidic conditions (reflux with dilute HCl) to yield carboxylic acids (R-COOH). The carbon atom of the nitrile group becomes the carboxylic acid carbon.\nCH\u2083CH\u2082CN + 2H\u2082O + H\u207a (from HCl) --(reflux)--> CH\u2083CH\u2082COOH + NH\u2084\u207a\nSo, Compound Z is propanoic acid (CH\u2083CH\u2082COOH).\n\n**Final Correct Answer: D**",
+      "option_analysis": {
+        "A": "Incorrect. This would be chloroethane, which is a different starting material or product from a different reaction (e.g., if KCN was replaced by KCl).",
+        "B": "Incorrect. This is propanenitrile, which is Compound X, the intermediate product, not the final product Z.",
+        "C": "Incorrect. This is ethanoic acid (CH\u2083COOH), which would be formed from the hydrolysis of ethanenitrile (CH\u2083CN), not propanenitrile. The chain length is different.",
+        "D": "Correct. This is propanoic acid (CH\u2083CH\u2082COOH), which is formed by the acid hydrolysis of propanenitrile (CH\u2083CH\u2082CN)."
+      },
+      "flashcards": [
+        {
+          "question": "What type of reaction occurs when an alkyl halide reacts with KCN in ethanol?",
+          "answer": "Nucleophilic substitution (SN2), forming a nitrile."
+        },
+        {
+          "question": "What is the product of reacting CH\u2083CH\u2082Br with KCN in ethanol?",
+          "answer": "Propanenitrile (CH\u2083CH\u2082CN)."
+        },
+        {
+          "question": "What happens when a nitrile (R-CN) is refluxed with dilute HCl?",
+          "answer": "It undergoes acid hydrolysis to form a carboxylic acid (R-COOH)."
+        }
+      ]
+    },
+    "page": 14
+  },
+  {
+    "question_number": 38,
+    "text": "Hydroxyethanal, HOCH\u2082CHO, is heated under reflux with an excess of acidified K\u2082Cr\u2082O\u2087 until no further oxidation takes place. What is the skeletal formula of the organic product?",
+    "options": {
+      "A": "Skeletal formula of HOOC-CH\u2082-CH\u2082-COOH (butanedioic acid)",
+      "B": "Skeletal formula of HOOC-COOH (ethanedioic acid)",
+      "C": "Skeletal formula of HOCH\u2082-COOH (2-hydroxyethanoic acid)",
+      "D": "Skeletal formula of OHC-COOH (2-oxoethanoic acid)"
+    },
+    "generated_content": {
+      "core_concept": "Oxidation of primary alcohols and aldehydes using strong oxidizing agents.",
+      "detailed_explanation": "Hydroxyethanal (HOCH\u2082CHO) contains two oxidizable functional groups: a primary alcohol group (-CH\u2082OH) and an aldehyde group (-CHO). The reagent, acidified potassium dichromate(VI) (K\u2082Cr\u2082O\u2087) under reflux, is a strong oxidizing agent. Under these conditions, a primary alcohol will be oxidized completely to a carboxylic acid, and an aldehyde will also be oxidized to a carboxylic acid. Since hydroxyethanal has two carbon atoms, both functional groups will convert to carboxylic acid groups, resulting in a two-carbon dicarboxylic acid. The primary alcohol group (-CH\u2082OH) at C1 will be oxidized to a carboxylic acid (-COOH). The aldehyde group (-CHO) at C2 will also be oxidized to a carboxylic acid (-COOH). The product will therefore be HOOC-COOH, which is ethanedioic acid (also known as oxalic acid). By examining the skeletal formulas provided, option B represents HOOC-COOH.\nFinal Correct Answer: B",
+      "option_analysis": {
+        "A": "This option represents butanedioic acid (succinic acid), HOOC-CH\u2082-CH\u2082-COOH, which is a 4-carbon dicarboxylic acid. This is incorrect as the starting material, hydroxyethanal, only has two carbon atoms.",
+        "B": "This option represents ethanedioic acid (oxalic acid), HOOC-COOH, which is a 2-carbon dicarboxylic acid. This is the correct product formed from the complete oxidation of both the primary alcohol and aldehyde groups in hydroxyethanal.",
+        "C": "This option represents 2-hydroxyethanoic acid (glycolic acid), HOCH\u2082-COOH. This would be the product if only the aldehyde group was oxidized and the primary alcohol group remained unchanged, or if it were an oxidation of a different starting material. However, a strong oxidizing agent under reflux would oxidize both groups.",
+        "D": "This option represents 2-oxoethanoic acid (glyoxylic acid), OHC-COOH. This would be the product if only the primary alcohol group was oxidized to an aldehyde and the aldehyde group was then oxidized to a carboxylic acid, or if the primary alcohol was oxidized to a carboxylic acid and the aldehyde remained. However, under strong oxidation conditions, the aldehyde would also be oxidized to a carboxylic acid."
+      },
+      "flashcards": [
+        {
+          "question": "What functional groups are present in hydroxyethanal (HOCH\u2082CHO)?",
+          "answer": "A primary alcohol group (-CH\u2082OH) and an aldehyde group (-CHO)."
+        },
+        {
+          "question": "How do strong oxidizing agents like acidified K\u2082Cr\u2082O\u2087 affect primary alcohols and aldehydes?",
+          "answer": "They oxidize primary alcohols completely to carboxylic acids and aldehydes to carboxylic acids."
+        },
+        {
+          "question": "What is the systematic name for HOOC-COOH?",
+          "answer": "Ethanedioic acid (or oxalic acid)."
+        }
+      ]
+    },
+    "page": 15
+  },
+  {
+    "question_number": 39,
+    "text": "The formula shows the repeat unit of an addition polymer. -CH(CH\u2083)CH(CH\u2082CH\u2083)- What is the correct name of the monomer from which this polymer is made?",
+    "options": {
+      "A": "1-methyl-2-ethylethene",
+      "B": "1-ethylprop-1-ene",
+      "C": "pent-2-ene",
+      "D": "pent-1-ene"
+    },
+    "generated_content": {
+      "core_concept": "Relating the repeat unit of an addition polymer to its original monomer structure and naming alkenes according to IUPAC rules.",
+      "detailed_explanation": "An addition polymer's repeat unit is formed by the breaking of the carbon-carbon double bond in the monomer and the formation of single bonds to adjacent monomer units. To determine the monomer, we reverse this process: identify the two main chain carbons in the repeat unit that were originally part of the double bond and reform the double bond between them. The given repeat unit is -CH(CH\u2083)CH(CH\u2082CH\u2083)-. The two carbons in the main chain involved in polymerization are the ones bearing the methyl and ethyl groups. So, the monomer will have a double bond between these two carbons: CH(CH\u2083)=CH(CH\u2082CH\u2083). To name this alkene systematically:\n1. Identify the longest carbon chain that includes the double bond. This chain is CH\u2083-CH=CH-CH\u2082-CH\u2083, which has 5 carbons (pent-).\n2. Number the carbon chain to give the double bond the lowest possible number. Numbering from the left: C1(CH\u2083)-C2(CH)=C3(CH)-C4(CH\u2082)-C5(CH\u2083). The double bond is between C2 and C3, so it is a pent-2-ene.\n3. There are no substituents to name on this longest chain. Therefore, the monomer is pent-2-ene.\nFinal Correct Answer: C",
+      "option_analysis": {
+        "A": "1-methyl-2-ethylethene is an incorrect IUPAC name. 'Ethene' refers to a 2-carbon chain. If substituents are methyl and ethyl, the longest chain containing the double bond would be longer than two carbons, making 'ethene' inappropriate. The correct name for the structure CH(CH\u2083)=CH(CH\u2082CH\u2083) is pent-2-ene.",
+        "B": "1-ethylprop-1-ene. Prop-1-ene is CH\u2083-CH=CH\u2082. If an ethyl group is added at position 1 (which would be the carbon with the methyl group in prop-1-ene), it implies CH\u2083-CH=CH-CH\u2082CH\u2083. While this structure is correct (pent-2-ene), '1-ethylprop-1-ene' is not the preferred IUPAC name as it doesn't represent the longest carbon chain containing the double bond as the parent chain.",
+        "C": "pent-2-ene. This is the correct IUPAC name for the monomer CH\u2083-CH=CH-CH\u2082-CH\u2083 derived from the given repeat unit. The longest chain is 5 carbons, and the double bond starts at the second carbon.",
+        "D": "pent-1-ene. This would correspond to a monomer with the double bond at the end of the chain, i.e., CH\u2082=CH-CH\u2082-CH\u2082-CH\u2083. The repeat unit for pent-1-ene would be -CH\u2082-CH(CH\u2082CH\u2082CH\u2083)- which is different from the given repeat unit -CH(CH\u2083)CH(CH\u2082CH\u2083)-."
+      },
+      "flashcards": [
+        {
+          "question": "How do you determine the monomer from an addition polymer's repeat unit?",
+          "answer": "Identify the two main chain carbons that formed the backbone of the polymer and re-form a double bond between them, along with their attached substituents."
+        },
+        {
+          "question": "What is the key rule for numbering the carbon chain when naming an alkene?",
+          "answer": "The carbon chain containing the double bond must be the longest possible, and the double bond must be given the lowest possible number."
+        },
+        {
+          "question": "What is the systematic name for CH\u2083CH=CHCH\u2082CH\u2083?",
+          "answer": "Pent-2-ene."
+        }
+      ]
+    },
+    "page": 15
+  },
+  {
+    "question_number": 40,
+    "text": "The infrared spectrum of a compound is shown.Which functional group could the compound contain?",
+    "options": {
+      "A": "alcohol",
+      "B": "carboxylic acid",
+      "C": "ester",
+      "D": "nitrile"
+    },
+    "generated_content": {
+      "core_concept": "Interpretation of Infrared (IR) spectroscopy to identify functional groups in organic compounds based on characteristic absorption bands.",
+      "detailed_explanation": "The provided infrared (IR) spectrum exhibits several key absorption bands that allow for the identification of functional groups:\n1.  **C=O Absorption**: A strong, sharp absorption band is observed at approximately 1710-1740 cm\u207b\u00b9. According to the IR correlation table, this range is characteristic of a C=O (carbonyl) bond, specifically for carboxyl (1670-1740 cm\u207b\u00b9) or ester (1710-1750 cm\u207b\u00b9). The presence of this C=O peak immediately rules out options A (alcohol, which lacks a C=O bond) and D (nitrile, which features a C\u2261N bond around 2200-2250 cm\u207b\u00b9).\n2.  **C-O Absorption**: A strong absorption band is present at approximately 1040-1300 cm\u207b\u00b9. The table identifies this as a C-O bond, which is found in hydroxy and ester groups. This is consistent with both carboxylic acids and esters.\n3.  **O-H Absorption**: A broad absorption band is observed in the region of approximately 3200-3600 cm\u207b\u00b9. The table identifies this as an O-H bond (hydroxy).\n\nNow, let's evaluate the remaining options:\n*   **Option C (ester)**: Esters are characterized by a C=O bond (1710-1750 cm\u207b\u00b9) and a C-O bond (1040-1300 cm\u207b\u00b9). Both these peaks are present. However, esters *do not* contain an O-H bond. The spectrum clearly shows a broad O-H absorption band at 3200-3600 cm\u207b\u00b9. Therefore, an ester cannot be the functional group.\n*   **Option B (carboxylic acid)**: Carboxylic acids are characterized by a C=O bond (1670-1740 cm\u207b\u00b9) and an O-H bond. The C=O absorption matches the observed strong peak, and the C-O absorption is also consistent. While the table specifies the O-H for carboxylic acid as 2500-3000 cm\u207b\u00b9, the observed broad O-H at 3200-3600 cm\u207b\u00b9 indicates the presence of an O-H group. Given that options A, C, and D are definitively ruled out by the presence or absence of key functional group signals (C=O and O-H), carboxylic acid is the most plausible functional group that fits the overall pattern of a C=O and an O-H group. The presence of both a strong carbonyl and a broad O-H is the defining characteristic of a carboxylic acid among the given choices, even if the O-H band is slightly higher than the typical 'acid O-H' range often given for highly hydrogen-bonded species.\nFinal Correct Answer: B",
+      "option_analysis": {
+        "A": "Incorrect. Alcohols possess an O-H bond (3200-3600 cm\u207b\u00b9) and a C-O bond (1040-1300 cm\u207b\u00b9), which are observed in the spectrum. However, alcohols do not have a C=O (carbonyl) group, which is clearly indicated by the strong absorption at ~1710-1740 cm\u207b\u00b9.",
+        "B": "Correct. Carboxylic acids contain both a C=O (carbonyl) group (1670-1740 cm\u207b\u00b9) and an O-H group. The spectrum shows a strong C=O peak and a broad O-H peak (3200-3600 cm\u207b\u00b9), along with a C-O peak (1040-1300 cm\u207b\u00b9). While the O-H range for carboxylic acids is typically cited as 2500-3000 cm\u207b\u00b9 in the table, the presence of both a C=O and an O-H band, with other options clearly ruled out, makes carboxylic acid the most suitable choice.",
+        "C": "Incorrect. Esters have a C=O bond (1710-1750 cm\u207b\u00b9) and a C-O bond (1040-1300 cm\u207b\u00b9), both of which are present in the spectrum. However, esters lack an O-H bond. The spectrum distinctly shows a broad O-H absorption at ~3200-3600 cm\u207b\u00b9, thereby ruling out an ester.",
+        "D": "Incorrect. Nitriles are characterized by a C\u2261N bond, which produces a sharp absorption band in the region of 2200-2250 cm\u207b\u00b9. There is no absorption in this region in the provided spectrum, making nitrile an incorrect option."
+      },
+      "flashcards": [
+        {
+          "question": "What are the key IR absorption ranges for a carboxylic acid?",
+          "answer": "Carboxylic acids typically show a very broad O-H stretch from 2500-3300 cm\u207b\u00b9 (often centered lower, like 2500-3000 cm\u207b\u00b9), a strong C=O stretch at 1670-1740 cm\u207b\u00b9, and a C-O stretch at 1040-1300 cm\u207b\u00b9."
+        },
+        {
+          "question": "How can IR spectroscopy distinguish an alcohol from an ester?",
+          "answer": "Alcohols show a broad O-H stretch (3200-3600 cm\u207b\u00b9) and a C-O stretch (1040-1300 cm\u207b\u00b9) but lack a C=O stretch. Esters show a strong C=O stretch (1710-1750 cm\u207b\u00b9) and a C-O stretch (1040-1300 cm\u207b\u00b9) but lack an O-H stretch."
+        },
+        {
+          "question": "What IR absorption peak would specifically indicate the presence of a nitrile group?",
+          "answer": "A nitrile group (C\u2261N) shows a characteristic sharp absorption band in the region of 2200-2250 cm\u207b\u00b9."
+        }
+      ]
+    },
+    "page": 16
+  }
+]

@@ -4,8 +4,9 @@ import io
 import uuid
 import fitz
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 from PIL import Image
+import base64
 from google import genai
 from google.genai import types
 from openai import OpenAI
@@ -62,6 +63,11 @@ class AutomationEngine:
         
         TARGET LANGUAGE: {lang}
         
+        IMPORTANT: If a question includes a diagram, chart, or image, identify its location on the page.
+        Provide the diagram's bounding box in normalized coordinates [ymin, xmin, ymax, xmax] where each value is an integer from 0 to 1000.
+        EXCLUSIVELY return the coordinates if there is a CLEAR visual element.
+        Return this in the 'diagram_coords' field.
+        
         For each question, perform the following analysis:
         """
         
@@ -71,7 +77,8 @@ class AutomationEngine:
         prompt += """
         
         Return the data in a valid JSON list following the provided schema.
-        If a question has a diagram, indicate its position with [DIAGRAM] in the text.
+        If a question has a diagram, indicate its position with [DIAGRAM] in the text and provide 'diagram_coords'. 
+        If no diagram is present, 'diagram_coords' must be null.
         """
         return prompt
 
@@ -90,6 +97,11 @@ class AutomationEngine:
                     "C": types.Schema(type="STRING"),
                     "D": types.Schema(type="STRING"),
                 }
+            ),
+            "diagram_coords": types.Schema(
+                type="ARRAY",
+                items=types.Schema(type="INTEGER"),
+                description="Bounding box [ymin, xmin, ymax, xmax] in 0-1000 scaled coordinates"
             )
         }
         
@@ -113,7 +125,7 @@ class AutomationEngine:
         )
 
     @opik.track(project_name="Edmate") if opik else lambda x: x
-    def process_pdf(self, pdf_path: str, config: Dict[str, Any]) -> List[Dict]:
+    def process_pdf(self, pdf_path: str, config: Dict[str, Any], progress_callback: Optional[Callable[[float], None]] = None) -> List[Dict]:
         """Processes a PDF using the specified modular configuration"""
         modalities = config.get("modalities", ["core_concept", "detailed_explanation", "option_analysis", "flashcards"])
         lang = config.get("language", "English")
@@ -121,22 +133,70 @@ class AutomationEngine:
         
         doc = fitz.open(pdf_path)
         all_questions = []
+        total_pages = len(doc)
         
         prompt = self._build_dynamic_prompt(modalities, lang, curriculum)
         schema = self._build_dynamic_schema(modalities)
         
         for i, page in enumerate(doc):
-            print(f"  Processing page {i+1}...")
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            print(f"  Processing page {i+1}/{total_pages}...")
+            # Use high-res for extraction, but we'll also use this for cropping
+            zoom = 2
+            pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom))
             img_bytes = pix.tobytes("png")
             
             questions = self._call_llm(img_bytes, prompt, schema)
+            
+            # Post-process diagrams
+            if questions:
+                self._extract_diagrams(img_bytes, questions)
+                
             for q in questions:
                 q['page'] = i + 1
             all_questions.extend(questions)
             
+            # Report progress
+            if progress_callback:
+                progress_callback(((i + 1) / total_pages) * 100)
+            
         doc.close()
         return all_questions
+
+    def _extract_diagrams(self, img_bytes: bytes, questions: List[Dict]):
+        """Crops diagrams from the page image based on LLM-provided coordinates"""
+        try:
+            img = Image.open(io.BytesIO(img_bytes))
+            width, height = img.size
+            
+            for q in questions:
+                coords = q.get("diagram_coords")
+                if coords and len(coords) == 4:
+                    # Normalize: [ymin, xmin, ymax, xmax] (0-1000)
+                    ymin, xmin, ymax, xmax = coords
+                    # Convert to pixel coordinates
+                    left = (xmin / 1000) * width
+                    top = (ymin / 1000) * height
+                    right = (xmax / 1000) * width
+                    bottom = (ymax / 1000) * height
+                    
+                    # Sanity check for crop area
+                    if right > left and bottom > top:
+                        # Crop with small padding (5 pixels)
+                        padding = 5
+                        left = max(0, left - padding)
+                        top = max(0, top - padding)
+                        right = min(width, right + padding)
+                        bottom = min(height, bottom + padding)
+                        
+                        cropped_img = img.crop((left, top, right, bottom))
+                        
+                        # Convert to base64
+                        buffered = io.BytesIO()
+                        cropped_img.save(buffered, format="PNG")
+                        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                        q["diagram_base64"] = f"data:image/png;base64,{img_str}"
+        except Exception as e:
+            print(f"  Diagram extraction failed: {e}")
 
     def _call_llm(self, img_bytes: bytes, prompt: str, schema: Any) -> List[Dict]:
         """Dispatches the call to the appropriate provider"""

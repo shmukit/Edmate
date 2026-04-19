@@ -3,7 +3,7 @@ import re
 import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -178,8 +178,33 @@ async def get_stats():
 
 # ───── AUTOMATION ENDPOINTS ─────
 
-DRAFTS_DIR = Path("qc_viewer/drafts")
+# Setup robust paths
+BASE_DIR = Path(__file__).parent
+DRAFTS_DIR = (BASE_DIR / "drafts").resolve()
 DRAFTS_DIR.mkdir(parents=True, exist_ok=True)
+
+print(f"🚀 Edmate Automation Hub Initialized")
+print(f"📂 Drafts Directory: {DRAFTS_DIR}")
+
+# Mount static files once at root for everything else
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    from fastapi.responses import FileResponse
+    favicon_path = BASE_DIR / "static" / "favicon.svg"
+    if favicon_path.exists():
+        return FileResponse(favicon_path, media_type="image/svg+xml")
+    return None
+
+@app.get("/api/debug/paths")
+async def debug_paths():
+    import os
+    return {
+        "DRAFTS_DIR": str(DRAFTS_DIR),
+        "exists": DRAFTS_DIR.exists(),
+        "files": os.listdir(DRAFTS_DIR) if DRAFTS_DIR.exists() else []
+    }
 
 @app.post("/api/automate/upload")
 async def upload_pdf(file: UploadFile = File(...)):
@@ -204,66 +229,189 @@ async def upload_pdf(file: UploadFile = File(...)):
     return draft_meta
 
 @app.post("/api/automate/process/{draft_id}")
-async def process_draft(draft_id: str, config: dict = None):
+async def process_draft(draft_id: str, background_tasks: BackgroundTasks, config: dict = None):
     """Triggers Modular AI extraction for a specific draft"""
     pdf_path = DRAFTS_DIR / f"{draft_id}.pdf"
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="Draft PDF not found")
         
-    # Default configuration if none provided
     if config is None:
         config = {
             "provider": "gemini",
-            "model_id": "gemini-2.5-flash",
+            "model_id": "gemini-2.0-flash",
             "modalities": ["core_concept", "detailed_explanation", "option_analysis", "flashcards"],
             "language": "English",
             "curriculum": "Cambridge O/Level"
         }
         
+    # Update status to PROCESSING immediately
+    meta_path = DRAFTS_DIR / f"{draft_id}.json"
+    with open(meta_path, "r") as f:
+        meta = json.load(f)
+    
+    meta.update({"status": "PROCESSING", "progress": 0})
+    with open(meta_path, "w") as f:
+        json.dump(meta, f)
+
+    # Launch background task
+    background_tasks.add_task(run_extraction_task, draft_id, str(pdf_path), config)
+    
+    return meta
+
+def run_extraction_task(draft_id: str, pdf_path: str, config: dict):
+    """Background task for PDF processing with progress updates"""
+    meta_path = DRAFTS_DIR / f"{draft_id}.json"
+    
+    def progress_callback(percent: float):
+        try:
+            with open(meta_path, "r") as f:
+                data = json.load(f)
+            data["progress"] = round(percent, 2)
+            with open(meta_path, "w") as f:
+                json.dump(data, f)
+        except Exception as e:
+            print(f"Callback error: {e}")
+
     try:
         engine = AutomationEngine(
             provider=config.get("provider", "gemini"),
             model_id=config.get("model_id")
         )
-        questions = engine.process_pdf(str(pdf_path), config)
+        questions = engine.process_pdf(pdf_path, config, progress_callback=progress_callback)
         
-        # Update draft with results
-        results = {
-            "id": draft_id,
+        with open(meta_path, "r") as f:
+            results = json.load(f)
+
+        results.update({
             "status": "PROCESSED",
             "questions": questions,
-            "config": config # Save config used for reproducibility
-        }
+            "config": config,
+            "progress": 100,
+            "processed_at": str(uuid.uuid4())
+        })
         
-        with open(DRAFTS_DIR / f"{draft_id}.json", "w") as f:
+        with open(meta_path, "w") as f:
             json.dump(results, f)
             
-        return results
     except Exception as e:
-        print(f"Processing Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Background Processing Error: {e}")
+        try:
+            with open(meta_path, "r") as f:
+                data = json.load(f)
+            data.update({"status": "FAILED", "error": str(e)})
+            with open(meta_path, "w") as f:
+                json.dump(data, f)
+        except:
+            pass
 
 @app.get("/api/automate/drafts")
 async def list_drafts():
-    """Returns all current drafts"""
+    """Returns all current drafts with sorted timestamps"""
     drafts = []
     for f in DRAFTS_DIR.glob("*.json"):
-        with open(f, "r") as json_file:
-            drafts.append(json.load(json_file))
-    return drafts
+        try:
+            with open(f, "r") as json_file:
+                drafts.append(json.load(json_file))
+        except Exception as e:
+            print(f"Error reading draft {f}: {e}")
+    # Sort by created_at descending
+    return sorted(drafts, key=lambda x: float(x.get("created_at", 0)), reverse=True)
+
+@app.get("/api/automate/drafts/{draft_id}")
+async def get_draft(draft_id: str):
+    """Returns a specific draft including questions"""
+    meta_path = DRAFTS_DIR / f"{draft_id}.json"
+    if not meta_path.exists():
+        print(f"Draft 404: {meta_path} does not exist")
+        raise HTTPException(status_code=404, detail=f"Draft {draft_id} not found")
+    with open(meta_path, "r") as f:
+        return json.load(f)
+
+@app.delete("/api/automate/drafts/{draft_id}")
+async def delete_draft(draft_id: str):
+    """Deletes a draft PDF and JSON record"""
+    pdf_path = DRAFTS_DIR / f"{draft_id}.pdf"
+    json_path = DRAFTS_DIR / f"{draft_id}.json"
+    
+    if pdf_path.exists(): pdf_path.unlink()
+    if json_path.exists(): json_path.unlink()
+    
+    return {"status": "success", "message": f"Draft {draft_id} deleted"}
+
+@app.patch("/api/automate/drafts/{draft_id}")
+async def update_draft(draft_id: str, updates: dict):
+    """Updates draft metadata or question data (e.g., status, admin edits)"""
+    meta_path = DRAFTS_DIR / f"{draft_id}.json"
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Draft not found")
+        
+    with open(meta_path, "r") as f:
+        data = json.load(f)
+    
+    # Merge updates
+    for key, value in updates.items():
+        if key == "questions" and isinstance(value, list):
+            data["questions"] = value
+        else:
+            data[key] = value
+            
+    data["last_reviewed_at"] = str(shutil.os.path.getmtime(meta_path))
+    
+    with open(meta_path, "w") as f:
+        json.dump(data, f)
+        
+    return data
 
 @app.post("/api/automate/inject")
-async def inject_question(q_data: dict):
-    """Injects a single verified question into the unified table"""
+async def inject_question(payload: dict):
+    """Injects a verified question into the specified subject table"""
+    table_name = payload.get("table_name")
+    q_data = payload.get("question_data")
+    
+    if not table_name or not q_data:
+        raise HTTPException(status_code=400, detail="Missing table_name or question_data")
+        
     db = DatabaseService()
     try:
-        db.inject_question(q_data)
-        return {"status": "success", "message": "Question injected into unified table"}
+        db.inject_question(table_name, q_data)
+        return {"status": "success", "message": f"Question injected into {table_name}"}
     except Exception as e:
+        print(f"Injection API Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Serve static files (must be last)
-app.mount("/", StaticFiles(directory="qc_viewer/static", html=True), name="static")
+@app.post("/api/automate/refine")
+async def refine_question(payload: dict):
+    """AI endpoint to refine a specific question based on admin feedback"""
+    feedback = payload.get("feedback")
+    original_q = payload.get("original_q")
+    
+    if not feedback or not original_q:
+        raise HTTPException(status_code=400, detail="Missing feedback or original_q")
+    
+    try:
+        engine = AutomationEngine(provider="gemini")
+        prompt = f"""
+        You are an educational editor. Refine the following question content based on the user feedback.
+        USER FEEDBACK: {feedback}
+        ORIGINAL CONTENT:
+        {json.dumps(original_q)}
+        Maintain the same JSON structure. Return ONLY the refined JSON object for this ONE question.
+        """
+        # Call the engine's internal call_llm if available or direct client
+        # For simplicity and correctness with current main.py structure:
+        response = engine.client.models.generate_content(
+            model=engine.model_id,
+            contents=prompt,
+            config={"response_mime_type": "application/json"}
+        )
+        refined_q = json.loads(response.text)
+        return {"status": "success", "refined_question": refined_q}
+    except Exception as e:
+        print(f"Refinement Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Mount logic at the end to catch all main UI requests
+app.mount("/", StaticFiles(directory=BASE_DIR / "static", html=True), name="static_root")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
