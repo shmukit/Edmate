@@ -61,12 +61,13 @@ class AutomationEngine:
         You are an advanced OCR and educational expert specializing in {curriculum}.
         Analyze the provided context (image or text) and extract ALL multiple-choice questions.
         
-        TARGET LANGUAGE: {lang}
+        IMPORTANT: If a question or its OPTIONS include a diagram, chart, or image, identify its location on the page.
+        Provide diagrams' bounding boxes in normalized coordinates [ymin, xmin, ymax, xmax] (0-1000).
         
-        IMPORTANT: If a question includes a diagram, chart, or image, identify its location on the page.
-        Provide the diagram's bounding box in normalized coordinates [ymin, xmin, ymax, xmax] where each value is an integer from 0 to 1000.
-        EXCLUSIVELY return the coordinates if there is a CLEAR visual element.
-        Return this in the 'diagram_coords' field.
+        CRITICAL CROP RULES:
+        1. CRITICAL: Use the TIGHTEST POSSIBLE bounding box for the diagram ONLY. 
+        2. EXCLUDE any text above/below the diagram (like question text or page numbers).
+        3. If a diagram is inside Option A, B, C, or D, provide it in the 'option_X_diagram_coords' field.
         
         For each question, perform the following analysis:
         """
@@ -101,8 +102,12 @@ class AutomationEngine:
             "diagram_coords": types.Schema(
                 type="ARRAY",
                 items=types.Schema(type="INTEGER"),
-                description="Bounding box [ymin, xmin, ymax, xmax] in 0-1000 scaled coordinates"
-            )
+                description="Main question diagram [ymin, xmin, ymax, xmax]"
+            ),
+            "option_A_diagram_coords": types.Schema(type="ARRAY", items=types.Schema(type="INTEGER")),
+            "option_B_diagram_coords": types.Schema(type="ARRAY", items=types.Schema(type="INTEGER")),
+            "option_C_diagram_coords": types.Schema(type="ARRAY", items=types.Schema(type="INTEGER")),
+            "option_D_diagram_coords": types.Schema(type="ARRAY", items=types.Schema(type="INTEGER"))
         }
         
         # Add generated content properties
@@ -169,8 +174,13 @@ class AutomationEngine:
             width, height = img.size
             
             for q in questions:
-                coords = q.get("diagram_coords")
-                if coords and len(coords) == 4:
+                # Find all coordinator fields (main and options)
+                coord_fields = [f for f in q.keys() if f.endswith("_coords") and q[f]]
+                
+                for field in coord_fields:
+                    coords = q.get(field)
+                    if not coords or len(coords) != 4: continue
+                    
                     # Normalize: [ymin, xmin, ymax, xmax] (0-1000)
                     ymin, xmin, ymax, xmax = coords
                     # Convert to pixel coordinates
@@ -181,8 +191,8 @@ class AutomationEngine:
                     
                     # Sanity check for crop area
                     if right > left and bottom > top:
-                        # Crop with small padding (5 pixels)
-                        padding = 5
+                        # Tighter crop for clearer extraction
+                        padding = 2
                         left = max(0, left - padding)
                         top = max(0, top - padding)
                         right = min(width, right + padding)
@@ -194,7 +204,10 @@ class AutomationEngine:
                         buffered = io.BytesIO()
                         cropped_img.save(buffered, format="PNG")
                         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                        q["diagram_base64"] = f"data:image/png;base64,{img_str}"
+                        
+                        # Store in the appropriate base64 field
+                        target_field = field.replace("_coords", "_base64")
+                        q[target_field] = f"data:image/png;base64,{img_str}"
         except Exception as e:
             print(f"  Diagram extraction failed: {e}")
 

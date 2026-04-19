@@ -19,6 +19,7 @@
 
     <!-- Markdown & Math Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script>
         window.MathJax = {
             tex: {
@@ -49,6 +50,7 @@
                 <div class="review-title-block">
                     <h2>Live Preview</h2>
                     <span id="currentQNum" class="q-subtitle">Select a question</span>
+                    <span id="reviewFilename" class="q-subtitle" style="display:block; font-size: 0.7rem; opacity: 0.7; margin-top: 2px;"></span>
                 </div>
                 <div class="review-actions">
                     <button class="btn btn-secondary btn-sm" id="btnRejectQuestion">Reject</button>
@@ -253,10 +255,43 @@
         </div>
     </div>
 
+    <!-- Image Editor Modal -->
+    <div id="imageEditorModal" class="modal" style="display:none">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Image Editor</h3>
+                <div class="editor-tools">
+                    <button class="btn btn-outline btn-sm" id="toolSelect">🖐 Move</button>
+                    <button class="btn btn-outline btn-sm" id="toolPencil">✏ Draw</button>
+                    <button class="btn btn-outline btn-sm" id="toolHighlighter">🖍 Highlight</button>
+                    <button class="btn btn-outline btn-sm" id="toolCrop">✂ Crop Mode</button>
+                    <button class="btn btn-outline btn-sm" id="toolClear">🔄 Reset</button>
+                </div>
+                <span class="close-btn" id="closeEditor">&times;</span>
+            </div>
+            <div class="modal-body editor-body">
+                <div id="canvasWrapper" style="position:relative; margin:auto; background:#eee; overflow:hidden; border-radius:8px;">
+                    <canvas id="editorCanvas"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id="editorStatus" style="font-size:0.8rem; color:var(--text-dim); margin-right:auto;"></span>
+                <button class="btn btn-secondary" id="cancelEditor">Cancel</button>
+                <button class="btn btn-primary" id="saveEditor">Apply Edits</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Input for Image Uploads -->
+    <input type="file" id="imageUploadInput" hidden accept="image/*">
+
     <!-- Application Controller -->
     <script type="module">
         import { AutomationUI } from './js/automate_ui.js';
         
+        // Expose to global scope for inline HTML handlers
+        window.AutomationUI = AutomationUI;
+
         // Initialize the UI logic
         AutomationUI.init();
 

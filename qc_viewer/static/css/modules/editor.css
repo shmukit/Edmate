@@ -1,0 +1,116 @@
+/* ── Interactive Image System ────────────────────── */
+.image-wrapper {
+    position: relative;
+    margin: 12px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+    background: #ffffff;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide wrappers that only contain a placeholder unless in edit-mode */
+.image-wrapper.has-placeholder { display: none; }
+.edit-mode .image-wrapper.has-placeholder { display: flex; }
+
+.image-wrapper:hover { border-color: var(--primary-light); }
+
+.image-wrapper img {
+    max-width: 100%;
+    display: block;
+    margin: 0;
+}
+
+.image-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateY(-5px);
+    z-index: 10;
+}
+
+.image-wrapper:hover .image-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.img-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(15, 23, 42, 0.85);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s, transform 0.1s;
+}
+
+.img-btn:hover { background: var(--primary); transform: scale(1.1); }
+.img-btn.btn-delete:hover { background: var(--danger); }
+
+.image-placeholder {
+    padding: 8px 12px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    width: fit-content;
+    border: 1px dashed var(--card-border);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    margin: 8px 0;
+}
+
+.image-placeholder:hover { 
+    color: var(--primary-light); 
+    border-color: var(--primary-light);
+    background: rgba(99,102,241,0.05);
+}
+
+/* ── Image Editor Specifics ───────────────────────── */
+.modal-lg { width: 900px; max-width: 95vw; }
+
+.editor-tools {
+    display: flex;
+    gap: 8px;
+    margin-left: 20px;
+}
+
+.editor-tools .btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.editor-body {
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    padding: 30px;
+}
+
+#canvasWrapper {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 1px solid var(--card-border);
+}
+
+.canvas-container { margin: 0 auto; } /* Fabric.js wrapper center */
+
+#editorStatus { font-weight: 500; }
