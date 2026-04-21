@@ -50,7 +50,7 @@ export const ReviewController = {
             };
         });
         document.querySelectorAll('.btn-inject').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); this.injectQuestion(parseInt(btn.dataset.index)); };
+            btn.onclick = (e) => { e.stopPropagation(); this.publishQuestion(parseInt(btn.dataset.index)); };
         });
     },
 
@@ -200,16 +200,17 @@ export const ReviewController = {
         }
     },
 
-    async injectQuestion(index) {
+    async publishQuestion(index) {
         this.saveCurrentEdits();
         const q = this.currentDraftData.questions[index];
         const gen = q.generated_content || {};
         const tableName = document.getElementById('targetTableSelect').value;
 
         const payload = {
+            draft_id: this.currentDraftData.id,
             table_name: tableName,
             question_data: {
-                question_identifier: `${this.currentDraftData.filename.replace('.pdf', '')}/Q${q.question_number}`,
+                question_identifier: `${this.currentDraftData.id}/Q${q.question_number}`,
                 title: q.text,
                 options: [q.options.A, q.options.B, q.options.C, q.options.D],
                 correct_options: [0], // Defaulting to A for now
@@ -223,7 +224,7 @@ export const ReviewController = {
         };
 
         try {
-            await AutomationAPI.injectQuestion(payload);
+            await AutomationAPI.publishQuestion(payload);
             q.status = 'INJECTED';
             this.showToast(`✅ Injected Q${q.question_number} to ${tableName}`);
             this.saveCurrentEdits();
@@ -235,7 +236,7 @@ export const ReviewController = {
         if (!confirm('Inject all processed questions into the production database?')) return;
         this.currentDraftData.questions.forEach((q, i) => {
             if (q.status !== 'INJECTED' && q.status !== 'REJECTED') {
-                this.injectQuestion(i);
+                this.publishQuestion(i);
             }
         });
     },

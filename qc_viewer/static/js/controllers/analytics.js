@@ -36,19 +36,25 @@ export const AnalyticsController = {
 
             const injectionRate = totalQ > 0 ? Math.round((injectedQ / totalQ) * 100) : 0;
 
+            // Update helper for safety
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
+
             // Render Stats
-            document.getElementById('statTotalDrafts').textContent = totalDrafts;
-            document.getElementById('statProcessed').textContent = processed;
-            document.getElementById('statInjected').textContent = injectedQ;
-            document.getElementById('statRejected').textContent = rejectedQ;
-            document.getElementById('statTotalQuestions').textContent = totalQ;
-            document.getElementById('statInjectionRate').textContent = injectionRate + '%';
+            setText('statTotalDrafts', totalDrafts);
+            setText('statProcessed', processed);
+            setText('statInjected', injectedQ);
+            setText('statRejected', rejectedQ);
+            setText('statTotalQuestions', totalQ);
+            setText('statInjectionRate', injectionRate + '%');
 
             // Render Core Metrics
             if (metrics) {
                 const cost = metrics.total_cost || 0;
-                document.getElementById('statTotalCost').textContent = `$${cost.toFixed(4)}`;
-                document.getElementById('statTotalTokens').textContent = (metrics.total_tokens || 0).toLocaleString();
+                setText('statTotalCost', `$${cost.toFixed(4)}`);
+                setText('statTotalTokens', (metrics.total_tokens || 0).toLocaleString());
                 
                 // Update Sidebar elements if they exist
                 const sideCost = document.getElementById('settingsCurrentCost');
@@ -56,7 +62,6 @@ export const AnalyticsController = {
                 
                 if (sideCost) sideCost.textContent = `$${cost.toFixed(4)}`;
                 if (sideBar) {
-                    // Logic: Get max_budget from config if possible, fallback to 10
                     fetch('/api/automate/config')
                         .then(res => res.json())
                         .then(config => {
@@ -69,6 +74,8 @@ export const AnalyticsController = {
 
             // Render Activity Feed
             const activityFeed = document.getElementById('analyticsActivity');
+            if (!activityFeed) return;
+
             if (drafts.length === 0) {
                 activityFeed.innerHTML = '<div class="subtitle">No recent activity</div>';
                 return;

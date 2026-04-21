@@ -1,23 +1,6 @@
 /* QC Viewer Specific Styles - Edmate Brand Identity */
 
-/* ── LAYOUT & SCROLLING ── */
-body {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-}
-
-aside {
-  width: var(--sidebar-width); 
-  min-width: var(--sidebar-width);
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--card-border);
-  display: flex; 
-  flex-direction: column;
-  backdrop-filter: blur(20px);
-  height: 100vh;
-}
-
+/* viewer.css should only contain component-specific styles now */
 .question-list { 
   flex: 1; 
   overflow-y: auto; 
@@ -70,14 +53,7 @@ main {
   background: rgba(var(--brand-amber-rgb), 0.2); 
 }
 
-/* ── SIDEBAR HEADER ── */
-.sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--card-border); }
-.logo-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; letter-spacing: .5px; }
-
 /* ── CUSTOM DROPDOWN ── */
-.paper-selector { padding: 14px 16px; border-bottom: 1px solid var(--card-border); position: relative; }
-.selector-label { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
-
 .selected-badge {
   display: none; align-items: center; justify-content: space-between;
   background: rgba(var(--brand-amber-rgb), 0.1); border: 1px solid rgba(var(--brand-amber-rgb), 0.2);

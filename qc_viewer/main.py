@@ -3,6 +3,7 @@ import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Form
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -28,6 +29,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Core Clean URL Navigation (Prioritized)
+@app.get("/")
+async def serve_root():
+    static_path = Path(__file__).resolve().parent / "static" / "index.html"
+    if not static_path.exists():
+         raise HTTPException(status_code=404, detail="index.html not found")
+    return FileResponse(static_path)
+
+@app.get("/automate")
+async def serve_hub():
+    static_path = Path(__file__).resolve().parent / "static" / "automate.html"
+    if not static_path.exists():
+         raise HTTPException(status_code=404, detail="automate.html not found")
+    return FileResponse(static_path)
+
+@app.get("/analytics")
+async def serve_analytics():
+    static_path = Path(__file__).resolve().parent / "static" / "analytics.html"
+    if not static_path.exists():
+         raise HTTPException(status_code=404, detail="analytics.html not found")
+    return FileResponse(static_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -237,17 +260,20 @@ async def run_automation_pipeline(draft_id: str, subject: str, paper_code: str, 
 @app.get("/api/automate/drafts")
 async def list_drafts():
     """Returns all current drafts with sorted timestamps"""
-    draft_ids = []
+    drafts = []
     drafts_root = Path(__file__).parent / "static" / "drafts"
     if not drafts_root.exists():
         return []
 
     for d in drafts_root.iterdir():
         if d.is_dir() and (d / "metadata.json").exists():
-            with open(d / "metadata.json", "r") as f:
-                drafts_root.append(json.load(f))
+            try:
+                with open(d / "metadata.json", "r") as f:
+                    drafts.append(json.load(f))
+            except Exception:
+                continue
 
-    return sorted(drafts_root, key=lambda x: x.get("timestamp", ""), reverse=True)
+    return sorted(drafts, key=lambda x: x.get("timestamp", ""), reverse=True)
 
 
 @app.get("/api/automate/draft/{draft_id}")
@@ -275,6 +301,47 @@ async def publish_draft(draft_id: str, table_name: str, question_data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/automate/metrics")
+async def get_metrics():
+    """Returns aggregate metrics for the automation pipeline"""
+    # In a real app, this would query a metrics table. 
+    # For now, we'll calculate from existing drafts.
+    drafts_root = Path(__file__).parent / "static" / "drafts"
+    total_cost = 0.0
+    total_tokens = 0
+    
+    if drafts_root.exists():
+        for d in drafts_root.iterdir():
+            if d.is_dir() and (d / "metadata.json").exists():
+                try:
+                    with open(d / "metadata.json", "r") as f:
+                        data = json.load(f)
+                        total_cost += data.get("total_cost", 0)
+                        total_tokens += data.get("total_tokens", 0)
+                except Exception:
+                    continue
+                    
+    return {
+        "total_cost": total_cost,
+        "total_tokens": total_tokens,
+        "active_drafts": 5, # Placeholder
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+@app.get("/api/automate/config")
+async def get_config():
+    """Returns pipeline configuration and budget limits"""
+    return {
+        "budget": {
+            "max_daily_usd": 10.0,
+            "current_usage_usd": 1.25
+        },
+        "model": "gpt-4o",
+        "vision_enabled": True
+    }
+
+
 @app.post("/api/automate/refine")
 async def refine_explanation(feedback: str, original_q: str):
     if not feedback or not original_q:
@@ -293,8 +360,34 @@ async def refine_explanation(feedback: str, original_q: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-app.mount("/static", StaticFiles(directory=Path(__file__).parent /
-          "static", html=True), name="static_root")
+@app.patch("/api/automate/draft/{draft_id}")
+async def update_draft(draft_id: str, updates: dict):
+    meta_path = Path(__file__).parent / "static" / "drafts" / draft_id / "metadata.json"
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Draft not found")
+    
+    with open(meta_path, "r") as f:
+        data = json.load(f)
+    
+    data.update(updates)
+    with open(meta_path, "w") as f:
+        json.dump(data, f)
+    return data
+
+
+@app.delete("/api/automate/draft/{draft_id}")
+async def delete_draft(draft_id: str):
+    draft_dir = Path(__file__).parent / "static" / "drafts" / draft_id
+    if not draft_dir.exists():
+        raise HTTPException(status_code=404, detail="Draft not found")
+    shutil.rmtree(draft_dir)
+    return {"status": "success"}
+
+
+# Static Fallback Mount 
+# This allows relative paths like css/viewer.css to work from clean URLs
+app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

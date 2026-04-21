@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="shortcut icon" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="shortcut icon" href="/favicon.svg">
 <script>
 MathJax = {
   tex: {
@@ -21,12 +21,14 @@ MathJax = {
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- Styles -->
-    <link rel="stylesheet" href="css/automate.css">
-    <link rel="stylesheet" href="css/viewer.css">
+    <link rel="stylesheet" href="/css/automate.css">
+    <link rel="stylesheet" href="/css/viewer.css">
 </head>
 <body>
 
-<aside>
+  </div>
+
+<aside id="mainSidebar">
   <div class="sidebar-header">
     <div class="logo">
         <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
@@ -34,27 +36,49 @@ MathJax = {
         </svg>
         <span>Edmate AI</span>
     </div>
-    <div class="logo-sub">QC Pipeline Viewer</div>
-    <div style="margin-top: 12px;">
-      <a href="automate.html" class="btn btn-outline btn-sm" style="text-decoration: none; display: flex; align-items: center; gap: 6px; width: fit-content;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        Go to Automation Hub
-      </a>
-    </div>
+    <button class="btn-collapse" id="btnCollapseSidebar" title="Toggle Sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
   </div>
 
-  <div class="paper-selector" id="paperSelector">
-    <div class="selector-label">Select Paper</div>
+  <nav>
+    <a href="/" class="nav-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>Standard Viewer</span>
+    </a>
+    <a href="/automate" class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      <span>Automation Hub</span>
+    </a>
+    <a href="/analytics" class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <span>Analytics</span>
+    </a>
+  </nav>
 
-    <div class="selected-badge" id="selectedBadge" onclick="clearSelection()">
+  <div class="sidebar-divider"></div>
+
+  <div class="paper-selector" id="paperSelector">
+    <div class="selector-label">Search Papers</div>
+
+    <div class="selected-badge" id="selectedBadge" onclick="clearSelection()" style="margin-top: 8px;">
       <div class="badge-text" id="badgeText">—</div>
       <div class="badge-change">✕ change</div>
     </div>
 
-    <div class="search-box" id="searchBox">
-      <input class="search-input" id="searchInput" type="text" placeholder="Type to search papers…" autocomplete="off">
+    <div class="search-box" id="searchBox" style="margin-top: 8px;">
+      <input class="search-input" id="searchInput" type="text" placeholder="Search papers..." autocomplete="off">
       <span class="search-icon">⌕</span>
       <div class="dropdown-list" id="dropdownList"></div>
     </div>
@@ -67,7 +91,16 @@ MathJax = {
 
 <main>
   <div class="container" id="contentView">
-    <header style="display:flex; justify-content: flex-end; margin-bottom: 20px;">
+    <nav class="breadcrumb-nav">
+      <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
+      <div class="breadcrumb-item active">Standard Viewer</div>
+    </nav>
+
+    <header style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="subtitle" style="margin-bottom:0">Quality control and verification workspace.</p>
+        </div>
         <div class="theme-toggle-container">
             <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
                 <span class="theme-icon-light">☀️</span>
@@ -77,18 +110,24 @@ MathJax = {
     </header>
 
     <div class="empty-state">
-      <span style="font-size:2.5rem">🔬</span>
+      <span style="font-size:3rem">🔬</span>
       <h2>Ready to Verify</h2>
-      <p>Select a paper and question to begin QC review.</p>
+      <p>Select a paper from the sidebar to begin your QC review process.</p>
     </div>
   </div>
 </main>
 
 <script type="module">
-import { ThemeManager } from './js/theme.js';
+import { ThemeManager } from '/js/theme.js';
+import { LayoutManager } from '/js/ui.js';
+import { AnalyticsController } from '/js/controllers/analytics.js';
+
 ThemeManager.init();
+LayoutManager.init();
 
 const API = '/api';
+const ROOT = '/';
+const AUTOMATE = '/automate';
 let allPapers = [];
 let currentTable = null;
 

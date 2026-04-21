@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edmate | Pipeline Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/automate.css">
+    <link rel="stylesheet" href="/css/viewer.css">
+</head>
+<body>
+
+<aside id="mainSidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+            <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+        </svg>
+        <span>Edmate AI</span>
+    </div>
+    <button class="btn-collapse" id="btnCollapseSidebar" title="Toggle Sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <nav>
+    <a href="/" class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>Standard Viewer</span>
+    </a>
+    <a href="/automate" class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      <span>Automation Hub</span>
+    </a>
+    <a href="/analytics" class="nav-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <span>Analytics</span>
+    </a>
+  </nav>
+</aside>
+
+<main>
+  <div class="container" id="analyticsContentView">
+     <nav class="breadcrumb-nav">
+      <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
+      <div class="breadcrumb-item active">Pipeline Analytics</div>
+    </nav>
+
+    <div class="analytics-panel" id="analyticsPanel">
+      <div class="analytics-header">
+          <div>
+              <h2 class="analytics-title">Pipeline Analytics</h2>
+              <p class="analytics-subtitle">Real-time stats from your content automation drafts</p>
+          </div>
+      </div>
+
+      <div class="analytics-grid" id="analyticsGrid">
+          <div class="stat-card">
+              <div class="stat-icon">📄</div>
+              <div class="stat-value" id="statTotalDrafts">—</div>
+              <div class="stat-label">Total PDFs Uploaded</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value" id="statProcessed">—</div>
+              <div class="stat-label">Successfully Processed</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-value" id="statTotalCost">$0.00</div>
+              <div class="stat-label">Total Cost (USD)</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-value" id="statInjectionRate">—</div>
+              <div class="stat-label">Injection Rate</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-value" id="statTotalQuestions">—</div>
+              <div class="stat-label">Total Questions</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">📥</div>
+              <div class="stat-value" id="statInjected">—</div>
+              <div class="stat-label">Questions Injected</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">🚫</div>
+              <div class="stat-value" id="statRejected">—</div>
+              <div class="stat-label">Questions Rejected</div>
+          </div>
+          <div class="stat-card">
+              <div class="stat-icon">🎟️</div>
+              <div class="stat-value" id="statTotalTokens">—</div>
+              <div class="stat-label">Total Tokens</div>
+          </div>
+      </div>
+
+      <div class="analytics-section">
+          <h3 class="analytics-section-title">Recent Draft Activity</h3>
+          <div id="analyticsActivity" class="activity-feed">Loading...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { ThemeManager } from '/js/theme.js';
+import { LayoutManager } from '/js/ui.js';
+import { AnalyticsController } from '/js/controllers/analytics.js';
+
+ThemeManager.init();
+LayoutManager.init();
+AnalyticsController.updateAnalytics();
+</script>
+
+</body>
+</html>
