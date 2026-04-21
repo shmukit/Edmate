@@ -31,13 +31,15 @@ class CoreConfig:
             routing = data.get("model_routing", {})
             budget = data.get("budget", {})
             img_settings = data.get("storage_settings", {})
+            ext_settings = data.get("extraction_settings", {})
             
             return ModelConfig(
                 extraction_model=routing.get("extraction") or "gemini/gemini-1.5-pro",
                 generation_model=routing.get("generation") or "anthropic/claude-3-haiku",
                 validation_model=routing.get("validation") or "openai/gpt-4o",
                 max_budget=budget.get("max_daily_usd", 10.0),
-                image_mode=img_settings.get("image_mode") or "cdn"
+                image_mode=img_settings.get("image_mode") or "cdn",
+                extraction_engine=ext_settings.get("engine") or "pdf_extract_kit"
             )
         except Exception as e:
             print(f"⚠️ Error loading config: {e}. Using defaults.")

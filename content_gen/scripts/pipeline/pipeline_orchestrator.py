@@ -21,6 +21,8 @@ from ...adapters.postgres_adapter import PostgresStorageAdapter
 
 # Import local modules
 from extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
+from ..adapters.kit_extraction_adapter import KitExtractionAdapter
+from ..adapters.pymupdf_adapter import PyMuPDFAdapter
 from processing.upload_to_storage import StorageUploader
 from processing.content_generator import ContentGenerator
 
@@ -40,9 +42,16 @@ class PipelineOrchestrator:
         self.router = router or ModelRoutingEngine()
         
         # Initialize components
-        self.uploader = StorageUploader() if storage_bucket else None
+        self.router = router or ModelRoutingEngine()
         self.generator = ContentGenerator(router=self.router)
         self.storage = PostgresStorageAdapter(db_connection) if db_connection else None
+        
+        # Initialize Extractor based on config
+        engine = self.router.config.extraction_engine
+        if engine == "pymupdf":
+            self.extractor = PyMuPDFAdapter()
+        else:
+            self.extractor = KitExtractionAdapter()
         
     def _convert_to_base64(self, image_path: Path) -> str:
         """Converts an image file to a base64 Data URI."""
@@ -77,22 +86,17 @@ class PipelineOrchestrator:
             "errors": []
         }
         
-        # Step 1: Extract PDF
-        try:
-            print("🔍 Step 1: Extracting content...")
-            extractor = PDFExtractKitWrapper(pdf_path, output_dir)
-            extraction_result = extractor.extract()
-            report["extraction"] = {"questions": len(extraction_result["questions"])}
-        except Exception as e:
-            report["errors"].append(f"Extraction failed: {e}")
-            return report
+        # Step 1: Multimodal Extraction (The "Eyes")
+        print(f"👁️  Step 1: Extracting with {self.router.config.extraction_engine}...")
+        extracted_questions = self.extractor.extract_content(Path(pdf_path), Path(output_dir))
+        report["extraction"] = {"questions": len(extracted_questions)}
         
         # Step 2: Modular Content Generation (The "Brain")
         generated_questions = []
         try:
             print("🤖 Step 2: Generating educational content via ModelRouter...")
             generated_questions = self.generator.generate_for_questions(
-                extraction_result["questions"], 
+                extracted_questions, 
                 subject=subject
             )
             report["processing"] = {"count": len(generated_questions)}

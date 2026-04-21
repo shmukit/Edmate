@@ -47,3 +47,4 @@ class ModelConfig(BaseModel):
     validation_model: str = "openai/gpt-4o"
     max_budget: float = 10.0  # USD daily cap placeholder
     image_mode: str = "cdn"    # "cdn" or "base64"
+    extraction_engine: str = "pdf_extract_kit" # "pdf_extract_kit" or "pymupdf"
