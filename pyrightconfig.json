@@ -1,13 +1,18 @@
 {
     "exclude": [
-        "content_gen/tools",
         "**/node_modules",
         "**/.venv"
     ],
     "executionEnvironments": [
         {
-            "root": "."
+            "root": ".",
+            "extraPaths": [
+                "content_gen/tools/PDF-Extract-Kit"
+            ]
         }
+    ],
+    "extraPaths": [
+        "content_gen/tools/PDF-Extract-Kit"
     ],
     "reportMissingImports": true,
     "pythonVersion": "3.9",
