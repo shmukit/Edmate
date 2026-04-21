@@ -69,16 +69,33 @@
 
     <!-- Sidebar Navigation -->
     <aside>
-        <div class="logo">Edmate AI</div>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+            </svg>
+            <span>Edmate AI</span>
+        </div>
         <nav>
             <a href="index.html" class="nav-item">
-                <span>🔍</span> Standard Viewer
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Standard Viewer</span>
             </a>
             <a href="automate.html" class="nav-item active">
-                <span>⚡</span> Automation Hub
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Automation Hub</span>
             </a>
             <a href="#" class="nav-item" id="navAnalytics">
-                <span>📊</span> Analytics
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Analytics</span>
             </a>
         </nav>
     </aside>
@@ -148,8 +165,18 @@
     <main>
         <div class="container">
             <header>
-                <h1>Automation Hub</h1>
-                <p class="subtitle">AI-powered PDF extraction for O/A-Level content generation.</p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                    <div>
+                        <h1>Automation Hub</h1>
+                        <p class="subtitle">AI-powered PDF extraction for O/A-Level content generation.</p>
+                    </div>
+                    <div class="theme-toggle-container">
+                        <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
+                            <span class="theme-icon-light">☀️</span>
+                            <span class="theme-icon-dark">🌙</span>
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <!-- Drag & Drop Upload Zone -->

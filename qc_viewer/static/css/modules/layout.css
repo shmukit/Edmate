@@ -25,11 +25,11 @@ aside {
     font-family: 'Outfit', sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #818cf8, #6366f1);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary);
     margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .nav-item {
@@ -46,14 +46,14 @@ aside {
 }
 
 .nav-item:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(var(--brand-amber-rgb), 0.05);
     color: var(--text-main);
 }
 
 .nav-item.active {
-    background: rgba(99, 102, 241, 0.2);
-    color: var(--primary-light);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: rgba(var(--brand-amber-rgb), 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(var(--brand-amber-rgb), 0.2);
 }
 
 /* Main Content */
@@ -61,7 +61,12 @@ main {
     flex: 1;
     padding: 40px;
     overflow-y: auto;
-    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent);
+    background-color: var(--bg);
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 32px 32px;
+    position: relative;
 }
 
 .container {

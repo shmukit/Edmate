@@ -6,7 +6,7 @@
     overflow: hidden;
     border: 2px solid transparent;
     transition: border-color 0.2s;
-    background: #ffffff;
+    background: var(--card-bg);
     min-height: 40px;
     display: flex;
     align-items: center;
@@ -47,8 +47,8 @@
     height: 34px;
     border-radius: 8px;
     border: none;
-    background: rgba(15, 23, 42, 0.85);
-    color: white;
+    background: rgba(var(--brand-amber-rgb), 0.15);
+    color: var(--primary);
     font-size: 1rem;
     cursor: pointer;
     display: flex;
@@ -58,8 +58,8 @@
     transition: background 0.2s, transform 0.1s;
 }
 
-.img-btn:hover { background: var(--primary); transform: scale(1.1); }
-.img-btn.btn-delete:hover { background: var(--danger); }
+.img-btn:hover { background: var(--primary); color: var(--brand-night); }
+.img-btn.btn-delete:hover { background: var(--danger); color: white; }
 
 .image-placeholder {
     padding: 8px 12px;
@@ -77,9 +77,9 @@
 }
 
 .image-placeholder:hover { 
-    color: var(--primary-light); 
-    border-color: var(--primary-light);
-    background: rgba(99,102,241,0.05);
+    color: var(--primary); 
+    border-color: var(--primary);
+    background: rgba(var(--brand-amber-rgb), 0.05);
 }
 
 /* ── Image Editor Specifics ───────────────────────── */
@@ -98,7 +98,7 @@
 }
 
 .editor-body {
-    background: #0f172a;
+    background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;

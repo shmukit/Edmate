@@ -2,6 +2,7 @@ import { DraftController } from './controllers/drafts.js';
 import { ReviewController } from './controllers/review.js';
 import { AnalyticsController } from './controllers/analytics.js';
 import { EditorController } from './controllers/editor.js';
+import { ThemeManager } from './theme.js';
 
 export const AutomationUI = {
     currentDraftData: null,
@@ -16,14 +17,16 @@ export const AutomationUI = {
     isDraggingCrop: false,
 
     init() {
+        ThemeManager.init();
         this.setupEventListeners();
         this.fetchDrafts();
         window.addEventListener('hashchange', () => this.checkHash());
         // Initial deep link check
-        setTimeout(() => this.checkHash(), 500);
+        setTimeout(() => this.checkHash(), 400);
     },
 
     setupEventListeners() {
+        // ThemeManager now handles its own listeners globally during init()
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
 

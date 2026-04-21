@@ -24,9 +24,8 @@
 }
 
 .draft-card:hover {
-    border-color: var(--primary-light);
-    background: rgba(30, 41, 59, 1);
-    transform: scale(1.01);
+    border-color: var(--primary);
+    background: var(--card-bg);
 }
 
 .draft-info h3 {
@@ -47,8 +46,8 @@
     text-transform: uppercase;
 }
 
-.status-processed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.status-uploaded { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.status-processed { background: rgba(var(--brand-amber-rgb), 0.15); color: var(--primary); }
+.status-uploaded { background: rgba(var(--brand-amber-rgb), 0.08); color: var(--text-dim); }
 .status-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 .status-rejected { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px dashed rgba(239, 68, 68, 0.3); }
 
@@ -84,11 +83,12 @@
 }
 
 .card-render {
-    background: white;
-    color: #334155;
+    background: var(--card-bg);
+    color: var(--text-main);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
 }
 
 .card-render h2 { color: var(--bg); margin-bottom: 15px; }
@@ -132,12 +132,12 @@
 /* Rendered Preview Box */
 .preview-render-box {
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 15px 20px;
     font-size: 0.95rem;
-    color: #1e293b;
+    color: var(--text-main);
     margin-top: 8px;
     margin-bottom: 24px;
     min-height: 40px;
@@ -244,12 +244,12 @@
     align-items: center;
     gap: 12px;
     background: var(--primary);
-    color: white;
+    color: var(--brand-night);
     padding: 10px 20px;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 10px 30px rgba(var(--brand-amber-rgb), 0.2);
     font-weight: 600;
     transition: all 0.2s;
 }
-.back-nav:hover { transform: scale(1.05); background: var(--primary-dark); }
+.back-nav:hover { background: var(--primary-light); }
