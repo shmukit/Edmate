@@ -10,6 +10,7 @@ import glob
 from pathlib import Path
 from typing import List, Dict, Optional
 import argparse
+import base64
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -43,6 +44,16 @@ class PipelineOrchestrator:
         self.generator = ContentGenerator(router=self.router)
         self.storage = PostgresStorageAdapter(db_connection) if db_connection else None
         
+    def _convert_to_base64(self, image_path: Path) -> str:
+        """Converts an image file to a base64 Data URI."""
+        try:
+            with open(image_path, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode("utf-8")
+                return f"data:image/png;base64,{encoded}"
+        except Exception as e:
+            print(f"⚠️ Failed to base64 encode {image_path}: {e}")
+            return ""
+
     def process_pdf(
         self,
         pdf_path: str,
@@ -90,6 +101,20 @@ class PipelineOrchestrator:
         
         # Step 3: Modular Persistence (The "Legs")
         if self.storage:
+            # 2. Storage Upload (Conditional)
+            cdn_mapping = {}
+            images = list(Path(output_dir).glob("*.png"))
+            if self.router.config.image_mode == "base64":
+                print("📦 Encoding images to Base64...")
+                for img_path in images:
+                    b64_str = self._convert_to_base64(img_path)
+                    if b64_str:
+                        cdn_mapping[img_path.name] = b64_str
+            else:
+                print(f"☁️ Uploading {len(images)} images to {self.storage_bucket}...")
+                uploader = StorageUploader(self.storage_bucket)
+                cdn_mapping = uploader.upload_batch(images, base_path=f"diagrams/{pdf_name}")
+            
             try:
                 print("📥 Step 3: Persisting to Database...")
                 for q in generated_questions:

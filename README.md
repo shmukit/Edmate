@@ -4,98 +4,85 @@
 
 Edmate is an open-source, vendor-agnostic pipeline designed to transform unstructured educational materials (PDFs, images, documents) into high-fidelity learning modules, flashcards, and MCQ banks. 
 
-Built with **modularity** and **modality** at its core, Edmate allows organizations to bring their own intelligence (LLMs), their own storage, and their own database schemas.
+Built with **modularity** and **multi-modality** at its core, Edmate allows organizations to bring their own intelligence (LLMs), their own storage (S3/R2), and their own database schemas.
 
 ---
 
 ## 🏗️ Modular Architecture
 
-Edmate is designed to be "Intelligence-Blind" and "Database-Agnostic."
+Edmate is designed to be "Intelligence-Blind" and "Database-Agnostic," adhering to the **Adapter Pattern**.
 
 ### 1. Intelligence Layer (LLM Agnostic)
-Powered by **LiteLLM**, Edmate supports 100+ model providers (OpenAI, Gemini, Anthropic, Ollama, etc.). Users can route specific tasks to different models to optimize for cost and capability:
-- **Extraction:** Use Gemini 1.5 Pro for its massive multimodal context.
-- **Generation:** Use Claude 3 Haiku or GPT-4o-mini for fast, structured output.
-- **Verification:** Use GPT-4o for high-reasoning quality control.
+Powered by **LiteLLM**, Edmate supports 100+ model providers (OpenAI, Gemini, Anthropic, Ollama, etc.). Users can route specific tasks to different models via the `ModelRoutingEngine` to optimize for cost and capability:
+- **Extraction:** Recommended model `gemini-1.5-pro` for massive multimodal context.
+- **Generation:** Recommended model `claude-3-haiku` or `gpt-4o-mini` for speed.
+- **Verification:** Recommended model `gpt-4o` for high-reasoning logic.
 
 ### 2. Persistence Layer (BYO-Database)
-Edmate uses the **Adapter Pattern** for data storage. The core pipeline produces standardized Pydantic JSON objects, which you can map to any schema:
-- **PostgreSQL / MySQL / MongoDB**
-- **Vector DBs for RAG**
-- **Flat files (JSON/Markdown)**
+Edmate produces standardized Pydantic models. Use **Storage Adapters** to map this data to any schema:
+- **PostgresStorageAdapter:** Ready-to-use adapter for PostgreSQL.
+- **BaseStorageAdapter:** Extend this to support MySQL, MongoDB, or Vector DBs.
 
 ### 3. Execution Interfaces
-- **The Dashboard:** A user-friendly UI for non-coders to manage providers and view analytics.
-- **CLI & Python Library:** For developers to integrate Edmate into their own applications.
-- **MCP Server:** Plug Edmate directly into Agentic IDEs like **Cursor** or **Windsurf** as a native tool.
+- **Automation Hub (UI):** A user-friendly dashboard for non-coders to manage drafts, observe real-time cost analytics, and configure model profiles.
+- **CLI Orchestrator:** For batch processing from the terminal.
+- **MCP Server:** Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool.
 
 ---
 
-## 🛡️ Security & Governance (OWASP Top 10 for LLMs)
-Edmate implements budget-friendly "AI Safety" guardrails out of the box:
-- **Prompt Isolation:** XML-delimited inputs to prevent prompt injection.
-- **Output Sanitization:** Middleware to strip executable code/tags from AI responses.
-- **Economic Kill-Switch:** Self-pausing pipelines when cost thresholds are met.
-- **PII Scrubbing:** Automatic masking of sensitive info before it reaches cloud providers.
+## 🛡️ Economic Safeties (AI Budgeting)
+Edmate includes an automatic **Economic Kill-Switch**:
+- **Real-time Metrics:** Tracks every cent and token spent in `session_metrics.json`.
+- **Budget Caps:** Define your `max_daily_usd` in `edmate_config.yaml`. The pipeline halts automatically if the limit is reached.
 
 ---
 
-## 📊 Hybrid Observability
-- **Native Analytics:** Real-time tracking of Cost (USD), Tokens, and Latency in the Edmate UI.
-- **Deep Tracing:** One-click integration with **Opik, Arize Phoenix, and Langfuse** for scientific evaluation and debugging.
+## 🚀 Getting Started
 
----
-
-## 🚀 Quick Start (Visionary)
-
-### Installation
+### 1. Installation
 ```bash
-# Clone and install
 git clone https://github.com/shmukit/Edmate.git
+cd Edmate
 pip install -r requirements.txt
 ```
 
-### Modular Configuration
-Assign specific models to specific tasks in your `edmate.yaml`:
+### 2. Configuration
+Copy the template and set your API keys in `.env` and routing in `edmate_config.yaml`:
 ```yaml
 model_routing:
   extraction: "gemini/gemini-1.5-pro"
   generation: "anthropic/claude-3-haiku"
-  qc_check: "openai/gpt-4o"
-
-storage:
-  type: "postgres"
-  endpoint: ${DATABASE_URL}
+budget:
+  max_daily_usd: 5.0
 ```
 
-### Run the Pipeline
+### 3. Launch
 ```bash
-python -m edmate.pipeline --input biology_paper.pdf --config edmate.yaml
+# Run the UI (FastAPI + Vanilla JS)
+python3 qc_viewer/main.py
+
+# Run the CLI
+python3 content_gen/scripts/pipeline/pipeline_orchestrator.py --single-pdf my_paper.pdf
 ```
 
 ---
 
-## 📁 Repository Structure
+## 📂 Repository Structure
 
-```
-Edmate/
-├── content_gen/          # Core Python engine & processing
-│   ├── adapters/         # DB & Storage interfaces
-│   ├── agents/           # LLM logic & Model Routing
-│   ├── scripts/          # Extraction & ingestion logic
-│   └── security/         # Sanitization & Safety middleware
-├── qc_viewer/            # Next.js/Vanilla Dashboard
-└── README.md             # This file
-```
+- `content_gen/core/`: Intelligence, Metrics, and Config logic.
+- `content_gen/adapters/`: Storage interfaces (Postgres, etc.).
+- `content_gen/scripts/`: Extraction and pipeline orchestration.
+- `qc_viewer/`: The Automation Hub frontend and API.
+- `content_gen/tests/`: Comprehensive unit and integration tests.
 
 ---
 
-## 🤝 Contributing & Community
-Edmate is evolving into a community-driven educational standard. Whether you are adding a new model provider or a custom database adapter, we welcome your contributions!
+## 🤝 Contributing
+Interested in adding a new adapter or a custom extraction prompt? Check our **[CONTRIBUTING_MODULAR.md](content_gen/docs/CONTRIBUTING_MODULAR.md)** guide.
 
 ---
 
 ## 📄 License
 MIT License - Open Source
 
-**Built with ❤️ for a more accessible, AI-powered education system.**
+**Built with ❤️ for an accessible, AI-powered education system.**
