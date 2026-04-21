@@ -18,3 +18,13 @@ __pycache__/
 *.log
 content_gen/content_gen/logs/
 llm_response_last.txt
+
+# Generated pipeline data & drafts
+content_gen/content_gen/data/extracted/
+content_gen/content_gen/data/outputs/
+content_gen/data/extracted/
+content_gen/data/inputs/
+content_gen/data/outputs/
+content_gen/data/*.json
+content_gen/data/*.txt
+qc_viewer/drafts/
