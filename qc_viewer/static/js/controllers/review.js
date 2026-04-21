@@ -4,15 +4,7 @@ export const ReviewController = {
     async openReview(id) {
         try {
             console.log(`🔍 Loading draft review: ${id}`);
-            const response = await fetch(`/api/automate/drafts/${id}`);
-            
-            if (!response.ok) {
-                const errorBody = await response.text();
-                console.error(`❌ Failed to load draft review. Status: ${response.status}`, errorBody);
-                throw new Error(`Failed to load review (Status ${response.status})`);
-            }
-
-            this.currentDraftData = await response.json();
+            this.currentDraftData = await AutomationAPI.getDraft(id);
             window.location.hash = `review/${id}`;
             document.getElementById('reviewPanel').classList.add('active');
             

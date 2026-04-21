@@ -64,12 +64,27 @@
     </nav>
 
     <div class="analytics-panel" id="analyticsPanel">
-      <div class="analytics-header">
-          <div>
-              <h2 class="analytics-title">Pipeline Analytics</h2>
-              <p class="analytics-subtitle">Real-time stats from your content automation drafts</p>
-          </div>
-      </div>
+    <header class="workspace-header">
+        <div class="header-title-group">
+            <h2 class="analytics-title">Pipeline Analytics</h2>
+            <p class="analytics-subtitle">Real-time stats from your content automation drafts</p>
+        </div>
+        <div class="header-actions-group">
+            <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="theme-toggle-container">
+                <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
+                    <span class="theme-icon-light">☀️</span>
+                    <span class="theme-icon-dark">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
       <div class="analytics-grid" id="analyticsGrid">
           <div class="stat-card">

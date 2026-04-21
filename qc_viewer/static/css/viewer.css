@@ -18,12 +18,6 @@ main {
 /* ── DROPDOWN THEME FIX ── */
 .dropdown-list {
   display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-  background: var(--sidebar-bg); /* Use sidebar bg for consistency */
-  border: 1px solid var(--card-border); 
-  border-radius: 10px;
-  max-height: 280px; 
-  overflow-y: auto; 
-  z-index: 100;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   backdrop-filter: blur(12px);
 }
@@ -188,13 +182,25 @@ main {
 }
 
 .fc-label {
-  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.2px; margin-bottom: 16px; opacity: 0.5;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 24px; opacity: 0.6;
 }
 .fc-face-front .fc-label { color: var(--primary); }
 .fc-face-back .fc-label { color: #10b981; }
 
-.fc-text { font-size: 1.1rem; line-height: 1.6; font-weight: 500; color: var(--text-main); }
+[data-theme="dark"] .fc-face-front {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fc-text { 
+  font-family: 'Outfit', 'Inter', var(--font-primary), sans-serif;
+  font-size: 1.15rem; 
+  line-height: 1.6; 
+  font-weight: 500; 
+  color: var(--text-main); 
+  padding: 0 10px;
+}
 .fc-tap-hint {
   margin-top: 20px; font-size: 0.72rem; color: var(--text-dim);
   display: flex; align-items: center; gap: 6px;

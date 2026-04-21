@@ -43,49 +43,51 @@ MathJax = {
     </button>
   </div>
 
-  <nav>
-    <a href="/" class="nav-item active">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <span>Standard Viewer</span>
-    </a>
-    <a href="/automate" class="nav-item">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-      </svg>
-      <span>Automation Hub</span>
-    </a>
-    <a href="/analytics" class="nav-item">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10"></line>
-        <line x1="12" y1="20" x2="12" y2="4"></line>
-        <line x1="6" y1="20" x2="6" y2="14"></line>
-      </svg>
-      <span>Analytics</span>
-    </a>
-  </nav>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="paper-selector" id="paperSelector">
-    <div class="selector-label">Search Papers</div>
-
-    <div class="selected-badge" id="selectedBadge" onclick="clearSelection()" style="margin-top: 8px;">
-      <div class="badge-text" id="badgeText">—</div>
-      <div class="badge-change">✕ change</div>
+  <div class="sidebar-content">
+    <nav>
+      <a href="/" class="nav-item active">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Standard Viewer</span>
+      </a>
+      <a href="/automate" class="nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Automation Hub</span>
+      </a>
+      <a href="/analytics" class="nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Analytics</span>
+      </a>
+    </nav>
+  
+    <div class="sidebar-divider"></div>
+  
+    <div class="paper-selector" id="paperSelector">
+      <div class="selector-label">Search Papers</div>
+  
+      <div class="selected-badge" id="selectedBadge" onclick="clearSelection()" style="margin-top: 8px;">
+        <div class="badge-text" id="badgeText">—</div>
+        <div class="badge-change">✕ change</div>
+      </div>
+  
+      <div class="search-box" id="searchBox" style="margin-top: 8px;">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search papers..." autocomplete="off">
+        <span class="search-icon">⌕</span>
+        <div class="dropdown-list" id="dropdownList"></div>
+      </div>
     </div>
-
-    <div class="search-box" id="searchBox" style="margin-top: 8px;">
-      <input class="search-input" id="searchInput" type="text" placeholder="Search papers..." autocomplete="off">
-      <span class="search-icon">⌕</span>
-      <div class="dropdown-list" id="dropdownList"></div>
+  
+    <div class="question-list" id="questionList">
+      <div class="loading-text">Select a paper to load questions.</div>
     </div>
-  </div>
-
-  <div class="question-list" id="questionList">
-    <div class="loading-text">Select a paper to load questions.</div>
   </div>
 </aside>
 
@@ -96,16 +98,25 @@ MathJax = {
       <div class="breadcrumb-item active">Standard Viewer</div>
     </nav>
 
-    <header style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <div>
+    <header class="workspace-header">
+        <div class="header-title-group">
             <h1>Dashboard</h1>
-            <p class="subtitle" style="margin-bottom:0">Quality control and verification workspace.</p>
+            <p class="subtitle">Quality control and verification workspace.</p>
         </div>
-        <div class="theme-toggle-container">
-            <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
-                <span class="theme-icon-light">☀️</span>
-                <span class="theme-icon-dark">🌙</span>
+        <div class="header-actions-group">
+            <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
             </button>
+            <div class="theme-toggle-container">
+                <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
+                    <span class="theme-icon-light">☀️</span>
+                    <span class="theme-icon-dark">🌙</span>
+                </button>
+            </div>
         </div>
     </header>
 

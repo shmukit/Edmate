@@ -154,22 +154,33 @@ async def verify_question(table: str, question_id: str, is_verified: bool):
 
 
 @app.get("/api/flashcards")
-async def get_flashcards(topic_id: str = None, subtopic_id: str = None):
+async def get_flashcards(topic_id: str = None, subtopic_id: str = None, question_id: str = None):
     conn = get_db()
     if not conn:
         raise HTTPException(
             status_code=500, detail="Database connection failed")
     try:
         with conn.cursor() as cur:
-            if subtopic_id:
-                cur.execute(
-                    'SELECT * FROM flashcards WHERE "subtopicId" = %s', (subtopic_id,))
-            elif topic_id:
-                cur.execute(
-                    'SELECT * FROM flashcards WHERE "topicId" = %s', (topic_id,))
-            else:
-                cur.execute("SELECT * FROM flashcards LIMIT 100")
-            return cur.fetchall()
+            # 1. Try Question-specific cards first
+            if question_id and question_id != 'undefined':
+                cur.execute('SELECT * FROM flashcards WHERE "questionId" = %s', (question_id,))
+                res = cur.fetchall()
+                if res:
+                    return res
+
+            # 2. Try Subtopic cards
+            if subtopic_id and subtopic_id != 'undefined' and subtopic_id != 'null':
+                cur.execute('SELECT * FROM flashcards WHERE "subtopicId" = %s', (subtopic_id,))
+                res = cur.fetchall()
+                if res: return res
+                
+            # 3. Try Topic cards
+            if topic_id and topic_id != 'undefined' and topic_id != 'null':
+                cur.execute('SELECT * FROM flashcards WHERE "topicId" = %s', (topic_id,))
+                return cur.fetchall()
+
+            # 4. Fallback (Empty instead of random bulk)
+            return []
     finally:
         conn.close()
 
@@ -204,7 +215,10 @@ async def receive_draft(
     Returns a draft ID so the frontend can poll for progress.
     """
     draft_id = f"draft_{uuid.uuid4().hex[:8]}"
-    static_dir = Path(__file__).parent / "static" / "drafts" / draft_id
+    drafts_root = Path(__file__).parent / "drafts"
+    drafts_root.mkdir(parents=True, exist_ok=True)
+    
+    static_dir = drafts_root / draft_id
     static_dir.mkdir(parents=True, exist_ok=True)
 
     file_path = static_dir / "source.pdf"
@@ -261,30 +275,106 @@ async def run_automation_pipeline(draft_id: str, subject: str, paper_code: str, 
 async def list_drafts():
     """Returns all current drafts with sorted timestamps"""
     drafts = []
-    drafts_root = Path(__file__).parent / "static" / "drafts"
+    drafts_root = Path(__file__).parent / "drafts"
     if not drafts_root.exists():
         return []
 
     for d in drafts_root.iterdir():
+        # New directory-based structure
         if d.is_dir() and (d / "metadata.json").exists():
             try:
                 with open(d / "metadata.json", "r") as f:
                     drafts.append(json.load(f))
             except Exception:
                 continue
+        # Old flat JSON structure (compatibility)
+        elif d.suffix == ".json" and d.name != "metadata.json":
+            try:
+                with open(d, "r") as f:
+                    data = json.load(f)
+                    if "id" in data:
+                        drafts.append(data)
+            except Exception:
+                continue
 
-    return sorted(drafts, key=lambda x: x.get("timestamp", ""), reverse=True)
+    # Convert timestamps for sorting if they are strings/floats
+    def get_time(x):
+        ts = x.get("timestamp") or x.get("created_at") or ""
+        try:
+             return float(ts)
+        except:
+             return 0.0
+
+    return sorted(drafts, key=get_time, reverse=True)
 
 
 @app.get("/api/automate/draft/{draft_id}")
 async def get_draft_results(draft_id: str):
-    meta_path = Path(__file__).parent / "static" / \
-        "drafts" / draft_id / "metadata.json"
+    # Try new structure first
+    meta_path = Path(__file__).parent / "drafts" / draft_id / "metadata.json"
+    
+    # Try legacy structure second
+    if not meta_path.exists():
+        legacy_path = Path(__file__).parent / "drafts" / f"{draft_id}.json"
+        if legacy_path.exists():
+            meta_path = legacy_path
+
     if not meta_path.exists():
         raise HTTPException(status_code=404, detail="Draft not found")
 
     with open(meta_path, "r") as f:
         return json.load(f)
+
+
+@app.patch("/api/automate/draft/{draft_id}")
+async def update_draft(draft_id: str, updates: dict):
+    # Try new structure first
+    meta_path = Path(__file__).parent / "drafts" / draft_id / "metadata.json"
+    
+    # Try legacy structure second
+    if not meta_path.exists():
+        legacy_path = Path(__file__).parent / "drafts" / f"{draft_id}.json"
+        if legacy_path.exists():
+            meta_path = legacy_path
+
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+    try:
+        with open(meta_path, "r") as f:
+            data = json.load(f)
+        
+        # Merge updates (deep merge for questions if needed, but usually it's a full list replacement)
+        data.update(updates)
+        data["timestamp"] = datetime.now().isoformat()
+
+        with open(meta_path, "w") as f:
+            json.dump(data, f)
+        
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/automate/draft/{draft_id}")
+async def delete_draft(draft_id: str):
+    # Modern directory-based structure
+    draft_dir = Path(__file__).parent / "drafts" / draft_id
+    if draft_dir.is_dir():
+        shutil.rmtree(draft_dir)
+        return {"status": "deleted"}
+
+    # Legacy flat JSON structure
+    legacy_json = Path(__file__).parent / "drafts" / f"{draft_id}.json"
+    legacy_pdf = Path(__file__).parent / "drafts" / f"{draft_id}.pdf"
+    
+    if legacy_json.exists():
+        legacy_json.unlink()
+        if legacy_pdf.exists():
+            legacy_pdf.unlink()
+        return {"status": "deleted"}
+
+    raise HTTPException(status_code=404, detail="Draft not found")
 
 
 @app.post("/api/automate/publish")

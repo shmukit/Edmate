@@ -18,8 +18,27 @@ export const LayoutManager = {
             const settingsToggle = e.target.closest('#btnToggleSettings');
             if (settingsToggle) {
                 this.toggleSettings();
+                return;
+            }
+
+            // Mobile Nav Toggle
+            const mobileBtn = e.target.closest('#btnMobileNav');
+            if (mobileBtn) {
+                this.toggleMobileNav();
+                return;
+            }
+
+            // Close mobile nav on overlay click
+            const aside = document.querySelector('aside');
+            if (aside && aside.classList.contains('mobile-active') && !aside.contains(e.target)) {
+                aside.classList.remove('mobile-active');
             }
         });
+    },
+
+    toggleMobileNav() {
+        const aside = document.querySelector('aside');
+        if (aside) aside.classList.toggle('mobile-active');
     },
 
     toggleSidebar() {
