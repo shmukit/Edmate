@@ -14,7 +14,10 @@ export const AnalyticsController = {
 
     async updateAnalytics() {
         try {
-            const drafts = await AutomationAPI.fetchDrafts();
+            const [drafts, metrics] = await Promise.all([
+                AutomationAPI.fetchDrafts(),
+                fetch('/api/automate/metrics').then(res => res.json())
+            ]);
             
             // Calculate Stats
             const totalDrafts = drafts.length;
@@ -40,6 +43,29 @@ export const AnalyticsController = {
             document.getElementById('statRejected').textContent = rejectedQ;
             document.getElementById('statTotalQuestions').textContent = totalQ;
             document.getElementById('statInjectionRate').textContent = injectionRate + '%';
+
+            // Render Core Metrics
+            if (metrics) {
+                const cost = metrics.total_cost || 0;
+                document.getElementById('statTotalCost').textContent = `$${cost.toFixed(4)}`;
+                document.getElementById('statTotalTokens').textContent = (metrics.total_tokens || 0).toLocaleString();
+                
+                // Update Sidebar elements if they exist
+                const sideCost = document.getElementById('settingsCurrentCost');
+                const sideBar = document.getElementById('budgetProgressBar');
+                
+                if (sideCost) sideCost.textContent = `$${cost.toFixed(4)}`;
+                if (sideBar) {
+                    // Logic: Get max_budget from config if possible, fallback to 10
+                    fetch('/api/automate/config')
+                        .then(res => res.json())
+                        .then(config => {
+                            const max = config.budget?.max_daily_usd || 10;
+                            const percent = Math.min((cost / max) * 100, 100);
+                            sideBar.style.width = `${percent}%`;
+                        });
+                }
+            }
 
             // Render Activity Feed
             const activityFeed = document.getElementById('analyticsActivity');

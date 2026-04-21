@@ -1,0 +1,87 @@
+import os
+import litellm
+from typing import Optional, List, Dict, Any
+from .schemas import ModelConfig
+from .config import CoreConfig
+from .metrics import MetricsTracker
+
+# Set up callbacks for observability if requested
+# Users can set LITELLM_CALLBACKS=["opik"] in their .env
+if os.getenv("LITELLM_CALLBACKS"):
+    litellm.success_callback = os.getenv("LITELLM_CALLBACKS").split(",")
+
+class BudgetExceededError(Exception):
+    """Raised when the session budget exceeds the configured limit."""
+    pass
+
+class ModelRoutingEngine:
+    """
+    Modular engine to route different Edmate tasks to different LLMs.
+    Includes an automatic 'Economic Kill-Switch' based on configured budget.
+    """
+    
+    def __init__(self, config: Optional[ModelConfig] = None):
+        # Load config from YAML if not provided
+        self.config = config or CoreConfig.load_from_yaml()
+        self.tracker = MetricsTracker()
+        
+    def generate_content(
+        self, 
+        prompt: str, 
+        task_type: str = "generation",
+        system_prompt: Optional[str] = None,
+        images: Optional[List[str]] = None,
+        json_mode: bool = False
+    ) -> str:
+        """
+        Routes the task to the appropriate model based on task_type.
+        Checks budget before execution (Economic Kill-Switch).
+        """
+        # 1. Check Budget (The Safety Layer)
+        current_cost = self.tracker.get_current_cost()
+        if current_cost >= self.config.max_budget:
+            raise BudgetExceededError(
+                f"🛑 Budget Exceeded: Current session cost (${current_cost:.4f}) "
+                f"has reached the limit (${self.config.max_budget:.2f})."
+            )
+
+        # 2. Determine model
+        if task_type == "extraction":
+            model = self.config.extraction_model or "gemini/gemini-1.5-pro"
+        elif task_type == "validation":
+            model = self.config.validation_model or "openai/gpt-4o"
+        else:
+            model = self.config.generation_model or "anthropic/claude-3-haiku"
+            
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+            
+        # Handle Multimodal
+        if images:
+            content = [{"type": "text", "text": prompt}]
+            for img in images:
+                content.append({"type": "image_url", "image_url": {"url": img}})
+            messages.append({"role": "user", "content": content})
+        else:
+            messages.append({"role": "user", "content": prompt})
+            
+        # 3. Execute call
+        response = litellm.completion(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"} if json_mode else None,
+            timeout=120 if task_type == "extraction" else 60
+        )
+        
+        # 4. Log usage (The Analytics Layer)
+        self.tracker.log_usage(response)
+        
+        return response.choices[0].message.content
+
+    def get_summary(self) -> Dict[str, Any]:
+        """Returns the current metrics and routing config."""
+        return {
+            "metrics": self.tracker.metrics,
+            "config": self.config.dict()
+        }

@@ -8,16 +8,19 @@ import sys
 import json
 import glob
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 import argparse
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Import modular core
+from ...core.model_router import ModelRoutingEngine
+from ...adapters.postgres_adapter import PostgresStorageAdapter
+
 # Import local modules
 from extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
 from processing.upload_to_storage import StorageUploader
-from processing.import_to_db import DatabaseImporter, create_schema
 from processing.content_generator import ContentGenerator
 
 
@@ -25,142 +28,91 @@ class PipelineOrchestrator:
     def __init__(
         self,
         storage_bucket: str = None,
-        db_connection: str = None
+        db_connection: str = None,
+        router: Optional[ModelRoutingEngine] = None
     ):
         """
-        Initialize pipeline orchestrator
-        
-        Args:
-            storage_bucket: Azure Storage container name
-            db_connection: Database connection string
+        Initialize modular pipeline orchestrator
         """
         self.storage_bucket = storage_bucket
         self.db_connection = db_connection
+        self.router = router or ModelRoutingEngine()
         
         # Initialize components
         self.uploader = StorageUploader() if storage_bucket else None
-        self.generator = ContentGenerator(provider="openai")  # Use OpenAI for standard processing
+        self.generator = ContentGenerator(router=self.router)
+        self.storage = PostgresStorageAdapter(db_connection) if db_connection else None
         
     def process_pdf(
         self,
         pdf_path: str,
         output_dir: str,
         subject: str,
-        difficulty: str = None,
+        difficulty: str = "Medium",
         topics: List[str] = None,
         cleanup_images: bool = False
     ) -> Dict:
         """
-        Process a single PDF through the full pipeline
-        
-        Args:
-            pdf_path: Path to PDF file
-            output_dir: Output directory for extracted data
-            subject: Subject name
-            difficulty: Difficulty level
-            topics: Topic tags
-            cleanup_images: Delete local images after upload
-            
-        Returns:
-            Report with counts and errors
+        Process a single PDF through the modular Edmate pipeline.
         """
         pdf_name = Path(pdf_path).stem
-        print(f"\n{'='*60}")
-        print(f"📄 Processing: {pdf_name}")
-        print(f"{'='*60}\n")
+        print(f"\n🚀 [MODULAR] Processing: {pdf_name}")
         
         report = {
             "pdf": pdf_name,
             "extraction": None,
-            "upload": None,
-            "import": None,
+            "processing": None,
+            "persistence": None,
             "errors": []
         }
         
         # Step 1: Extract PDF
         try:
-            print("🔍 Step 1: Extracting PDF content using PDF-Extract-Kit...")
+            print("🔍 Step 1: Extracting content...")
             extractor = PDFExtractKitWrapper(pdf_path, output_dir)
             extraction_result = extractor.extract()
-            
-            json_path = Path(output_dir) / f"{pdf_name}_extracted.json"
-            images_dir = Path(output_dir) / "images"
-            
-            report["extraction"] = {
-                "questions": len(extraction_result["questions"]),
-                "json_path": str(json_path)
-            }
-            print(f"  ✅ Extracted {len(extraction_result['questions'])} questions")
-            
+            report["extraction"] = {"questions": len(extraction_result["questions"])}
         except Exception as e:
             report["errors"].append(f"Extraction failed: {e}")
-            print(f"  ❌ Extraction failed: {e}")
             return report
         
-        # Step 1.5: Generate Content using LLM
+        # Step 2: Modular Content Generation (The "Brain")
+        generated_questions = []
         try:
-            print("\n🤖 Step 1.5: Generating detailed explanations using LLM...")
-            # Use the extractor's outputs_dir to ensure consistency
-            text_path = extractor.outputs_dir / f"{pdf_name}_processed.txt"
-            self.generator.process_and_update_file(text_path, subject)
-            print(f"  ✅ Content generated for {pdf_name}")
+            print("🤖 Step 2: Generating educational content via ModelRouter...")
+            generated_questions = self.generator.generate_for_questions(
+                extraction_result["questions"], 
+                subject=subject
+            )
+            report["processing"] = {"count": len(generated_questions)}
         except Exception as e:
             report["errors"].append(f"Content generation failed: {e}")
-            print(f"  ❌ Content generation failed: {e}")
-            # Continue pipeline even if generation fails, as extraction is still useful
         
-        # Step 2: Upload to storage
-        cdn_mapping = {}
-        if self.uploader and self.storage_bucket:
+        # Step 3: Modular Persistence (The "Legs")
+        if self.storage:
             try:
-                print("\n📤 Step 2: Uploading images to storage...")
-                base_path = f"diagrams/{pdf_name}"
-                cdn_mapping, upload_report = self.uploader.upload_directory(
-                    images_dir=str(images_dir),
-                    bucket=self.storage_bucket,
-                    base_path=base_path
-                )
+                print("📥 Step 3: Persisting to Database...")
+                for q in generated_questions:
+                    # Enrich with paper metadata
+                    q.paper_code = pdf_name
+                    q.metadata.update({
+                        "difficulty": difficulty,
+                        "subject": subject,
+                        "topic_hint": topics[0] if topics else None
+                    })
+                    self.storage.save_question(q)
                 
-                report["upload"] = upload_report
+                # Batch save flashcards
+                all_fcs = []
+                for q in generated_questions:
+                    all_fcs.extend(q.flashcards)
                 
-                # Save CDN mapping
-                cdn_mapping_path = Path(output_dir) / f"{pdf_name}_cdn_mapping.json"
-                with open(cdn_mapping_path, 'w') as f:
-                    json.dump({"cdn_mapping": cdn_mapping, "report": upload_report}, f, indent=2)
+                if all_fcs:
+                    self.storage.save_flashcards(all_fcs, {"subject": subject})
                 
-                # Cleanup local images if requested
-                if cleanup_images and upload_report["failed"] == 0:
-                    for img_file in images_dir.glob("*.png"):
-                        img_file.unlink()
-                    print(f"  🗑️  Cleaned up {upload_report['uploaded']} local images")
-                
+                report["persistence"] = {"status": "complete"}
             except Exception as e:
-                report["errors"].append(f"Upload failed: {e}")
-                print(f"  ❌ Upload failed: {e}")
-        else:
-            print("\n⏭️  Step 2: Skipping storage upload (not configured)")
-        
-        # Step 3: Import to database
-        if self.db_connection:
-            try:
-                print("\n📥 Step 3: Importing to database...")
-                with DatabaseImporter(self.db_connection) as importer:
-                    import_report = importer.import_questions(
-                        json_path=str(json_path),
-                        cdn_mapping=cdn_mapping,
-                        paper_code=pdf_name,
-                        subject=subject,
-                        difficulty=difficulty,
-                        topics=topics
-                    )
-                
-                report["import"] = import_report
-                
-            except Exception as e:
-                report["errors"].append(f"Import failed: {e}")
-                print(f"  ❌ Import failed: {e}")
-        else:
-            print("\n⏭️  Step 3: Skipping database import (not configured)")
+                report["errors"].append(f"Persistence failed: {e}")
         
         return report
     
@@ -271,7 +223,7 @@ def main():
     # Create schema if requested
     if args.create_schema and db_url:
         print("🏗️  Creating database schema...")
-        create_schema(db_url)
+        PostgresStorageAdapter.initialize_schema(db_url)
     
     # Initialize orchestrator
     orchestrator = PipelineOrchestrator(

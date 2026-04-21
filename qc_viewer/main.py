@@ -175,6 +175,42 @@ async def get_stats():
     finally:
         conn.close()
 
+@app.get("/api/automate/metrics")
+async def get_metrics():
+    """Returns real-time token/cost metrics from the modular core"""
+    metrics_path = Path(__file__).parent.parent / "content_gen" / "data" / "session_metrics.json"
+    if not metrics_path.exists():
+        return {"total_cost": 0.0, "total_tokens": 0, "calls": 0}
+    try:
+        with open(metrics_path, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {"total_cost": 0.0, "total_tokens": 0, "calls": 0}
+
+@app.get("/api/automate/config")
+async def get_config():
+    """Returns the current modular configuration"""
+    import yaml
+    config_path = Path(__file__).parent.parent / "edmate_config.yaml"
+    if not config_path.exists():
+        return {"model_routing": {}, "budget": {"max_daily_usd": 10.0}}
+    try:
+        with open(config_path, "r") as f:
+            return yaml.safe_load(f)
+    except Exception:
+        return {"error": "Failed to load config"}
+
+@app.post("/api/automate/config")
+async def update_config(config: dict):
+    """Updates the modular configuration YAML"""
+    import yaml
+    config_path = Path(__file__).parent.parent / "edmate_config.yaml"
+    try:
+        with open(config_path, "w") as f:
+            yaml.dump(config, f, default_flow_style=False)
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ───── AUTOMATION ENDPOINTS ─────
 

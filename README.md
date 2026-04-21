@@ -1,18 +1,77 @@
-# Edmate
+# Edmate 🎓
 
-**AI-Powered Educational Content Platform for A/O-Level Students**
+**The Modular AI Factory for Educational Content Generation**
 
-Edmate is an intelligent educational platform that generates high-quality learning materials from Cambridge A/O-Level exam papers using AI-powered content extraction and generation.
+Edmate is an open-source, vendor-agnostic pipeline designed to transform unstructured educational materials (PDFs, images, documents) into high-fidelity learning modules, flashcards, and MCQ banks. 
+
+Built with **modularity** and **modality** at its core, Edmate allows organizations to bring their own intelligence (LLMs), their own storage, and their own database schemas.
 
 ---
 
-## 🎯 Project Overview
+## 🏗️ Modular Architecture
 
-This repository contains the content generation pipeline that:
-- Extracts questions and diagrams from PDF exam papers
-- Uploads images to cloud storage (Cloudflare R2/AWS S3)
-- Imports structured data into PostgreSQL database
-- Generates formatted educational content using AI
+Edmate is designed to be "Intelligence-Blind" and "Database-Agnostic."
+
+### 1. Intelligence Layer (LLM Agnostic)
+Powered by **LiteLLM**, Edmate supports 100+ model providers (OpenAI, Gemini, Anthropic, Ollama, etc.). Users can route specific tasks to different models to optimize for cost and capability:
+- **Extraction:** Use Gemini 1.5 Pro for its massive multimodal context.
+- **Generation:** Use Claude 3 Haiku or GPT-4o-mini for fast, structured output.
+- **Verification:** Use GPT-4o for high-reasoning quality control.
+
+### 2. Persistence Layer (BYO-Database)
+Edmate uses the **Adapter Pattern** for data storage. The core pipeline produces standardized Pydantic JSON objects, which you can map to any schema:
+- **PostgreSQL / MySQL / MongoDB**
+- **Vector DBs for RAG**
+- **Flat files (JSON/Markdown)**
+
+### 3. Execution Interfaces
+- **The Dashboard:** A user-friendly UI for non-coders to manage providers and view analytics.
+- **CLI & Python Library:** For developers to integrate Edmate into their own applications.
+- **MCP Server:** Plug Edmate directly into Agentic IDEs like **Cursor** or **Windsurf** as a native tool.
+
+---
+
+## 🛡️ Security & Governance (OWASP Top 10 for LLMs)
+Edmate implements budget-friendly "AI Safety" guardrails out of the box:
+- **Prompt Isolation:** XML-delimited inputs to prevent prompt injection.
+- **Output Sanitization:** Middleware to strip executable code/tags from AI responses.
+- **Economic Kill-Switch:** Self-pausing pipelines when cost thresholds are met.
+- **PII Scrubbing:** Automatic masking of sensitive info before it reaches cloud providers.
+
+---
+
+## 📊 Hybrid Observability
+- **Native Analytics:** Real-time tracking of Cost (USD), Tokens, and Latency in the Edmate UI.
+- **Deep Tracing:** One-click integration with **Opik, Arize Phoenix, and Langfuse** for scientific evaluation and debugging.
+
+---
+
+## 🚀 Quick Start (Visionary)
+
+### Installation
+```bash
+# Clone and install
+git clone https://github.com/shmukit/Edmate.git
+pip install -r requirements.txt
+```
+
+### Modular Configuration
+Assign specific models to specific tasks in your `edmate.yaml`:
+```yaml
+model_routing:
+  extraction: "gemini/gemini-1.5-pro"
+  generation: "anthropic/claude-3-haiku"
+  qc_check: "openai/gpt-4o"
+
+storage:
+  type: "postgres"
+  endpoint: ${DATABASE_URL}
+```
+
+### Run the Pipeline
+```bash
+python -m edmate.pipeline --input biology_paper.pdf --config edmate.yaml
+```
 
 ---
 
@@ -20,115 +79,23 @@ This repository contains the content generation pipeline that:
 
 ```
 Edmate/
-├── content_gen/          # Content generation pipeline
-│   ├── scripts/          # Extraction, upload, and import scripts
-│   ├── data/             # Input PDFs and extracted outputs
-│   ├── docs/             # Detailed documentation
-│   └── tools/            # External tools (PDF-Extract-Kit)
-└── README.md            # This file
+├── content_gen/          # Core Python engine & processing
+│   ├── adapters/         # DB & Storage interfaces
+│   ├── agents/           # LLM logic & Model Routing
+│   ├── scripts/          # Extraction & ingestion logic
+│   └── security/         # Sanitization & Safety middleware
+├── qc_viewer/            # Next.js/Vanilla Dashboard
+└── README.md             # This file
 ```
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8+
-- PostgreSQL database
-- Azure Blob Storage
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/shmukit/Edmate.git
-cd Edmate/content_gen
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-### Basic Usage
-
-```bash
-# Process a single PDF
-python scripts/pipeline/pipeline_orchestrator.py \
-  --single-pdf "data/inputs/9701_s25_qp_13.pdf" \
-  --output-dir "data/extracted" \
-  --subject Biology \
-  --storage-provider r2 \
-  --storage-bucket edmate-diagrams \
-  --db-url "postgresql://user:pass@host:5432/edmate"
-```
-
----
-
-## 📚 Documentation
-
-For detailed information, see the [`content_gen`](content_gen/) directory:
-
-- **[Content Gen README](content_gen/README.md)** - Complete setup and usage guide
-- **[Agentic Workflow](content_gen/docs/AGENTIC_WORKFLOW.md)** - Pipeline architecture
-- **[Process Guide](content_gen/docs/PROCESS_GUIDE.md)** - Content generation workflow
-- **[Skills Catalog](content_gen/docs/SKILLS_CATALOG.md)** - Formal skills definitions
-- **[Scalability Plan](content_gen/docs/SCALABILITY_PLAN.md)** - Scaling strategy
-
----
-
-## 🔧 Key Features
-
-- ✅ **AI-Powered Extraction**: Uses PDF-Extract-Kit for accurate question and diagram extraction
-- ✅ **Cloud Storage Integration**: Automatic upload to Cloudflare R2 or AWS S3
-- ✅ **Database Import**: Structured data storage in PostgreSQL
-- ✅ **Batch Processing**: Handle multiple PDFs efficiently
-- ✅ **Agentic Workflow**: Automated content generation pipeline
-
----
-
-## 🎓 Supported Subjects
-
-Currently supporting Cambridge A/O-Level subjects:
-- Biology (9700/5090)
-- Chemistry (9701/5070)
-- Physics (9702/5054)
-- Mathematics (9709/4024)
-- And more...
-
----
-
-## 📊 Performance
-
-**100 PDFs** (~2000 questions, ~5000 images):
-- Extraction: ~10 minutes
-- Upload: ~5 minutes  
-- Import: ~2 minutes
-- **Total**: ~17 minutes
-
-**Cost**: ~$0.01/month (R2 storage + Supabase free tier)
-
----
-
-## 🤝 Contributing
-
-This is a private educational project. For questions or collaboration inquiries, please contact the repository owner.
+## 🤝 Contributing & Community
+Edmate is evolving into a community-driven educational standard. Whether you are adding a new model provider or a custom database adapter, we welcome your contributions!
 
 ---
 
 ## 📄 License
+MIT License - Open Source
 
-Proprietary - All rights reserved
-
----
-
-## 🔗 Links
-
-- **Repository**: [github.com/shmukit/Edmate](https://github.com/shmukit/Edmate)
-- **Documentation**: [content_gen/README.md](content_gen/README.md)
-
----
-
-**Built with ❤️ for A/O-Level students**
+**Built with ❤️ for a more accessible, AI-powered education system.**

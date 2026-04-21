@@ -22,75 +22,26 @@ try:
 except ImportError:
     def load_dotenv(): pass
 
-# Try to import Opik for observability
-try:
-    import opik
-    from opik import track
-    from opik.integrations.openai import track_openai
-except ImportError:
-    opik = None
-    track = lambda project_name=None: (lambda f: f)
-    track_openai = lambda client, project_name=None: client
+from ...core.schemas import ProcessedQuestion, Flashcard
+from ...core.model_router import ModelRoutingEngine
 
 # Load prompts
 try:
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-    from scripts.prompts import CONTENT_GENERATION_PROMPT, FORMATTING_PROMPT, JSON_GENERATION_PROMPT
+    from scripts.prompts import CONTENT_GENERATION_PROMPT
 except ImportError:
     CONTENT_GENERATION_PROMPT = ""
-    FORMATTING_PROMPT = ""
-    JSON_GENERATION_PROMPT = ""
 
 class ContentGenerator:
     """
     Automates Phase 2 (Content Generation) and Phase 3 (Formatting) 
-    using flexible LLM providers.
+    using the modular ModelRoutingEngine.
     """
     
-    def __init__(self, provider: str = "gemini", model_name: Optional[str] = None):
+    def __init__(self, router: Optional[ModelRoutingEngine] = None):
         """
-        Initialize the generator with a specific provider.
-        
-        Args:
-            provider: 'gemini', 'openai', or 'mock'
-            model_name: Specific model ID (e.g., 'gemini-1.5-pro', 'gpt-4o')
+        Initialize the generator with a modular router.
         """
-        self.provider = provider.lower()
-        self.api_key = self._get_api_key()
-        
-        if self.provider == "gemini":
-            if not genai:
-                raise ImportError("google-generativeai not installed")
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel(model_name or "gemini-1.5-flash")
-            
-        elif self.provider == "openai":
-            if not OpenAI:
-                raise ImportError("openai not installed")
-            self.client = OpenAI(api_key=self.api_key)
-            self.model_name = model_name or "gpt-4o"
-            # Wrap OpenAI client with Opik for auto-tracking
-            if opik:
-                self.client = track_openai(self.client, project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
-            
-        elif self.provider == "mock":
-            print("⚠️ Using Mock Generator (no API calls)")
-            
-    def _get_api_key(self) -> str:
-        """Retrieve API key from environment variables"""
-        if self.provider == "gemini":
-            key = os.getenv("GEMINI_API_KEY")
-        elif self.provider == "openai":
-            key = os.getenv("OPENAI_API_KEY")
-        else:
-            return "mock"
-            
-        if not key and self.provider != "mock":
-            raise ValueError(f"Missing API key for {self.provider}. Please set {self.provider.upper()}_API_KEY.")
-        return key
+        self.router = router or ModelRoutingEngine()
 
     def _encode_image(self, image_path: str) -> str:
         """Helper to convert local image to base64 string"""
@@ -98,53 +49,55 @@ class ContentGenerator:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")
 
-    @track(project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
-    def generate_for_questions(self, questions: List[Dict], subject: str, batch_size: int = 5) -> List[Dict]:
+    def generate_for_questions(self, questions: List[Dict], subject: str, batch_size: int = 5) -> List[ProcessedQuestion]:
         """
-        Generate detailed analysis for a list of questions.
-        
-        Args:
-            questions: List of extracted question dictionaries
-            subject: The subject name
-            
-        Returns:
-            Updated questions list with generated content
+        Generate detailed analysis for a list of questions using the modular router.
         """
         if not questions:
             return []
             
-        print(f"🧠 Generating content for {len(questions)} questions using {self.provider}...")
+        print(f"🧠 Generating content for {len(questions)} questions using Modular Router...")
         
-        # In a real scenario, we might batch these to save tokens/time
-        updated_questions = []
+        processed_results = []
         
         for i in range(0, len(questions), batch_size):
             batch = questions[i:i+batch_size]
             batch_indices = [q['question_number'] for q in batch]
             print(f"   Processing batch: Questions {batch_indices}")
             
-            # Prepare context for the LLM
             context = self._prepare_prompt_context(batch, subject)
             
             try:
-                raw_response = self._call_llm(context)
+                # Use the modular router instead of private _call_llm
+                raw_response = self.router.generate_content(
+                    prompt=context, 
+                    task_type="generation",
+                    system_prompt="You are an expert AI educational content generator. Provide deep explanations and flashcards."
+                )
+                
                 parsed_content = self._parse_response(raw_response, batch_indices)
                 
-                # Update batch with generated content
                 for q in batch:
                     q_num = q['question_number']
-                    if q_num in parsed_content:
-                        q.update(parsed_content[q_num])
-                    else:
-                        print(f"   ⚠️ Warning: No content generated for Question {q_num}")
+                    content = parsed_content.get(q_num, {})
+                    
+                    # Convert to standardized ProcessedQuestion
+                    processed_q = ProcessedQuestion(
+                        question_number=q_num,
+                        question_text=q.get('question_text', ''),
+                        options=q.get('options', {}),
+                        subject=subject,
+                        explanation_body=content.get("explanation_generated"),
+                        option_wise_explanation=content.get("options_explanation_generated"),
+                        flashcards=[Flashcard(front_text=f.split(":")[0], back_text=f.split(":")[1]) 
+                                   for f in content.get("flashcards_generated", "").split("\n") if ":" in f]
+                    )
+                    processed_results.append(processed_q)
                 
             except Exception as e:
                 print(f"   ❌ Error generating content for batch {batch_indices}: {e}")
-                # Keep original with placeholders on failure
             
-            updated_questions.extend(batch)
-            
-        return updated_questions
+        return processed_results
 
     def _prepare_prompt_context(self, batch: List[Dict], subject: str) -> str:
         """Formats the extraction data into the prompt format defined in prompts.py"""
@@ -163,88 +116,6 @@ class ContentGenerator:
             
         return prompt + data_block
 
-    @track(name="llm_call", project_name=os.getenv("OPIK_PROJECT_NAME", "Edmate"))
-    def _call_llm(self, prompt: str, images: Optional[List[str]] = None) -> str:
-        """
-        Executes the LLM call based on the provider.
-        
-        Args:
-            prompt: Text prompt
-            images: Optional list of base64 encoded images or image paths
-        """
-        if self.provider == "gemini":
-            # Handle multimodal if images are provided
-            if images:
-                # Assuming images are paths for simplicity in this implementation
-                content = [prompt]
-                for img_path in images:
-                    if os.path.exists(img_path):
-                        img_data = genai.upload_file(img_path)
-                        content.append(img_data)
-                response = self.model.generate_content(content)
-            else:
-                response = self.model.generate_content(prompt)
-            
-            # Log metadata to Opik
-            if opik:
-                usage = {
-                    "prompt_tokens": response.usage_metadata.prompt_token_count,
-                    "completion_tokens": response.usage_metadata.candidates_token_count,
-                    "total_tokens": response.usage_metadata.total_token_count
-                }
-                metadata = {"usage": usage}
-                if images:
-                    metadata["images_count"] = len(images)
-                    # Log base64 images if the user requested it earlier
-                    metadata["images_base64"] = [self._encode_image(p) if os.path.exists(p) else p for p in images] 
-                opik.log_metadata(metadata)
-                
-            return response.text
-        elif self.provider == "openai":
-            # For OpenAI, images are handled via messages structure
-            if images:
-                messages = [{
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt}
-                    ]
-                }]
-                for img_path in images:
-                    if os.path.exists(img_path):
-                        b64_img = self._encode_image(img_path)
-                        messages[0]["content"].append({
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"}
-                        })
-                    else:
-                        # Fallback for URLs
-                        messages[0]["content"].append({
-                            "type": "image_url",
-                            "image_url": {"url": img_path}
-                        })
-            else:
-                messages = [{"role": "user", "content": prompt}]
-                
-            # Use JSON Mode for experiments if requested
-            is_json = "JSON" in prompt
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,
-                response_format={"type": "json_object"} if is_json else None
-            )
-            
-            # OpenAI costs are tracked automatically by track_openai
-            return response.choices[0].message.content
-        elif self.provider == "mock":
-            # Return a formatted string that the parser can understand
-            mock_resp = ""
-            for q_num in re.findall(r'--- Question (\d+) ---', prompt):
-                mock_resp += f"\nQuestion {q_num}\n"
-                mock_resp += "[DE_START]This is a mock explanation for " + q_num + ".[DE_END]\n"
-                mock_resp += "[OE_START]This is a mock option analysis.[OE_END]\n"
-                mock_resp += "[GA_START]Flashcard 1: Q? Back: A.[GA_END]\n"
-            return mock_resp
-        return ""
 
     def _parse_response(self, response: str, batch_indices: List[int]) -> Dict[int, Dict]:
         """
@@ -386,13 +257,13 @@ class ContentGenerator:
             
         return questions
 
-    def _inject_content(self, original_content: str, generated_data: List[Dict]) -> str:
-        """Injects generated content into the placeholder structure"""
+    def _inject_content(self, original_content: str, generated_data: List[ProcessedQuestion]) -> str:
+        """Injects generated data back into the placeholder structure"""
         sections = re.split(r'(Question\s+\d+Question and Options in Text Format)', original_content)
         header = sections[0]
         
         body_parts = []
-        gen_map = {q['question_number']: q for q in generated_data}
+        gen_map = {q.question_number: q for q in generated_data}
         
         for i in range(1, len(sections), 2):
             q_intro = sections[i]
@@ -403,9 +274,9 @@ class ContentGenerator:
                 q_num = int(q_num_match.group(1))
                 if q_num in gen_map:
                     g = gen_map[q_num]
-                    q_body = q_body.replace("[EXPLANATION_PLACEHOLDER]", g.get("explanation_generated", "[EXPLANATION_FAILED]"))
-                    q_body = q_body.replace("[OPTION_EXPLANATION_PLACEHOLDER]", g.get("options_explanation_generated", "[EXPLANATION_FAILED]"))
-                    q_body = q_body.replace("[FLASHCARDS_PLACEHOLDER]", g.get("flashcards_generated", "[GENERATION_FAILED]"))
+                    q_body = q_body.replace("[EXPLANATION_PLACEHOLDER]", g.explanation_body or "[EXPLANATION_FAILED]")
+                    q_body = q_body.replace("[OPTION_EXPLANATION_PLACEHOLDER]", g.option_wise_explanation or "[EXPLANATION_FAILED]")
+                    q_body = q_body.replace("[FLASHCARDS_PLACEHOLDER]", "\n".join([f"{f.front_text}: {f.back_text}" for f in g.flashcards]) or "[GENERATION_FAILED]")
             
             body_parts.append(q_intro + q_body)
             

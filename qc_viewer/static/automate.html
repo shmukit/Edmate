@@ -121,6 +121,16 @@
                 <div class="stat-label">Total Questions Extracted</div>
             </div>
             <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="statTotalCost">$0.00</div>
+                <div class="stat-label">Total Cost (USD)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🪙</div>
+                <div class="stat-value" id="statTotalTokens">0</div>
+                <div class="stat-label">Tokens Consumed</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-icon">🎯</div>
                 <div class="stat-value" id="statInjectionRate">—</div>
                 <div class="stat-label">Injection Rate</div>
@@ -180,32 +190,30 @@
         </div>
 
         <div class="settings-group">
-            <span class="settings-label">Extraction Modalities</span>
-            <div class="toggle-container">
-                <span>Core Concept</span>
-                <label class="switch"><input type="checkbox" id="mod_core_concept" checked><span class="slider"></span></label>
-            </div>
-            <div class="toggle-container">
-                <span>Detailed Explanation</span>
-                <label class="switch"><input type="checkbox" id="mod_detailed_explanation" checked><span class="slider"></span></label>
-            </div>
-            <div class="toggle-container">
-                <span>Option Analysis</span>
-                <label class="switch"><input type="checkbox" id="mod_option_analysis" checked><span class="slider"></span></label>
-            </div>
-            <div class="toggle-container">
-                <span>Flashcards</span>
-                <label class="switch"><input type="checkbox" id="mod_flashcards" checked><span class="slider"></span></label>
-            </div>
-        </div>
-
-        <div class="settings-group">
             <span class="settings-label">Target Language</span>
             <select id="languageSelect">
                 <option value="English">English</option>
                 <option value="Bengali">Bengali</option>
-                <option value="Spanish">Spanish</option>
-                <option value="French">French</option>
+            </select>
+        </div>
+
+        <div class="settings-group" style="background: rgba(255,107,0,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.2);">
+            <span class="settings-label" style="color: var(--accent); font-weight: 600;">🛡️ Model Routing & Budget</span>
+            <div style="margin-bottom: 12px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                    <span>Session Cost</span>
+                    <span id="settingsCurrentCost">$0.00</span>
+                </div>
+                <div class="progress-container" style="height:6px; margin:0;">
+                    <div class="progress-bar" id="budgetProgressBar" style="width: 0%; background: var(--accent);"></div>
+                </div>
+            </div>
+            
+            <span class="settings-label" style="font-size:0.7rem;">Routing Profile</span>
+            <select id="routingProfileSelect" style="font-size:0.8rem; height:32px;">
+                <option value="balanced">Balanced (Gemini + Claude)</option>
+                <option value="high_quality">High Quality (GPT-4o)</option>
+                <option value="turbo">Cost Effective (Haiku / Flash)</option>
             </select>
         </div>
 
