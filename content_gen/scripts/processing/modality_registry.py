@@ -1,12 +1,14 @@
 from typing import Dict, Any, List, Optional
 from google.genai import types
 
+
 class Modality:
     def __init__(self, id: str, name: str, prompt_chunk: str, schema_fragment: Dict[str, Any]):
         self.id = id
         self.name = name
         self.prompt_chunk = prompt_chunk
         self.schema_fragment = schema_fragment
+
 
 # Registry of all available modalities
 MODALITIES: Dict[str, Modality] = {
@@ -56,6 +58,7 @@ MODALITIES: Dict[str, Modality] = {
         }
     )
 }
+
 
 def get_modalities(ids: List[str]) -> List[Modality]:
     return [MODALITIES[mid] for mid in ids if mid in MODALITIES]

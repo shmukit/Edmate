@@ -1,0 +1,15 @@
+{
+    "exclude": [
+        "content_gen/tools",
+        "**/node_modules",
+        "**/.venv"
+    ],
+    "executionEnvironments": [
+        {
+            "root": "."
+        }
+    ],
+    "reportMissingImports": true,
+    "pythonVersion": "3.9",
+    "pythonPlatform": "Darwin"
+}

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List
 from pathlib import Path
 from ..core.schemas import ProcessedQuestion
+
 
 class BaseExtractionAdapter(ABC):
     """
@@ -9,7 +10,7 @@ class BaseExtractionAdapter(ABC):
     Ensures that different tools (kit-based, OCR, or cloud-based) 
     produce a standardized output for the pipeline.
     """
-    
+
     @abstractmethod
     def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
         """

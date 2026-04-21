@@ -3,6 +3,7 @@ import re
 import sys
 import os
 
+
 def extract_text(docx_path):
     try:
         with zipfile.ZipFile(docx_path) as z:
@@ -19,10 +20,11 @@ def extract_text(docx_path):
     except Exception as e:
         return f"Error reading {docx_path}: {e}"
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python extract_text.py <docx_file>")
         sys.exit(1)
-    
+
     path = sys.argv[1]
     print(extract_text(path))

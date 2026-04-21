@@ -21,11 +21,12 @@ except ImportError:
     opik = None
     opik_context = None
 
+
 class GeminiExtractor:
     def __init__(self, model_id: str = "gemini-2.5-flash"):
         self.api_key = os.getenv("GEMINI_API_KEY")
         self.creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-        
+
         # Initialize GenAI Client
         if self.creds_path and os.path.exists(self.creds_path):
             # Use Vertex AI (GCP)
@@ -38,8 +39,9 @@ class GeminiExtractor:
             # Fallback to API Key (Google AI Studio)
             self.client = genai.Client(api_key=self.api_key)
         else:
-            raise ValueError("Missing Gemini credentials (GEMINI_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)")
-            
+            raise ValueError(
+                "Missing Gemini credentials (GEMINI_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)")
+
         self.model_id = model_id
 
     def pdf_to_images(self, pdf_path: str, dpi: int = 200) -> List[Image.Image]:
@@ -56,12 +58,12 @@ class GeminiExtractor:
     @opik.track(project_name="Edmate") if opik else lambda x: x
     def extract_questions_from_page(self, page_image: Image.Image, page_num: int) -> List[Dict]:
         """Send a single page image to Gemini and extract structured questions with analysis"""
-        
+
         # Convert PIL to bytes for Gemini
         img_byte_arr = io.BytesIO()
         page_image.save(img_byte_arr, format='PNG')
         img_bytes = img_byte_arr.getvalue()
-        
+
         prompt = """
         You are an advanced OCR and educational expert.
         Analyze the provided image of an exam paper and extract ALL multiple-choice questions.
@@ -75,12 +77,13 @@ class GeminiExtractor:
         
         Return the data in a valid JSON list following the provided schema.
         """
-        
+
         try:
             response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=[
-                    types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
+                    types.Part.from_bytes(
+                        data=img_bytes, mime_type="image/png"),
                     prompt
                 ],
                 config=types.GenerateContentConfig(
@@ -132,7 +135,7 @@ class GeminiExtractor:
                     )
                 )
             )
-            
+
             # Log usage metadata for Opik if available
             if opik and opik_context and response.usage_metadata:
                 opik_context.update_current_span(
@@ -154,14 +157,14 @@ class GeminiExtractor:
         print(f"🚀 Processing PDF: {pdf_path}")
         images = self.pdf_to_images(pdf_path)
         all_questions = []
-        
+
         for i, img in enumerate(images):
             print(f"  Processing page {i+1}...")
             questions = self.extract_questions_from_page(img, i+1)
             for q in questions:
                 q['page'] = i + 1
             all_questions.extend(questions)
-            
+
         return {
             "source": pdf_path,
             "papers_code": Path(pdf_path).stem,

@@ -5,6 +5,7 @@ from pathlib import Path
 from content_gen.scripts.processing.image_utils import ImageHandler
 from content_gen.scripts.processing.database_service import DatabaseService
 
+
 class TestImageHandler(unittest.TestCase):
     def test_to_base64_html(self):
         # Create a dummy image file
@@ -12,11 +13,11 @@ class TestImageHandler(unittest.TestCase):
         dummy_data = b"fakeimagecontent"
         with open(dummy_path, "wb") as f:
             f.write(dummy_data)
-        
+
         try:
             handler = ImageHandler()
             html = handler.to_base64_html(dummy_path)
-            
+
             self.assertIn("<div", html)
             self.assertIn("data:image/png;base64,", html)
             self.assertIn(base64.b64encode(dummy_data).decode("utf-8"), html)
@@ -24,6 +25,7 @@ class TestImageHandler(unittest.TestCase):
         finally:
             if os.path.exists(dummy_path):
                 os.remove(dummy_path)
+
 
 class TestDatabaseService(unittest.TestCase):
     def setUp(self):
@@ -42,6 +44,7 @@ class TestDatabaseService(unittest.TestCase):
         # We just want to check if it doesn't crash during preparation (mocked conn logic is hard to test without real pg)
         # But we can verify our previous enum fix here by inspecting the expected param type if we were to unit test further.
         pass
+
 
 if __name__ == "__main__":
     unittest.main()

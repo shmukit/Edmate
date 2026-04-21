@@ -2,12 +2,13 @@ import base64
 import os
 from pathlib import Path
 
+
 class ImageHandler:
     @staticmethod
     def to_base64_html(image_path: str) -> str:
         """
         Converts an image file to a base64 string and wraps it in the specified HTML format.
-        
+
         Format:
         <div>
           &lt;p&gt;...&lt;/p&gt;<br/>
@@ -16,10 +17,11 @@ class ImageHandler:
         """
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found at {image_path}")
-            
+
         with open(image_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
-            
+            encoded_string = base64.b64encode(
+                image_file.read()).decode('utf-8')
+
         # Standard HTML wrapper for embedded images in the Edmate project
         html_snippet = (
             f'<div>\n'
@@ -41,5 +43,5 @@ class ImageHandler:
                 snippets.append(ImageHandler.to_base64_html(path))
             except Exception as e:
                 print(f"Warning: Failed to embed image {path}: {e}")
-        
+
         return text + "\n<br/>\n" + "\n".join(snippets) if snippets else text

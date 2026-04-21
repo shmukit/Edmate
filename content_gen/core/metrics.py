@@ -1,15 +1,15 @@
 import json
-import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from datetime import datetime
+
 
 class MetricsTracker:
     """
     Tracks LLM usage, tokens, and costs across Edmate sessions.
     Persists data to a local JSON file for UI consumption.
     """
-    
+
     def __init__(self, storage_path: str = "content_gen/data/session_metrics.json"):
         self.storage_path = Path(storage_path)
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
@@ -18,7 +18,7 @@ class MetricsTracker:
     def _load_metrics(self) -> Dict[str, Any]:
         if not self.storage_path.exists():
             return {"total_cost": 0.0, "total_tokens": 0, "last_updated": None, "calls": 0}
-        
+
         try:
             with open(self.storage_path, 'r') as f:
                 return json.load(f)
@@ -31,9 +31,8 @@ class MetricsTracker:
         """
         # LiteLLM provides usage and cost in the response
         usage = getattr(response_obj, 'usage', {})
-        cost = getattr(response_obj, '_response_ms', 0) # Just a placeholder if cost is missing
-        
-        # Real cost from LiteLLM is usually in response._hidden_params or similar 
+
+        # Real cost from LiteLLM is usually in response._hidden_params or similar
         # but LiteLLM also provides it in a more direct way if litellm.ModelResponse is used
         try:
             from litellm import completion_cost
@@ -45,7 +44,7 @@ class MetricsTracker:
         self.metrics["total_tokens"] += usage.get("total_tokens", 0)
         self.metrics["calls"] += 1
         self.metrics["last_updated"] = datetime.now().isoformat()
-        
+
         self._save_metrics()
 
     def _save_metrics(self):

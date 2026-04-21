@@ -1,13 +1,14 @@
 import json
 from pathlib import Path
 
+
 def export_to_txt(json_path: Path, txt_path: Path):
     if not json_path.exists():
         print(f"❌ JSON not found: {json_path}")
         return
 
     print(f"📄 Exporting {json_path.name} to {txt_path.name}...")
-    
+
     with open(json_path, 'r', encoding='utf-8') as f:
         questions = json.load(f)
 
@@ -15,10 +16,10 @@ def export_to_txt(json_path: Path, txt_path: Path):
         for q in questions:
             q_num = q["question_number"]
             content = q.get("generated_content", {})
-            
+
             f.write(f"Question {q_num}Question and Options in Text Format\n\n")
             f.write(f"{q.get('text', q.get('question_text', ''))}\n\n")
-            
+
             opts = q["options"]
             opt_str = f"A. {opts.get('A')} B. {opts.get('B')} C. {opts.get('C')} D. {opts.get('D')}"
             f.write(f"{opt_str}\n\n")
@@ -43,22 +44,24 @@ def export_to_txt(json_path: Path, txt_path: Path):
             f.write("[GA_START]\n")
             flashcards = content.get("flashcards", [])
             for i, fc in enumerate(flashcards):
-                f.write(f"Flashcard {i+1}: {fc.get('question')} Back: {fc.get('answer')}\n")
+                f.write(
+                    f"Flashcard {i+1}: {fc.get('question')} Back: {fc.get('answer')}\n")
             f.write("[GA_END]\n\n")
-            
+
             f.write("-" * 50 + "\n\n")
 
     print(f"✅ Export complete: {txt_path}")
 
+
 if __name__ == "__main__":
     base_dir = Path("content_gen/data/outputs")
-    
+
     # Export Mini
     export_to_txt(
         base_dir / "experiment_9701_m24_mini.json",
         base_dir / "9701_m24_qp_12_mini_REVIEW.txt"
     )
-    
+
     # Export Standard
     export_to_txt(
         base_dir / "experiment_9701_m24_standard.json",

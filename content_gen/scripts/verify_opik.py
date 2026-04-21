@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
+
 def verify_opik():
     try:
         import opik
@@ -17,13 +18,13 @@ def verify_opik():
     # Opik uses these env vars automatically
     api_key = os.getenv("OPIK_API_KEY")
     project_name = os.getenv("OPIK_PROJECT_NAME", "Edmate")
-    
+
     if not api_key:
         print("❌ OPIK_API_KEY not found.")
         return
 
     print(f"📡 Testing Opik connection for project: {project_name}...")
-    
+
     @track(project_name=project_name)
     def test_function():
         return "Connection successful"
@@ -34,6 +35,7 @@ def verify_opik():
         print("🔗 Check your dashboard: https://www.comet.com/opik/")
     except Exception as e:
         print(f"❌ Failed to send trace: {e}")
+
 
 if __name__ == "__main__":
     verify_opik()

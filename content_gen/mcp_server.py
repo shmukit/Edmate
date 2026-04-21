@@ -5,12 +5,13 @@ from typing import Dict, Any, List, Optional
 from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.core.config import CoreConfig
 
+
 class EdmateMCPServer:
     """
     A Model Context Protocol (MCP) server for the Edmate Content Engine.
     Exposes intelligence and metrics as tools for AI Agents.
     """
-    
+
     def __init__(self):
         self.router = ModelRoutingEngine()
         self.running = True
@@ -18,12 +19,12 @@ class EdmateMCPServer:
     def run(self):
         """Main loop for reading MCP messages from stdin."""
         print("Edmate MCP Server Started (JSON-RPC over Stdio)", file=sys.stderr)
-        
+
         while self.running:
             line = sys.stdin.readline()
             if not line:
                 break
-                
+
             try:
                 request = json.loads(line)
                 response = self.handle_request(request)
@@ -39,7 +40,7 @@ class EdmateMCPServer:
         method = request.get("method")
         params = request.get("params", {})
         req_id = request.get("id")
-        
+
         # MCP Handshake / Capability Discovery
         if method == "initialize":
             return {
@@ -90,7 +91,7 @@ class EdmateMCPServer:
         if method == "tools/call":
             tool_name = params.get("name")
             tool_args = params.get("arguments", {})
-            
+
             if tool_name == "generate_edmate_content":
                 try:
                     result = self.router.generate_content(
@@ -123,6 +124,7 @@ class EdmateMCPServer:
             "id": req_id,
             "error": {"code": -32000, "message": message}
         }
+
 
 if __name__ == "__main__":
     server = EdmateMCPServer()

@@ -6,7 +6,7 @@ Converts raw PDF-extracted text (with LaTeX-style notation and Wingdings
 characters) into frontend-ready HTML that the Edmate frontend can render.
 
 Usage:
-    from scripts.processing.text_normalizer import normalize
+    from content_gen.scripts.processing.text_normalizer import normalize
 
     clean = normalize("CH_4(g) + 2H_2O(g) \\uf0ae CO_2(g) + 4H_2(g)")
     # → "<p>CH<sub>4</sub>(g) + 2H<sub>2</sub>O(g) → CO<sub>2</sub>(g) + 4H<sub>2</sub>(g)</p>"
@@ -94,7 +94,6 @@ def _apply_sub_sup_html(text: str) -> str:
         Use a state-machine regex to identify token boundaries.
     """
 
-
     # ── Electron configuration notation: 1s^22s^22p^6 ──────────────────
     # These look like: <digit><orbital_letter(s/p/d/f)>^<exponent><next_token>
     # Problem: naive greedy regex captures "^22s" as the exponent.
@@ -103,20 +102,22 @@ def _apply_sub_sup_html(text: str) -> str:
     #
     # Pattern: a caret, some digits, then immediately a digit followed by s/p/d/f
     # We insert a space: ^2 → <sup>2</sup>, and "2s" stays as-is.
-    text = re.sub(r'\^([0-9]+)(?=\d[spdf])', lambda m: f'<sup>{m.group(1)}</sup>', text)
+    text = re.sub(r'\^([0-9]+)(?=\d[spdf])',
+                  lambda m: f'<sup>{m.group(1)}</sup>', text)
 
     # Remaining unbraced superscripts: ^<digits+signs>  e.g. ^2+  ^–1  ^27
     # (Do NOT capture trailing letters to avoid eating orbital symbols)
-    text = re.sub(r'\^([0-9–\+\-]+)', lambda m: f'<sup>{m.group(1)}</sup>', text)
+    text = re.sub(r'\^([0-9–\+\-]+)',
+                  lambda m: f'<sup>{m.group(1)}</sup>', text)
 
     # Pure single-letter superscript (e.g. ^n) only when not followed by a digit
-    text = re.sub(r'\^([a-zA-Z])(?!\d)', lambda m: f'<sup>{m.group(1)}</sup>', text)
+    text = re.sub(r'\^([a-zA-Z])(?!\d)',
+                  lambda m: f'<sup>{m.group(1)}</sup>', text)
 
     # Subscript: _ followed by digits only (e.g. CH_4, H_2O → CH<sub>4</sub>)
     text = re.sub(r'_([0-9]+)', lambda m: f'<sub>{m.group(1)}</sub>', text)
 
     return text
-
 
 
 def _wrap_html(text: str) -> str:
@@ -199,14 +200,17 @@ def fix_existing_rows(
         (paper_code_pattern,),
     )
     rows = cur.fetchall()
-    print(f"🔍 Found {len(rows)} rows matching '{paper_code_pattern}' in '{table}'")
+    print(
+        f"🔍 Found {len(rows)} rows matching '{paper_code_pattern}' in '{table}'")
 
     updated = 0
     for row_id, q_id, raw_title, raw_options in rows:
         new_title = normalize(raw_title)
-        new_options = [normalize(o, wrap_html=False) for o in (raw_options or [])]
+        new_options = [normalize(o, wrap_html=False)
+                       for o in (raw_options or [])]
 
-        changed = (new_title != raw_title) or (new_options != list(raw_options or []))
+        changed = (new_title != raw_title) or (
+            new_options != list(raw_options or []))
         if not changed:
             continue
 
@@ -225,7 +229,7 @@ def fix_existing_rows(
             updated += 1
 
     if dry_run:
-        print(f"\n🚫 Dry run — no changes written. Run with dry_run=False to apply.")
+        print("\n🚫 Dry run — no changes written. Run with dry_run=False to apply.")
         conn.rollback()
     else:
         conn.commit()
@@ -240,12 +244,17 @@ def fix_existing_rows(
 # ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import argparse, os
+    import argparse
+    import os
 
-    parser = argparse.ArgumentParser(description="Fix LaTeX/Wingdings in imported DB rows")
-    parser.add_argument("--table", required=True, help="e.g. chemistry_questions")
-    parser.add_argument("--paper-code", default="%", help="SQL LIKE filter on question_identifier, e.g. '9701_w25%%'")
-    parser.add_argument("--apply", action="store_true", help="Actually write changes (default is dry-run)")
+    parser = argparse.ArgumentParser(
+        description="Fix LaTeX/Wingdings in imported DB rows")
+    parser.add_argument("--table", required=True,
+                        help="e.g. chemistry_questions")
+    parser.add_argument("--paper-code", default="%",
+                        help="SQL LIKE filter on question_identifier, e.g. '9701_w25%%'")
+    parser.add_argument("--apply", action="store_true",
+                        help="Actually write changes (default is dry-run)")
     parser.add_argument("--db-url", default=None)
     args = parser.parse_args()
 

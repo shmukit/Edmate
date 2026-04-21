@@ -1,13 +1,13 @@
 import yaml
 from pathlib import Path
-from typing import Optional
-from .schemas import ModelConfig
+from content_gen.core.schemas import ModelConfig
+
 
 class CoreConfig:
     """
     Handles loading and validating the Edmate configuration from YAML.
     """
-    
+
     @staticmethod
     def load_from_yaml(config_path: str = "edmate_config.yaml") -> ModelConfig:
         """
@@ -15,24 +15,24 @@ class CoreConfig:
         If the file doesn't exist, returns default configuration.
         """
         path = Path(config_path)
-        
+
         if not path.exists():
             print(f"ℹ️ Config file {config_path} not found. Using defaults.")
             return ModelConfig()
-            
+
         try:
             with open(path, 'r') as f:
                 data = yaml.safe_load(f)
-                
+
             if not data:
                 return ModelConfig()
-                
+
             # Extract routing and budget info
             routing = data.get("model_routing", {})
             budget = data.get("budget", {})
             img_settings = data.get("storage_settings", {})
             ext_settings = data.get("extraction_settings", {})
-            
+
             return ModelConfig(
                 extraction_model=routing.get("extraction") or "gemini/gemini-1.5-pro",
                 generation_model=routing.get("generation") or "anthropic/claude-3-haiku",
@@ -56,6 +56,12 @@ class CoreConfig:
             },
             "budget": {
                 "max_daily_usd": 10.0
+            },
+            "storage_settings": {
+                "image_mode": "cdn"
+            },
+            "extraction_settings": {
+                "engine": "pdf_extract_kit"
             },
             "observability": {
                 "litellm_callbacks": ["opik"]

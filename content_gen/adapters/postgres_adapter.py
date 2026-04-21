@@ -5,12 +5,13 @@ from typing import List, Dict, Optional, Any
 from .base import BaseStorageAdapter
 from ..core.schemas import ProcessedQuestion, Flashcard
 
+
 class PostgresStorageAdapter(BaseStorageAdapter):
     """
     Concrete implementation of Edmate storage for the private 
     PostgreSQL schema used in the Edmate ecosystem.
     """
-    
+
     def __init__(self, connection_string: str):
         self.conn_str = connection_string
         self.conn = psycopg2.connect(connection_string)
@@ -71,7 +72,7 @@ class PostgresStorageAdapter(BaseStorageAdapter):
         finally:
             cur.close()
             conn.close()
-        
+
     def _get_table_name(self, subject: str, grade: str) -> str:
         # Based on the original TABLE_MAP in import_to_db.py
         mapping = {
@@ -86,13 +87,13 @@ class PostgresStorageAdapter(BaseStorageAdapter):
 
     def save_question(self, question: ProcessedQuestion) -> str:
         table = self._get_table_name(
-            question.subject, 
+            question.subject,
             question.metadata.get("grade", "A-Level")
         )
-        
+
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         q_id = str(uuid.uuid4())
-        
+
         # Mapping Pydantic model to legacy SQL columns
         self.cur.execute(
             f"""
@@ -108,16 +109,16 @@ class PostgresStorageAdapter(BaseStorageAdapter):
             RETURNING id;
             """,
             (
-                q_id, 
-                question.question_text, 
-                "MCQ", 
+                q_id,
+                question.question_text,
+                "MCQ",
                 question.metadata.get("difficulty", "Medium"),
                 "PastPaper",
                 question.metadata.get("subject_id"),
                 question.metadata.get("topic_id"),
                 list(question.options.values()),
                 question.correct_options,
-                [question.option_wise_explanation], # Simplifying for legacy
+                [question.option_wise_explanation],  # Simplifying for legacy
                 question.explanation_body,
                 question.explanation_body[:500] if question.explanation_body else None,
                 question.paper_code or f"GEN_{q_id}",
@@ -156,4 +157,4 @@ class PostgresStorageAdapter(BaseStorageAdapter):
 
     def resolve_metadata(self, hint: str, type: str) -> Optional[str]:
         # Logical mapping for subject/topic IDs
-        return hint # Simplified for this modular placeholder
+        return hint  # Simplified for this modular placeholder

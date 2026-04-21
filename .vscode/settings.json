@@ -1,0 +1,15 @@
+{
+    "python.analysis.exclude": [],
+    "python.analysis.extraPaths": [
+        "./",
+        "content_gen/tools/PDF-Extract-Kit"
+    ],
+    "search.exclude": {
+        "content_gen/tools/**": true,
+        "**/node_modules": true,
+        "**/.venv": true
+    },
+    "files.exclude": {
+        "content_gen/tools/**": true
+    }
+}

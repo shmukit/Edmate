@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
+
 def setup_opik():
     try:
         import opik
@@ -23,10 +24,10 @@ def setup_opik():
         return
 
     print(f"🚀 Configuring Opik for project: {project_name}...")
-    
+
     # Configure the environment
     configure(api_key=api_key, force=True, automatic_approvals=True)
-    
+
     # Explicitly create project
     client = Opik()
     try:
@@ -40,6 +41,7 @@ def setup_opik():
             print(f"⚠️ Note on project creation: {e}")
 
     print("\n🎉 Opik is ready! You can now view your traces at: https://www.comet.com/opik/")
+
 
 if __name__ == "__main__":
     setup_opik()

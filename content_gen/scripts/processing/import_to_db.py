@@ -173,14 +173,17 @@ class DatabaseImporter:
         # Resolve subject ID
         subject_id = SUBJECT_IDS.get(subject)
         if not subject_id:
-            raise ValueError(f"Unknown subject '{subject}'. Valid: {list(SUBJECT_IDS.keys())}")
+            raise ValueError(
+                f"Unknown subject '{subject}'. Valid: {list(SUBJECT_IDS.keys())}")
 
         # Resolve topic
         resolved_topic_id = topic_id or FALLBACK_TOPIC_ID
 
         questions = data.get("questions", [])
-        print(f"\n📥 Importing {len(questions)} questions from '{paper_code}' → table '{table}'")
-        print(f"   Subject: {subject} | Grade: {effective_grade} | Year: {meta.get('year')} | Session: {meta.get('session')}")
+        print(
+            f"\n📥 Importing {len(questions)} questions from '{paper_code}' → table '{table}'")
+        print(
+            f"   Subject: {subject} | Grade: {effective_grade} | Year: {meta.get('year')} | Session: {meta.get('session')}")
 
         inserted = 0
         skipped = 0
@@ -204,10 +207,12 @@ class DatabaseImporter:
             except psycopg2.errors.UniqueViolation:
                 self.conn.rollback()
                 skipped += 1
-                print(f"  ⚠️  Q{q.get('question_number')}: already exists, skipped")
+                print(
+                    f"  ⚠️  Q{q.get('question_number')}: already exists, skipped")
             except Exception as e:
                 self.conn.rollback()
-                errors.append({"question_number": q.get("question_number"), "error": str(e)})
+                errors.append({"question_number": q.get(
+                    "question_number"), "error": str(e)})
                 print(f"  ❌ Q{q.get('question_number')}: {e}")
 
         report = {
@@ -216,7 +221,8 @@ class DatabaseImporter:
             "skipped": skipped,
             "errors": errors,
         }
-        print(f"\n✅ Done: {inserted} inserted, {skipped} skipped, {len(errors)} errors.")
+        print(
+            f"\n✅ Done: {inserted} inserted, {skipped} skipped, {len(errors)} errors.")
         return report
 
     # ──────────────────────────────────────────
@@ -294,7 +300,8 @@ class DatabaseImporter:
                 subject_id, topic_id, subtopic_id,
                 options_list, None, None,
                 other_contents, None, None, None,
-                meta.get("year"), meta.get("session"), meta.get("variant"), question_identifier,
+                meta.get("year"), meta.get("session"), meta.get(
+                    "variant"), question_identifier,
                 meta.get("grade"), meta.get("exam_board"), None,
                 True, False,
                 now, now,
@@ -367,17 +374,17 @@ class DatabaseImporter:
             (f"{paper_code}/%",),
         )
         rows = self.cur.fetchall()
-        
+
         results = []
         for r in rows:
             q_id, q_identifier, title, options = r
-            
+
             # Extract question number from identifier (e.g. 9701_w25_qp_11/Q1 -> 1)
             q_num = 0
             match = re.search(r'/Q(\d+)$', q_identifier)
             if match:
                 q_num = int(match.group(1))
-            
+
             results.append({
                 "id": q_id,
                 "question_identifier": q_identifier,
@@ -443,8 +450,10 @@ def main():
         description="Import extracted questions into the production mukit_edmate_frontend DB"
     )
     parser.add_argument("json_path", help="Path to extracted JSON file")
-    parser.add_argument("--db-url", help="Database URL (falls back to DATABASE_URL env var)")
-    parser.add_argument("--paper-code", required=True, help="Paper code, e.g. 9701_w25_qp_11")
+    parser.add_argument(
+        "--db-url", help="Database URL (falls back to DATABASE_URL env var)")
+    parser.add_argument("--paper-code", required=True,
+                        help="Paper code, e.g. 9701_w25_qp_11")
     parser.add_argument(
         "--subject", required=True,
         choices=["Biology", "Chemistry", "Physics", "Mathematics"],
@@ -460,8 +469,10 @@ def main():
         choices=["Easy", "Medium", "Hard"],
     )
     parser.add_argument("--topic-id", default=None, help="Override topic UUID")
-    parser.add_argument("--subtopic-id", default=None, help="Override subtopic UUID")
-    parser.add_argument("--cdn-mapping", default=None, help="Path to CDN mapping JSON (optional)")
+    parser.add_argument("--subtopic-id", default=None,
+                        help="Override subtopic UUID")
+    parser.add_argument("--cdn-mapping", default=None,
+                        help="Path to CDN mapping JSON (optional)")
 
     args = parser.parse_args()
 
