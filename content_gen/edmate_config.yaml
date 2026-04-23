@@ -1,0 +1,16 @@
+model_routing:
+  extraction: "vertex_ai/gemini-2.5-flash"
+  generation: "vertex_ai/gemini-2.5-flash"
+  validation: "vertex_ai/gemini-2.5-flash"
+
+budget:
+  max_daily_usd: 20.0
+
+storage_settings:
+  image_mode: "base64"
+
+extraction_settings:
+  engine: "pymupdf"
+
+observability:
+  litellm_callbacks: ["opik"]
