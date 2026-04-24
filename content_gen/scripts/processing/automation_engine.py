@@ -31,9 +31,10 @@ class AutomationEngine:
     Supports dynamic modalities, providers, and input formats.
     """
 
-    def __init__(self, provider_or_subject: str = "gemini", model_id: Optional[str] = None):
+    def __init__(self, provider_or_subject: str = "gemini", model_id: Optional[str] = None, api_key: Optional[str] = None):
         """
         Supports both direct provider name (gemini/openai) or subject name.
+        Allows manual api_key injection for BYOK.
         """
         # Determine provider based on input
         p_lower = provider_or_subject.lower()
@@ -45,29 +46,33 @@ class AutomationEngine:
             # Fallback for subjects like "Chemistry", "Physics"
             self.provider = "gemini"
 
-        self.api_key = os.getenv(
-            "GEMINI_API_KEY") if "gemini" in self.provider else os.getenv("OPENAI_API_KEY")
+        self.api_key = api_key or (os.getenv("GEMINI_API_KEY") if "gemini" in self.provider else os.getenv("OPENAI_API_KEY"))
         self.creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
         if "gemini" in self.provider:
-            self._init_gemini(model_id or "gemini-2.5-flash")
+            self._init_gemini(model_id or "gemini-2.5-flash", self.api_key)
         elif "openai" in self.provider:
-            self._init_openai(model_id or "gpt-4o")
+            self._init_openai(model_id or "gpt-4o", self.api_key)
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
 
-    def _init_gemini(self, model_id: str):
-        if self.creds_path and os.path.exists(self.creds_path):
+    def _init_gemini(self, model_id: str, api_key: Optional[str] = None):
+        if self.creds_path and os.path.exists(self.creds_path) and not api_key:
             self.client = genai.Client(
                 vertexai=True, project="mcq-master-490011", location="asia-south1")
+        elif api_key:
+            self.client = genai.Client(api_key=api_key)
         elif os.getenv("GEMINI_API_KEY"):
             self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         else:
             raise ValueError("Missing Gemini credentials")
         self.model_id = model_id
 
-    def _init_openai(self, model_id: str):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    def _init_openai(self, model_id: str, api_key: Optional[str] = None):
+        key = api_key or os.getenv("OPENAI_API_KEY")
+        if not key:
+            raise ValueError("Missing OpenAI API Key")
+        self.client = OpenAI(api_key=key)
         self.model_id = model_id
 
     def _build_dynamic_prompt(self, modalities: List[str], lang: str = "English", curriculum: str = "Cambridge O/Level") -> str:

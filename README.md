@@ -1,10 +1,10 @@
-# Edmate 🎓
+# Edmate Lab_QA 🎓
 
-**The Modular AI Factory for Educational Content Generation**
+**The Modular Service Platform for Global Educational Content Automation**
 
-Edmate is an open-source, vendor-agnostic pipeline designed to transform unstructured educational materials (PDFs, images, documents) into high-fidelity learning modules, flashcards, and MCQ banks. 
+Edmate Lab_QA is a headless, open-source service platform designed to convert any unstructured educational material (**PDF, Excel, Docx**, etc.) into high-fidelity, curriculum-aligned **Q&A, explanations, and 3D flashcards**.
 
-Built with **modularity** and **multi-modality** at its core, Edmate allows organizations to bring their own intelligence (LLMs), their own storage (S3/R2), and their own database schemas.
+Built for **"Plug & Play" integration**, Edmate Lab_QA allows teachers, publishers, and developers to serve external platforms (like Alopoth or A/O-Level portals) using their own AI logic and API keys.
 
 ---
 

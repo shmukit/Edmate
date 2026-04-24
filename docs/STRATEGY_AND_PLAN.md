@@ -1,7 +1,7 @@
-# Edmate: The Modular content Automation Service (Strategy & Plan)
+# Edmate Lab_QA: The Modular content Automation Service (Strategy & Plan)
 
 ## 1. Vision & Core Proposition
-Edmate is an open-source service platform designed to be the "Content Infrastructure" for teachers, publishers, and EdTech developers.
+Edmate Lab_QA is an open-source service platform designed to be the "Content Infrastructure" for teachers, publishers, and EdTech developers.
 
 **Core Value:** Provide an automated pipeline to convert any source material (**PDF, Excel, Docx**, etc.) into beautiful, structured Q&A, explanations, and visual study aids (Flashcards, etc.) for **any curriculum** using **any LLM**.
 
@@ -10,11 +10,12 @@ Edmate is an open-source service platform designed to be the "Content Infrastruc
 ## 2. Competitive Landscape & "Unfair Advantages"
 
 ### Market Position
-| Solution Type | Examples | Edmate's Advantage |
-| :--- | :--- | :--- |
-| **Consumer SaaS** | Quizgecko, Quizizz | **Workflow:** Edmate provides a professional "Draft -> Review -> QC" pipeline. |
-| **Structural AI** | MentoMind, MinerU | **Experience:** Edmate turns raw extraction into "Beautiful" UI (3D Flashcards). |
-| **Generic AI** | NotebookLM | **Automation:** Edmate is a "headless" factory, not just a search tool. |
+| Solution Type | Feature | Edmate Lab_QA | Quizgecko / Quizizz | MentoMind | NotebookLM |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Model** | Open Core / SaaS | Proprietary SaaS | Enterprise AI | Free SaaS |
+ **Workflow:** Edmate Lab_QA provides a professional "Draft -> Review -> QC" pipeline. |
+| **Structural AI** | MentoMind, MinerU | **Experience:** Edmate Lab_QA turns raw extraction into "Beautiful" UI (3D Flashcards). |
+| **Generic AI** | NotebookLM | **Automation:** Edmate Lab_QA is a "headless" factory, not just a search tool. |
 
 ### Strategic Differentiators
 1.  **Regional Optimization:** Native support for Bangladesh NCTB and British (CIE/Edexcel) A/O-Level formatting.

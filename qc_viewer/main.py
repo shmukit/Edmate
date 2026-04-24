@@ -16,12 +16,15 @@ from datetime import datetime
 # Import local services
 from content_gen.scripts.processing.automation_engine import AutomationEngine
 from content_gen.scripts.processing.database_service import DatabaseService
+from .router_v1 import router as api_v1_router
 
 # Load environment variables from content_gen/.env
 env_path = Path(__file__).parent.parent / "content_gen" / ".env"
 load_dotenv(dotenv_path=env_path)
 
-app = FastAPI(title="Edmate QC Viewer")
+app = FastAPI(title="Edmate Lab_QA Service")
+
+app.include_router(api_v1_router)
 
 app.add_middleware(
     CORSMiddleware,
