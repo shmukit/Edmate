@@ -1,0 +1,70 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.1, pytest-9.0.2, pluggy-1.6.0 -- /Library/Frameworks/Python.framework/Versions/3.13/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/mukit_10ms/Documents/GitHub/Edmate
+plugins: anyio-4.7.0, opik-1.10.58
+collecting ... collected 2 items / 1 deselected / 1 selected
+
+content_gen/tests/test_base64.py::test_base64_conversion FAILED          [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_base64_conversion ____________________________
+
+tmp_path = PosixPath('/private/var/folders/bb/0qfpngxj3gx13l06rpgkhpn40000gn/T/pytest-of-mukit_10ms/pytest-9/test_base64_conversion0')
+
+    def test_base64_conversion(tmp_path):
+        # Setup: Create a dummy image file
+        img_path = tmp_path / "test.png"
+        img_path.write_bytes(b"dummy image data")
+    
+        # Initialize orchestrator
+>       orchestrator = PipelineOrchestrator()
+                       ^^^^^^^^^^^^^^^^^^^^^^
+
+content_gen/tests/test_base64.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+content_gen/scripts/pipeline/pipeline_orchestrator.py:45: in __init__
+    self.extractor = KitExtractionAdapter()
+                     ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <content_gen.adapters.kit_extraction_adapter.KitExtractionAdapter object at 0x12c541550>
+use_gpu = True
+
+    def __init__(self, use_gpu: bool = True):
+>       self.wrapper = PDFExtractKitWrapper(use_gpu=use_gpu)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: PDFExtractKitWrapper.__init__() got an unexpected keyword argument 'use_gpu'
+
+content_gen/adapters/kit_extraction_adapter.py:15: TypeError
+----------------------------- Captured stdout call -----------------------------
+ℹ️ Config file edmate_config.yaml not found. Using defaults.
+ℹ️ Config file edmate_config.yaml not found. Using defaults.
+=============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+content_gen/scripts/processing/content_generator.py:10
+  /Users/mukit_10ms/Documents/GitHub/Edmate/content_gen/scripts/processing/content_generator.py:10: FutureWarning: 
+  
+  All support for the `google.generativeai` package has ended. It will no longer be receiving 
+  updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+  See README for more details:
+  
+  https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+  
+    import google.generativeai as genai
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED content_gen/tests/test_base64.py::test_base64_conversion - TypeError: ...
+================= 1 failed, 1 deselected, 6 warnings in 3.67s ==================
+<sys>:0: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

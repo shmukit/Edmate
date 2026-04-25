@@ -1,84 +1,90 @@
-# Edmate Lab_QA 🎓
+<p align="center">
+  <img src="docs/assets/banner.png" alt="Edmate Banner" width="100%">
+</p>
 
-**The Modular Service Platform for Global Educational Content Automation**
+<p align="center">
+  <b>The Modular AI Content Factory for Global Educational Automation</b>
+</p>
 
-Edmate Lab_QA is a headless, open-source service platform designed to convert any unstructured educational material (**PDF, Excel, Docx**, etc.) into high-fidelity, curriculum-aligned **Q&A, explanations, and 3D flashcards**.
+<p align="center">
+  <img src="https://img.shields.io/github/license/shmukit/Edmate?style=flat-square&color=fbbf24" alt="License">
+  <img src="https://img.shields.io/github/issues/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Issues">
+  <img src="https://img.shields.io/github/stars/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Stars">
+  <img src="https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square&color=1e1b4b" alt="Python">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&color=fbbf24" alt="PRs Welcome">
+</p>
 
-Built for **"Plug & Play" integration**, Edmate Lab_QA allows teachers, publishers, and developers to serve external platforms (like Alopoth or A/O-Level portals) using their own AI logic and API keys.
+---
+
+Edmate Lab_QA is a **headless, open-source service platform** designed to transform unstructured educational materials (**PDF, Excel, Docx**) into high-fidelity, curriculum-aligned **Q&A, explanations, and 3D flashcards**.
+
+Built on a "Plug & Play" architecture, it empowers teachers, publishers, and developers to serve external platforms using their own AI logic and API keys.
+
+## ✨ Key Features
+
+- 🛡️ **Economic Kill-Switch**: Real-time token tracking with automatic pipeline halts when daily USD budgets are reached.
+- 🧩 **Intelligence-Blind**: LLM-agnostic routing via LiteLLM. Support for 100+ providers (Gemini, OpenAI, Anthropic, etc.).
+- 💾 **Adapter-Driven Persistence**: Swap between Postgres, Vector DBs, or JSON exports with zero changes to core logic.
+- ⚡ **MCP Ready**: Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool for instant content generation.
+- 📊 **Automation Hub**: A sleek, dark-mode dashboard for managing drafts, review workflows, and cost analytics.
+
+---
+
+## 🚀 30-Second Quick Start
+
+Get Edmate running in seconds using the CLI orchestrator.
+
+```bash
+# 1. Clone & Install
+git clone https://github.com/shmukit/Edmate.git
+cd Edmate
+pip install -r content_gen/requirements.txt
+
+# 2. Configure (Set your keys)
+cp content_gen/.env.example content_gen/.env
+
+# 3. Process a PDF
+python3 content_gen/scripts/pipeline/pipeline_orchestrator.py --single-pdf path/to/your_paper.pdf
+```
 
 ---
 
 ## 🏗️ Modular Architecture
 
-Edmate is designed to be "Intelligence-Blind" and "Database-Agnostic," adhering to the **Adapter Pattern**.
+Edmate is built for extensibility. It uses the **Adapter Pattern** to remain decoupled from specific AI models and database schemas.
 
-### 1. Intelligence Layer (LLM Agnostic)
-Powered by **LiteLLM**, Edmate supports 100+ model providers (OpenAI, Gemini, Anthropic, Ollama, etc.). Users can route specific tasks to different models via the `ModelRoutingEngine` to optimize for cost and capability:
-- **Extraction:** Recommended model `gemini-1.5-pro` for massive multimodal context.
-- **Generation:** Recommended model `claude-3-haiku` or `gpt-4o-mini` for speed.
-- **Verification:** Recommended model `gpt-4o` for high-reasoning logic.
-
-### 2. Persistence Layer (BYO-Database)
-Edmate produces standardized Pydantic models. Use **Storage Adapters** to map this data to any schema:
-- **PostgresStorageAdapter:** Ready-to-use adapter for PostgreSQL.
-- **BaseStorageAdapter:** Extend this to support MySQL, MongoDB, or Vector DBs.
-
-### 3. Execution Interfaces
-- **Automation Hub (UI):** A user-friendly dashboard for non-coders to manage drafts, observe real-time cost analytics, and configure model profiles.
-- **CLI Orchestrator:** For batch processing from the terminal.
-- **MCP Server:** Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool.
-
----
-
-## 🛡️ Economic Safeties (AI Budgeting)
-Edmate includes an automatic **Economic Kill-Switch**:
-- **Real-time Metrics:** Tracks every cent and token spent in `session_metrics.json`.
-- **Budget Caps:** Define your `max_daily_usd` in `edmate_config.yaml`. The pipeline halts automatically if the limit is reached.
-
----
-
-## 🚀 Getting Started
-
-### 1. Installation
-```bash
-git clone https://github.com/shmukit/Edmate.git
-cd Edmate
-pip install -r requirements.txt
-```
-
-### 2. Configuration
-Copy the template and set your API keys in `.env` and routing in `edmate_config.yaml`:
-```yaml
-model_routing:
-  extraction: "gemini/gemini-1.5-pro"
-  generation: "anthropic/claude-3-haiku"
-budget:
-  max_daily_usd: 5.0
-```
-
-### 3. Launch
-```bash
-# Run the UI (FastAPI + Vanilla JS)
-python3 qc_viewer/main.py
-
-# Run the CLI
-python3 content_gen/scripts/pipeline/pipeline_orchestrator.py --single-pdf my_paper.pdf
+```mermaid
+graph TD
+    A[Unstructured PDF/Doc] --> B[Extraction Agent]
+    B --> C{Model Router}
+    C -->|Gemini 1.5| D[High-Fidelity Extraction]
+    C -->|GPT-4o| E[Logical Verification]
+    D & E --> F[Standardized JSON]
+    F --> G[Storage Adapter]
+    G -->|Postgres| H[(Main DB)]
+    G -->|JSON| I[External Export]
+    style C fill:#fbbf24,stroke:#111827,color:#111827
+    style G fill:#1e1b4b,stroke:#fbbf24,color:#fff
 ```
 
 ---
 
-## 📂 Repository Structure
+## 📂 Repository Layout
 
-- `content_gen/core/`: Intelligence, Metrics, and Config logic.
-- `content_gen/adapters/`: Storage interfaces (Postgres, etc.).
-- `content_gen/scripts/`: Extraction and pipeline orchestration.
-- `qc_viewer/`: The Automation Hub frontend and API.
-- `content_gen/tests/`: Comprehensive unit and integration tests.
+- `content_gen/core/`: The "Brain"—Routing, Budgeting, and Schema logic.
+- `content_gen/adapters/`: The "Connectors"—Postgres and Base storage interfaces.
+- `qc_viewer/`: The "Heart"—FastAPI backend and Vanilla JS Automation Hub.
+- `docs/`: Deep-dive documentation on system design and database schemas.
 
 ---
 
-## 🤝 Contributing
-Interested in adding a new adapter or a custom extraction prompt? Check our **[CONTRIBUTING_MODULAR.md](content_gen/docs/CONTRIBUTING_MODULAR.md)** guide.
+## 🤝 Community & Contributing
+
+We welcome contributions of all kinds! Whether it's a new Storage Adapter, an extraction prompt, or a bug fix.
+
+- 📖 **[Contributing Guide](CONTRIBUTING.md)**: How to get started.
+- 📜 **[Code of Conduct](CODE_OF_CONDUCT.md)**: Our community standards.
+- 🏗️ **[Modular Architecture Guide](content_gen/docs/CONTRIBUTING_MODULAR.md)**: Deep dive for developers.
 
 ---
 

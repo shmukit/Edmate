@@ -27,15 +27,18 @@ class PDFExtractKitWrapper:
     compatible with the old smart_extract.py output format
     """
 
-    def __init__(self, pdf_path: str, output_dir: str = None):
+    def __init__(self, pdf_path: str = None, output_dir: str = None, use_gpu: bool = False):
         """
         Initialize PDF extractor
 
         Args:
-            pdf_path: Path to PDF file
-            output_dir: Output directory for extracted data (defaults to data/extracted relative to script)
+            pdf_path: Optional path to PDF file
+            output_dir: Optional output directory
+            use_gpu: Whether to use GPU for models
         """
+        self.use_gpu = use_gpu
         self.pdf_path = pdf_path
+        self.output_dir = Path(output_dir) if output_dir else None
 
         # Determine working directory or use provided output_dir
         if output_dir:
@@ -58,6 +61,7 @@ class PDFExtractKitWrapper:
 
     def _init_models(self):
         """Initialize PDF-Extract-Kit AI models"""
+        device = "cuda" if self.use_gpu else "cpu"
         # Configuration for layout detection
         config = {
             "tasks": {
@@ -68,7 +72,7 @@ class PDFExtractKitWrapper:
                         "conf_thres": 0.25,
                         "iou_thres": 0.45,
                         "model_path": str(KIT_PATH / "models/Layout/YOLO/doclayout_yolo_ft.pt"),
-                        "device": "cpu"  # Change to "cuda" if GPU available
+                        "device": device
                     }
                 }
             }
@@ -133,6 +137,24 @@ class PDFExtractKitWrapper:
             f"   Images: {self.images_dir} ({len(list(self.images_dir.glob('*.png')))} files)")
 
         return output
+
+    def extract_questions(self, source_path: str, output_dir: str) -> Dict:
+        """
+        Adapter-compatible extraction method
+        """
+        self.pdf_path = source_path
+        self.output_dir = Path(output_dir)
+        self.base_name = Path(source_path).stem
+        
+        # Create PDF-specific subfolder for images
+        self.images_dir = self.output_dir / "images" / self.base_name
+        self.images_dir.mkdir(parents=True, exist_ok=True)
+
+        # Sub-folder for processed text files (relative to data root)
+        self.outputs_dir = self.output_dir.parent / "outputs"
+        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+
+        return self.extract()
 
     def _process_page(self, page, page_num: int, doc) -> List[Dict]:
         """

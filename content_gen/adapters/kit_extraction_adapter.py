@@ -11,7 +11,7 @@ class KitExtractionAdapter(BaseExtractionAdapter):
     Uses multimodal vision models for precise diagram extraction.
     """
 
-    def __init__(self, use_gpu: bool = True):
+    def __init__(self, use_gpu: bool = False):
         self.wrapper = PDFExtractKitWrapper(use_gpu=use_gpu)
 
     def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:

@@ -6,8 +6,13 @@ import pytest
 import sys
 from unittest.mock import MagicMock
 
-# Mock fitz (PyMuPDF) before importing orchestrator to avoid ModuleNotFoundError
-sys.modules["fitz"] = MagicMock()
+# Mock heavy dependencies using patch.dict to avoid global side effects
+HEAVY_MOCKS = {
+    "fitz": MagicMock(),
+    "pdf_extract_kit.tasks": MagicMock(),
+    "pdf_extract_kit.utils.config_loader": MagicMock(),
+    "psycopg2": MagicMock()
+}
 
 
 def test_base64_conversion(tmp_path):
@@ -15,9 +20,12 @@ def test_base64_conversion(tmp_path):
     img_path = tmp_path / "test.png"
     img_path.write_bytes(b"dummy image data")
 
-    # Initialize orchestrator
-    orchestrator = PipelineOrchestrator()
-
+    # Initialize orchestrator with mocked extractor/storage to avoid heavy init
+    with patch.dict("sys.modules", HEAVY_MOCKS):
+        with patch("content_gen.scripts.pipeline.pipeline_orchestrator.KitExtractionAdapter"), \
+             patch("content_gen.scripts.pipeline.pipeline_orchestrator.PostgresStorageAdapter"):
+            orchestrator = PipelineOrchestrator()
+    
     # Execute conversion
     b64_str = orchestrator._convert_to_base64(img_path)
 
@@ -34,10 +42,14 @@ def test_pipeline_uses_base64_mode(mock_uploader, tmp_path):
     (img_dir / "q1_stem.png").write_bytes(b"data")
 
     # Mock router with base64 config
-    mock_router = MagicMock(spec=ModelRoutingEngine)
+    mock_router = MagicMock()
     mock_router.config.image_mode = "base64"
+    mock_router.config.extraction_engine = "pymupdf"
 
-    orchestrator = PipelineOrchestrator(router=mock_router)
+    with patch.dict("sys.modules", HEAVY_MOCKS):
+        with patch("content_gen.scripts.pipeline.pipeline_orchestrator.KitExtractionAdapter"), \
+             patch("content_gen.scripts.pipeline.pipeline_orchestrator.PostgresStorageAdapter"):
+            orchestrator = PipelineOrchestrator(router=mock_router)
 
     # Manually check the logic branch in process_pdf (isolated)
     images = [img_dir / "q1_stem.png"]
