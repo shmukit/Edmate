@@ -3,18 +3,12 @@
         "**/node_modules",
         "**/.venv"
     ],
-    "executionEnvironments": [
-        {
-            "root": ".",
-            "extraPaths": [
-                "content_gen/tools/PDF-Extract-Kit"
-            ]
-        }
-    ],
     "extraPaths": [
         "content_gen/tools/PDF-Extract-Kit"
     ],
+    "venvPath": ".",
+    "venv": ".venv",
     "reportMissingImports": true,
-    "pythonVersion": "3.9",
+    "pythonVersion": "3.13",
     "pythonPlatform": "Darwin"
 }

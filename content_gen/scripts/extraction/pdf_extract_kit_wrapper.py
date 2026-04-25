@@ -13,8 +13,13 @@ KIT_PATH = Path(__file__).parent.parent.parent / "tools" / "PDF-Extract-Kit"
 if str(KIT_PATH) not in sys.path:
     sys.path.insert(0, str(KIT_PATH))
 
-import pdf_extract_kit.tasks  # Trigger registration
-from pdf_extract_kit.utils.config_loader import load_config, initialize_tasks_and_models
+try:
+    import pdf_extract_kit.tasks  # Trigger registration
+    from pdf_extract_kit.utils.config_loader import load_config, initialize_tasks_and_models
+    HAS_KIT = True
+except (ImportError, ModuleNotFoundError):
+    HAS_KIT = False
+    print("⚠️ PDF-Extract-Kit not found. Extraction features using this engine will be disabled.")
 import json
 import re
 import fitz
@@ -61,6 +66,11 @@ class PDFExtractKitWrapper:
 
     def _init_models(self):
         """Initialize PDF-Extract-Kit AI models"""
+        if not HAS_KIT:
+            print("❌ Cannot initialize models: PDF-Extract-Kit not found in tools/")
+            self.layout_detector = None
+            return
+
         device = "cuda" if self.use_gpu else "cpu"
         # Configuration for layout detection
         config = {
@@ -101,6 +111,9 @@ class PDFExtractKitWrapper:
                 ]
             }
         """
+        if not HAS_KIT:
+            raise RuntimeError("Extraction failed: PDF-Extract-Kit is not installed or found in tools/")
+
         doc = fitz.open(self.pdf_path)
         all_questions = []
 
