@@ -3,13 +3,13 @@
 </p>
 
 <p align="center">
-  <b>The Modular AI Content Factory for Global Educational Automation</b>
+  <b>The Modular Academic Content Automation Service based on Learning Science.</b>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/shmukit/Edmate?style=flat-square&color=fbbf24" alt="License">
-  <img src="https://img.shields.io/github/issues/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Issues">
-  <img src="https://img.shields.io/github/stars/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Stars">
+  <img src="https://img.shields.io/github/license/shmukit/edmate?style=flat-square&color=fbbf24" alt="License">
+  <img src="https://img.shields.io/github/issues/shmukit/edmate?style=flat-square&color=fbbf24" alt="Issues">
+  <img src="https://img.shields.io/github/stars/shmukit/edmate?style=flat-square&color=fbbf24" alt="Stars">
   <img src="https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square&color=1e1b4b" alt="Python">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&color=fbbf24" alt="PRs Welcome">
 </p>
@@ -58,8 +58,8 @@ Edmate is built for extensibility. It uses the **Adapter Pattern** to remain dec
 graph TD
     A[Unstructured PDF/Doc] --> B[Extraction Agent]
     B --> C{Model Router}
-    C -->|Gemini 1.5| D[High-Fidelity Extraction]
-    C -->|GPT-4o| E[Logical Verification]
+    C -->|Primary LLM| D[High-Fidelity Extraction]
+    C -->|Secondary LLM| E[Logical Verification]
     D & E --> F[Standardized JSON]
     F --> G[Storage Adapter]
     G -->|Postgres| H[(Main DB)]
