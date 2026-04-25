@@ -50,10 +50,74 @@ export const ReviewController = {
         this.currentQuestionIndex = index;
         const q = this.currentDraftData.questions[index];
         const gen = q.generated_content || {};
+        const hia = q.hia_details || {};
         
+        // Render Resilience Badge
+        const badge = document.getElementById('resilienceBadge');
+        if (badge) {
+            const score = q.ai_integrity_label || 'Low';
+            badge.textContent = `${score} Integrity`;
+            badge.className = `resilience-badge ${score.toLowerCase()}`;
+        }
+
         document.getElementById('currentQNum').textContent = `Question ${q.question_number} (${q.status || 'Draft'})`;
         const preview = document.getElementById('previewCard');
         
+        let typeSpecificHtml = '';
+        const qType = q.type || 'mcq';
+
+        if (qType === 'mcq') {
+            typeSpecificHtml = `
+                <div style="margin-top:20px; border-top: 1px solid #e2e8f0; padding-top:12px;">
+                    <b style="color:var(--primary); font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Options</b>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                        ${['A', 'B', 'C', 'D'].map(opt => `
+                            <div class="edit-group opt-field" id="group-opt-${opt}">
+                                <label class="field-label" style="font-weight:700; text-transform:uppercase; font-size:0.7rem;">Option ${opt}</label>
+                                ${this.renderImageWrapper(q[`option_${opt}_diagram_base64`], `option_${opt}_diagram_base64`, true)}
+                                <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${q.options ? q.options[opt] || '' : ''}</textarea>
+                                <div id="preview-opt-${opt}" class="preview-render-box" style="padding:8px; font-size:0.88rem; min-height:36px;"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (qType === 'ai_critique') {
+            typeSpecificHtml = `
+                <div class="hia-container">
+                    <div class="hia-title">🛡️ High-Integrity: AI Critique</div>
+                    <div class="critique-box">
+                        <label class="field-label">AI-Generated Answer (Stimulus)</label>
+                        <textarea class="editable-field" id="edit-hia-stimulus" style="height:100px;">${hia.ai_generated_answer || ''}</textarea>
+                        <div id="preview-hia-stimulus" class="preview-render-box">${hia.ai_generated_answer || ''}</div>
+                    </div>
+                    <label class="field-label">Planted Errors (Student must identify)</label>
+                    <div id="hia-errors-list">
+                        ${(hia.planted_errors || []).map((err, i) => `
+                            <div class="error-item">
+                                <span class="error-tag">Error ${i+1}</span>
+                                <div>${err}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (qType === 'viva_prompt') {
+            typeSpecificHtml = `
+                <div class="hia-container">
+                    <div class="hia-title">🛡️ High-Integrity: Viva Defense Probes</div>
+                    <div class="viva-grid">
+                        ${Object.entries(hia.viva_probes || {}).map(([stage, probe]) => `
+                            <div class="viva-card">
+                                <h4>${stage}</h4>
+                                <p>${probe}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         preview.innerHTML = `
             <div class="edit-group" id="group-text">
                 <label class="field-label">Question Text</label>
@@ -63,22 +127,7 @@ export const ReviewController = {
 
             ${this.renderImageWrapper(q.diagram_base64, 'diagram_base64')}
             
-            <div style="margin-top:20px; border-top: 1px solid #e2e8f0; padding-top:12px;">
-                <b style="color:var(--primary); font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Options</b>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                    ${['A', 'B', 'C', 'D'].map(opt => `
-                        <div class="edit-group opt-field" id="group-opt-${opt}">
-                            <label class="field-label" style="font-weight:700; text-transform:uppercase; font-size:0.7rem;">Option ${opt}</label>
-                            
-                            <!-- Option Diagram Wrapper -->
-                            ${this.renderImageWrapper(q[`option_${opt}_diagram_base64`], `option_${opt}_diagram_base64`, true)}
-
-                            <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${q.options[opt]}</textarea>
-                            <div id="preview-opt-${opt}" class="preview-render-box" style="padding:8px; font-size:0.88rem; min-height:36px;"></div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
+            ${typeSpecificHtml}
 
             <div class="edit-group" id="group-core" style="margin-top:20px;">
                 <label class="field-label" style="color:var(--primary);">Core Concept</label>

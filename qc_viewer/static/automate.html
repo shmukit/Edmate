@@ -49,6 +49,7 @@
             <div class="review-header">
                 <div class="review-title-block">
                     <h2>Live Preview</h2>
+                    <div id="resilienceBadge" class="resilience-badge" title="AI Resilience Score"></div>
                     <span id="currentQNum" class="q-subtitle">Select a question</span>
                     <span id="reviewFilename" class="q-subtitle" style="display:block; font-size: 0.7rem; opacity: 0.7; margin-top: 2px;"></span>
                 </div>
@@ -103,6 +104,13 @@
                     <line x1="6" y1="20" x2="6" y2="14"></line>
                 </svg>
                 <span>Analytics</span>
+            </a>
+            <a href="#" class="nav-item" id="navPedagogy">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <circle cx="12" cy="11" r="3"></circle>
+                </svg>
+                <span>How it Works</span>
             </a>
         </nav>
     </aside>
@@ -235,6 +243,27 @@
             </select>
         </div>
 
+        <!-- Pedagogy & Integrity Settings -->
+        <div class="settings-group" style="background: rgba(14, 165, 233, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(14, 165, 233, 0.2); margin-top: 20px;">
+            <span class="settings-label" style="color: var(--primary); font-weight: 600;">🧠 Pedagogy & Integrity</span>
+            
+            <span class="settings-label" style="font-size:0.7rem; margin-top: 8px;">Learning Science Profile</span>
+            <select id="lsProfileSelect" style="font-size:0.8rem; height:32px;">
+                <option value="default">Default (Balanced)</option>
+                <option value="exam_prep">Exam Prep (High Bloom's)</option>
+                <option value="beginner">Beginner (Scaffolded)</option>
+                <option value="flashcard_only">Flashcard Only</option>
+            </select>
+
+            <span class="settings-label" style="font-size:0.7rem; margin-top: 12px;">HIA Resilience Target</span>
+            <select id="hiaResilienceSelect" style="font-size:0.8rem; height:32px;">
+                <option value="Low">Low (Standard)</option>
+                <option value="Medium">Medium (Enhanced)</option>
+                <option value="High" selected>High (AI-Resilient)</option>
+                <option value="Very High">Very High (HIA Only)</option>
+            </select>
+        </div>
+
         <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--card-border);">
             <p style="font-size:0.75rem; color:var(--text-dim);">Engine: v2.5 (Visual-Aware)</p>
         </div>
@@ -281,6 +310,17 @@
                 <span id="editorStatus" style="font-size:0.8rem; color:var(--text-dim); margin-right:auto;"></span>
                 <button class="btn btn-secondary" id="cancelEditor">Cancel</button>
                 <button class="btn btn-primary" id="saveEditor">Apply Edits</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pedagogy Overlay -->
+    <div id="pedagogyOverlay" class="pedagogy-overlay">
+        <div class="pedagogy-modal">
+            <span class="close-btn" id="closePedagogy" style="cursor:pointer; font-size: 2rem; color: var(--text-dim);">&times;</span>
+            <div id="pedagogyContent" class="preview-render-box" style="background:var(--card-bg); border:none; padding:0; min-height:600px;">
+                <!-- Content will be loaded here -->
+                <div class="loading-text">Loading Pedagogy Framework...</div>
             </div>
         </div>
     </div>

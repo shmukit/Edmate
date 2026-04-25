@@ -76,6 +76,30 @@ export const AutomationUI = {
             this.openAnalytics();
         });
         document.getElementById('btnCloseAnalytics')?.addEventListener('click', () => this.closeAnalytics());
+
+        // Pedagogy Nav
+        document.getElementById('navPedagogy')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openPedagogy();
+        });
+        document.getElementById('closePedagogy')?.addEventListener('click', () => {
+            document.getElementById('pedagogyOverlay').style.display = 'none';
+        });
+    },
+
+    async openPedagogy() {
+        const overlay = document.getElementById('pedagogyOverlay');
+        const content = document.getElementById('pedagogyContent');
+        overlay.style.display = 'block';
+        
+        try {
+            const resp = await fetch('/docs/PEDAGOGY.md');
+            const md = await resp.text();
+            content.innerHTML = marked.parse(md);
+            if (window.MathJax) MathJax.typesetPromise([content]);
+        } catch (e) {
+            content.innerHTML = '<div class="alert alert-danger">Failed to load pedagogy documentation.</div>';
+        }
     },
 
     // Mix in modular controllers
