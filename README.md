@@ -27,6 +27,7 @@ Built on a "Plug & Play" architecture, it empowers teachers, publishers, and dev
 - 💾 **Adapter-Driven Persistence**: Swap between Postgres, Vector DBs, or JSON exports with zero changes to core logic.
 - ⚡ **MCP Ready**: Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool for instant content generation.
 - 📊 **Automation Hub**: A sleek, dark-mode dashboard for managing drafts, review workflows, and cost analytics.
+- 🛡️ **High-Integrity (HIA) First**: Specialized engine for generating AI-resilient assessments (AI Critique, Isomorphic Variants, Viva Prompts) that combat AI cheating.
 
 ---
 
@@ -78,13 +79,47 @@ graph TD
 
 ---
 
+## 🏛️ Edmate "Open Core" Model
+
+Edmate is committed to keeping its core engine free and open-source forever. We follow an **Open Core** model where the essential tools are free, while advanced institutional features are part of our Studio/Enterprise offerings.
+
+| Feature | Community (Free) | Studio / Enterprise |
+| :--- | :---: | :---: |
+| **Core AI Pipeline** | ✅ | ✅ |
+| **PDF/Excel Ingestion** | ✅ | ✅ |
+| **Standard Assessment (MCQ/TF)** | ✅ | ✅ |
+| **High-Integrity Assessments (HIA)** | ✅ (Basic) | ✅ (Advanced) |
+| **Custom Prompts** | ✅ | ✅ |
+| **Collaboration & Teams** | ❌ | ✅ |
+| **Advanced Institutional Analytics** | ❌ | ✅ |
+| **Managed Cloud Hosting** | ❌ | ✅ |
+| **SSO & RBAC** | ❌ | ✅ |
+
+---
+
+## 🛡️ Why High-Integrity Assessments (HIA)?
+
+In the era of Generative AI, traditional "recall-based" homework is becoming obsolete. Edmate's mission is to help teachers and platforms move toward **Authentic Assessment** — content designed to ensure students "lift the weights" of their own education.
+
+Edmate's HIA engine generates:
+*   **AI Critique Exercises**: Students must find errors in deliberately flawed AI answers.
+*   **Isomorphic Variants**: Unique numerical/contextual versions of the same concept per student.
+*   **Viva Defense Prompts**: Structured probing questions for verbal reasoning verification.
+*   **Scaffolded Sequences**: Breaking single tasks into mandatory intellectual process steps.
+
+---
+
+---
+
 ## 🤝 Community & Contributing
 
 We welcome contributions of all kinds! Whether it's a new Storage Adapter, an extraction prompt, or a bug fix.
 
+- 🗺️ **[Product Roadmap](ROADMAP.md)**: Where we're going and how to help get there.
 - 📖 **[Contributing Guide](CONTRIBUTING.md)**: How to get started.
 - 📜 **[Code of Conduct](CODE_OF_CONDUCT.md)**: Our community standards.
 - 🏗️ **[Modular Architecture Guide](content_gen/docs/CONTRIBUTING_MODULAR.md)**: Deep dive for developers.
+- 🧠 **[Pedagogy & Learning Science](docs/PEDAGOGY.md)**: The "How It Works" behind our content generation.
 
 ---
 
