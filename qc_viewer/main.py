@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
