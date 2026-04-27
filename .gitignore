@@ -24,13 +24,11 @@ Thumbs.db
 # Logs & Temporary outputs
 **/logs/
 *.log
-content_gen/content_gen/logs/
+content_gen/logs/
 llm_response_last.txt
 test_out*.txt
 
 # Generated pipeline data & drafts
-content_gen/content_gen/data/extracted/
-content_gen/content_gen/data/outputs/
 content_gen/data/extracted/
 content_gen/data/inputs/
 content_gen/data/outputs/

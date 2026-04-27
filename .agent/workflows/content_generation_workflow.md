@@ -1,12 +1,11 @@
 ---
-description: Workflow for generating and formatting A/O-level content using Gemini and ChatGPT
+description: Workflow for generating and formatting modular educational content using Gemini and ChatGPT
 ---
 
-This workflow outlines the steps to generate educational content for A/O-level coaching using Gemini for content creation and ChatGPT for formatting.
+This workflow outlines the steps to generate curriculum-agnostic educational content. While the examples below use A/O-Level subjects, the prompts can be adjusted for any subject or standard.
 
-## Step 1: Download Resources
-Download the Question Paper (QP) and Marks Scheme (MS) for the subject.
-*Example: `5090_s24_qp_11` (Question Paper) and `5090_s24_m1_12` (Marks Scheme)*
+## Step 1: Prepare Source Materials
+Gather the source materials (e.g., Question Papers, Study Guides, or Transcripts) and any reference keys (Marks Schemes).
 
 ## Step 2: Generate Content with Gemini
 Use **Gemini** to generate detailed explanations, concept gap analysis, and flashcards.
@@ -59,9 +58,9 @@ Use standard markdown headings (### and ##) to create a clear hierarchy.
 
 Ensure all content is presented in paragraph format (no tables, no UI elements).
 
-Be detailed and rigorous in all  Biology explanations, adhering to the 9700  Biology AS  Biology syllabus standards.
+Be detailed and rigorous in all explanations, adhering to the specified subject syllabus standards (e.g., 9700 Biology AS).
 
-The final output must only contain the requested sections (1, 2, 3, 4) in order.
+The final output must only contain the requested sections in order.
 
 Ensure the short explanation in section 2 is brief and precedes the step-by-step analysis.
 ```
