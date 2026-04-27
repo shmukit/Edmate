@@ -4,6 +4,30 @@ This document defines the operational boundaries of **Edmate**, outlining exactl
 
 ---
 
+## 🗺️ User Journey: How to Adopt Edmate
+
+The journey from discovery to generation follows a clean, branching path depending on the user's technical profile.
+
+```mermaid
+graph TD
+    Start[Read README & Use Cases] --> Profile{Who are you?}
+    
+    Profile -->|Developer / Platform| Dev[1. Configure API Integration]
+    Dev --> DevBYOK[2. Optional: Pass BYOK Headers]
+    DevBYOK --> DevPayload[3. Dictate Modular Choices in Payload]
+    DevPayload --> DevInject[4. Inject Generated JSON into your DB]
+    
+    Profile -->|Teacher / Non-Tech| Teach[1. Access Edmate Automation Hub]
+    Teach --> TeachUpload[2. Upload PDF/Docx]
+    Teach --> TeachReview[3. Review & Edit in Hub UI]
+    Teach --> TeachExport[4. Download DOCX/Excel/PDF]
+    
+    style Start fill:#fbbf24,stroke:#111827,color:#111827
+    style Profile fill:#1e1b4b,stroke:#fbbf24,color:#fff
+```
+
+---
+
 ## 🔍 Project Scope
 
 Edmate is a **Content Factory Infrastructure**. Its boundaries are strictly defined to ensure high-fidelity assessment generation without feature creep into LMS/SIS territories.

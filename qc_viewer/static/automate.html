@@ -264,6 +264,28 @@
             </select>
         </div>
 
+        <!-- BYOK API Key Configuration -->
+        <div class="settings-group" style="background: rgba(251,191,36,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); margin-top: 20px;">
+            <span class="settings-label" style="color: var(--primary); font-weight: 600;">🔑 API Key (BYOK)</span>
+            <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 10px;">Session-only. Never stored on server. Leave blank to use server-configured key.</p>
+
+            <span class="settings-label" style="font-size:0.7rem;">LLM Provider</span>
+            <select id="byokProviderSelect" style="font-size:0.8rem; height:32px; margin-bottom:8px;">
+                <option value="">Server Default</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+            </select>
+
+            <span class="settings-label" style="font-size:0.7rem;">Your API Key</span>
+            <input type="password" id="byokApiKey" placeholder="Paste key here — cleared on tab close"
+                style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); margin-bottom:8px; box-sizing:border-box;">
+
+            <span class="settings-label" style="font-size:0.7rem;">Model ID (optional)</span>
+            <input type="text" id="byokModelId" placeholder="e.g. gpt-4o, gemini-2.5-flash"
+                style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); box-sizing:border-box;">
+        </div>
+
         <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--card-border);">
             <p style="font-size:0.75rem; color:var(--text-dim);">Engine: v2.5 (Visual-Aware)</p>
         </div>

@@ -11,8 +11,26 @@ export const AutomationAPI = {
             formData.append('subject', subject);
             formData.append('paper_code', paperCode);
 
+            // Read pedagogy settings from UI
+            const curriculum = document.getElementById('curriculumSelect')?.value || 'Cambridge O/Level';
+            const lsProfile = document.getElementById('lsProfileSelect')?.value || 'default';
+            const hiaMode = document.getElementById('hiaResilienceSelect')?.value || 'Low';
+            formData.append('curriculum', curriculum);
+            formData.append('ls_profile', lsProfile);
+            formData.append('hia_mode', hiaMode);
+
+            // Read BYOK settings from UI (session-only, never persisted)
+            const byokProvider = document.getElementById('byokProviderSelect')?.value;
+            const byokKey = document.getElementById('byokApiKey')?.value;
+            const byokModel = document.getElementById('byokModelId')?.value;
+
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/automate/draft', true);
+
+            // Only set BYOK headers if the user provided a key
+            if (byokProvider) xhr.setRequestHeader('X-LLM-Provider', byokProvider);
+            if (byokKey)      xhr.setRequestHeader('X-API-Key', byokKey);
+            if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
 
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable && onProgress) {

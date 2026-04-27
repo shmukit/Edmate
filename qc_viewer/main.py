@@ -2,7 +2,7 @@ import os
 import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Form, Header
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +16,7 @@ from datetime import datetime
 # Import local services
 from content_gen.scripts.processing.automation_engine import AutomationEngine
 from content_gen.scripts.processing.database_service import DatabaseService
+from content_gen.core.pedagogy_engine import PedagogyEngine
 from .router_v1 import router as api_v1_router
 
 # Load environment variables from content_gen/.env
@@ -211,10 +212,18 @@ async def receive_draft(
     background_tasks: BackgroundTasks,
     subject: str = Form(...),
     paper_code: str = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    curriculum: str = Form("Cambridge O/Level"),
+    ls_profile: str = Form("default"),
+    hia_mode: str = Form("Low"),
+    x_llm_provider: Optional[str] = Header(None, alias="X-LLM-Provider"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    x_model_id: Optional[str] = Header(None, alias="X-Model-ID"),
 ):
     """
     Receives a PDF and kicks off the background automation pipeline.
+    Supports BYOK via X-API-Key / X-LLM-Provider / X-Model-ID headers.
+    Falls back to .env keys if headers are not provided (self-hosted mode).
     Returns a draft ID so the frontend can poll for progress.
     """
     draft_id = f"draft_{uuid.uuid4().hex[:8]}"
@@ -234,28 +243,59 @@ async def receive_draft(
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
+            "curriculum": curriculum,
+            "ls_profile": ls_profile,
+            "hia_mode": hia_mode,
+            "llm_provider": x_llm_provider or "env-default",
             "status": "EXTRACTING",
             "timestamp": datetime.now().isoformat()
         }, f)
 
-    background_tasks.add_task(run_automation_pipeline,
-                              draft_id, subject, paper_code, file_path)
+    background_tasks.add_task(
+        run_automation_pipeline,
+        draft_id, subject, paper_code, file_path,
+        curriculum, ls_profile, hia_mode,
+        x_llm_provider, x_api_key, x_model_id
+    )
 
     return {"draft_id": draft_id}
 
 
-async def run_automation_pipeline(draft_id: str, subject: str, paper_code: str, file_path: Path):
-    """Heavy lifting background task"""
+async def run_automation_pipeline(
+    draft_id: str, subject: str, paper_code: str, file_path: Path,
+    curriculum: str = "Cambridge O/Level",
+    ls_profile: str = "default",
+    hia_mode: str = "Low",
+    llm_provider: Optional[str] = None,
+    api_key: Optional[str] = None,
+    model_id: Optional[str] = None,
+):
+    """Heavy lifting background task. Supports BYOK and PedagogyEngine."""
     meta_path = file_path.parent / "metadata.json"
     try:
-        engine = AutomationEngine(subject)
-        results = engine.process_pdf(str(file_path), str(file_path.parent))
+        # Build pedagogical system prompt from selected profile
+        pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
+        system_prompt = pedagogy.compile_system_prompt()
+
+        engine = AutomationEngine(
+            provider_or_subject=llm_provider or subject,
+            model_id=model_id,
+            api_key=api_key  # None = falls back to .env keys
+        )
+        config = {
+            "curriculum": curriculum,
+            "ls_profile": ls_profile,
+            "hia_mode": hia_mode,
+            "system_prompt": system_prompt,
+        }
+        results = engine.process_pdf(str(file_path), config)
 
         results.update({
             "status": "REVIEW_READY",
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
+            "pedagogy_profile": pedagogy.get_profile_summary(),
             "timestamp": datetime.now().isoformat()
         })
 
