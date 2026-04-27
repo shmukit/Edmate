@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/banner.png" alt="Edmate Banner" width="100%">
+  <img src="docs/brand/assets/banner.png" alt="Edmate Banner" width="100%">
 </p>
 
 <p align="center">
@@ -127,11 +127,11 @@ Edmate's HIA engine generates:
 We welcome contributions of all kinds! Whether it's a new Storage Adapter, an extraction prompt, or a bug fix.
 
 - 🗺️ **[Product Roadmap](ROADMAP.md)**: Where we're going and how to help get there.
-- 🎯 **[Use Cases](docs/USE_CASES.md)**: How different users (Platforms vs. Teachers) adopt Edmate.
+- 🎯 **[Use Cases](docs/product/USE_CASES.md)**: How different users (Platforms vs. Teachers) adopt Edmate.
 - 📖 **[Contributing Guide](CONTRIBUTING.md)**: How to get started.
 - 📜 **[Code of Conduct](CODE_OF_CONDUCT.md)**: Our community standards.
-- 🏗️ **[Modular Architecture Guide](content_gen/docs/CONTRIBUTING_MODULAR.md)**: Deep dive for developers.
-- 🧠 **[Pedagogy & Learning Science](docs/PEDAGOGY.md)**: The "How It Works" behind our content generation.
+- 🏗️ **[Modular Architecture Guide](docs/contributing/CONTRIBUTING_MODULAR.md)**: Deep dive for developers.
+- 🧠 **[Pedagogy & Learning Science](docs/pedagogy/PEDAGOGY.md)**: The "How It Works" behind our content generation.
 
 ---
 

@@ -50,4 +50,4 @@ This document outlines the future modularity scopes and technical milestones for
 ---
 
 ## 🤝 Contribution
-If you are interested in leading one of these modularity scopes, please refer to our **[CONTRIBUTING_MODULAR.md](CONTRIBUTING_MODULAR.md)** guide.
+If you are interested in leading one of these modularity scopes, please refer to our **[CONTRIBUTING_MODULAR.md](../contributing/CONTRIBUTING_MODULAR.md)** guide.

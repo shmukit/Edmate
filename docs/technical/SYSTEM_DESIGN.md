@@ -84,30 +84,16 @@ graph TB
 
 ```
 Edmate/
-├── README.md
+├── README.md              # Project overview & quick start
+├── ROADMAP.md             # Public product roadmap
 ├── docs/
-│   └── SYSTEM_DESIGN.md          ← This file
-└── content_gen/
-    ├── README.md
-    ├── data/
-    │   ├── inputs/                # Raw exam PDFs
-    │   ├── extracted/             # Intermediate JSON + temp PNGs
-    │   └── outputs/               # Final processed content text
-    ├── docs/
-    │   ├── AGENTIC_WORKFLOW.md    # Detailed pipeline architecture
-    │   ├── PROCESS_GUIDE.md       # Step-by-step usage guide
-    │   ├── QC_RUBRIC.md           # Content quality rubric
-    │   ├── SCALABILITY_PLAN.md    # Batch scaling strategy
-    │   └── SKILLS_CATALOG.md      # Formal skill definitions
-    ├── scripts/
-    │   ├── extraction/            # PDF → JSON + PNG
-    │   ├── processing/            # AI content generation
-    │   ├── pipeline/              # Orchestrator
-    │   ├── docx/                  # Document output helpers
-    │   ├── prompts.py             # Centralized AI prompts
-    │   └── README.md
-    └── tools/
-        └── PDF-Extract-Kit/       # External PDF extraction tool
+│   ├── pedagogy/          # Learning science & QC rubrics
+│   ├── technical/         # Architecture, schemas, and workflows
+│   ├── product/           # Use cases, PRDs, and plans
+│   ├── contributing/      # Guides for developers
+│   └── brand/             # Guidelines & assets
+└── content_gen/           # AI Pipeline Core
+└── qc_viewer/             # Automation Hub (UI + API)
 ```
 
 ---
@@ -568,9 +554,9 @@ python content_gen/scripts/pipeline/pipeline_orchestrator.py \
 
 | Document | Path |
 |----------|------|
-| Agentic Workflow | [`content_gen/docs/AGENTIC_WORKFLOW.md`](../content_gen/docs/AGENTIC_WORKFLOW.md) |
-| Process Guide | [`content_gen/docs/PROCESS_GUIDE.md`](../content_gen/docs/PROCESS_GUIDE.md) |
-| QC Rubric | [`content_gen/docs/QC_RUBRIC.md`](../content_gen/docs/QC_RUBRIC.md) |
-| Scalability Plan | [`content_gen/docs/SCALABILITY_PLAN.md`](../content_gen/docs/SCALABILITY_PLAN.md) |
-| Skills Catalog | [`content_gen/docs/SKILLS_CATALOG.md`](../content_gen/docs/SKILLS_CATALOG.md) |
-| Content Gen README | [`content_gen/README.md`](../content_gen/README.md) |
+| Agentic Workflow | [`AGENTIC_WORKFLOW.md`](AGENTIC_WORKFLOW.md) |
+| Process Guide | [`../contributing/PROCESS_GUIDE.md`](../contributing/PROCESS_GUIDE.md) |
+| QC Rubric | [`../pedagogy/QC_RUBRIC.md`](../pedagogy/QC_RUBRIC.md) |
+| Scalability Plan | [`SCALABILITY_PLAN.md`](SCALABILITY_PLAN.md) |
+| Skills Catalog | [`../product/SKILLS_CATALOG.md`](../product/SKILLS_CATALOG.md) |
+| Content Gen README | [`../../content_gen/README.md`](../../content_gen/README.md) |

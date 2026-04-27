@@ -1,23 +1,32 @@
 content_gen/tools/PDF-Extract-Kit
 
-# Environment variables
+# Environment variables & Credentials
 .env
 content_gen/.env
+credentials/
+*.json
+!pyrightconfig.json
+!schema_dump.json
+!package.json
+!composer.json
 
 # Python
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/
 
-# macOS
+# macOS & System
 .DS_Store
 **/.DS_Store
+Thumbs.db
 
-# Logs
+# Logs & Temporary outputs
 **/logs/
 *.log
 content_gen/content_gen/logs/
 llm_response_last.txt
+test_out*.txt
 
 # Generated pipeline data & drafts
 content_gen/content_gen/data/extracted/

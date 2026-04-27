@@ -28,9 +28,9 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ## 🏗️ Technical Architecture
 Edmate follows a modular **Adapter Pattern**. For deep technical details on extending the system, please see:
-- [Extending Storage Adapters](content_gen/docs/CONTRIBUTING_MODULAR.md#adding-a-new-storage-adapter)
-- [Customizing Model Routing](content_gen/docs/CONTRIBUTING_MODULAR.md#customizing-model-routing)
-- [Extending MCP Server](content_gen/docs/CONTRIBUTING_MODULAR.md#extending-the-mcp-server)
+- [Extending Storage Adapters](docs/contributing/CONTRIBUTING_MODULAR.md#adding-a-new-storage-adapter)
+- [Customizing Model Routing](docs/contributing/CONTRIBUTING_MODULAR.md#customizing-model-routing)
+- [Extending MCP Server](docs/contributing/CONTRIBUTING_MODULAR.md#extending-the-mcp-server)
 
 ## 🧪 Testing Guidelines
 Always run the test suite before submitting a PR:
