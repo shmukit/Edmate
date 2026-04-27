@@ -20,10 +20,21 @@ Edmate Lab_QA is a **headless, open-source service platform** designed to transf
 
 Built on a "Plug & Play" architecture, it empowers teachers, publishers, and developers to serve external platforms using their own AI logic and API keys.
 
+---
+
+## 🔍 Project Scope & Boundaries
+
+Edmate is a **Content Factory Infrastructure**. Its mission ends where the learner's experience begins.
+
+- **✅ IN-SCOPE**: Source ingestion, AI generation (Q&A/Explanations), human-in-the-loop review, and DB/File persistence.
+- **❌ OUT-OF-SCOPE**: Learner test-taking UI, live grading, student progress tracking, or proctoring.
+
+---
+
 ## ✨ Key Features
 
 - 🛡️ **Economic Kill-Switch**: Real-time token tracking with automatic pipeline halts when daily USD budgets are reached.
-- 🧩 **Intelligence-Blind**: LLM-agnostic routing via LiteLLM. Support for 100+ providers (Gemini, OpenAI, Anthropic, etc.).
+- 🧩 **Intelligence-Blind & BYOK**: LLM-agnostic routing via LiteLLM. Support for 100+ providers. External platforms can **Bring Your Own Key (BYOK)** to dictate their own model selection and billing.
 - 💾 **Adapter-Driven Persistence**: Swap between Postgres, Vector DBs, or JSON exports with zero changes to core logic.
 - ⚡ **MCP Ready**: Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool for instant content generation.
 - 📊 **Automation Hub**: A sleek, dark-mode dashboard for managing drafts, review workflows, and cost analytics.
@@ -116,6 +127,7 @@ Edmate's HIA engine generates:
 We welcome contributions of all kinds! Whether it's a new Storage Adapter, an extraction prompt, or a bug fix.
 
 - 🗺️ **[Product Roadmap](ROADMAP.md)**: Where we're going and how to help get there.
+- 🎯 **[Use Cases](docs/USE_CASES.md)**: How different users (Platforms vs. Teachers) adopt Edmate.
 - 📖 **[Contributing Guide](CONTRIBUTING.md)**: How to get started.
 - 📜 **[Code of Conduct](CODE_OF_CONDUCT.md)**: Our community standards.
 - 🏗️ **[Modular Architecture Guide](content_gen/docs/CONTRIBUTING_MODULAR.md)**: Deep dive for developers.
