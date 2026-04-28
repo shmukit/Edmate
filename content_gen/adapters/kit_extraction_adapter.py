@@ -12,7 +12,14 @@ class KitExtractionAdapter(BaseExtractionAdapter):
     """
 
     def __init__(self, use_gpu: bool = False):
-        self.wrapper = PDFExtractKitWrapper(use_gpu=use_gpu)
+        try:
+            self.wrapper = PDFExtractKitWrapper(use_gpu=use_gpu)
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to initialize PDF-Extract-Kit: {e}\n"
+                "Please ensure all machine learning dependencies (e.g. doclayout_yolo, torch) are installed, "
+                "or switch the 'extraction_engine' config to 'pymupdf' in edmate_config.yaml to use the lightweight extractor."
+            ) from e
 
     def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
         # Invoke the existing wrapper logic

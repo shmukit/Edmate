@@ -33,9 +33,9 @@ graph TB
         C --> P
         P --> Router
         
-        Router -.->|OpenAI| E[Extraction & Validation Agent]
-        Router -.->|Gemini| E
-        Router -.->|Anthropic / Local| E
+        Router -.->|Provider A| E[Extraction & Validation Agent]
+        Router -.->|Provider B| E
+        Router -.->|Self-Hosted| E
     end
 
     %% 3. Output
@@ -97,9 +97,9 @@ Coordinates the end-to-end flow:
 **Configuration**: `edmate_config.yaml`
 - **Pedagogy & Curriculum Injection:** Dynamically applies Learning Science principles (e.g., HIA for AI Critiques, Isomorphic Variants) based on the selected curriculum format (GCSE, National, Custom).
 - **Dynamic Routing (BYOK):**
-    - `extraction`: Gemini 1.5 Pro (Multimodal)
-    - `generation`: Claude 3 Haiku / GPT-4o (High Reasoning)
-    - `open_source`: Llama 3 / Mixtral
+    - `extraction`: Any Multimodal Provider
+    - `generation`: Any High-Reasoning Provider
+    - `open_source`: Local/Self-hosted weights
 - **Multi-Tier Output:** Generates simple text/images alongside enriched data (explanations, flashcards, concept gaps).
 - **Budget Monitoring:** Session cost is tracked dynamically.
 

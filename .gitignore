@@ -5,6 +5,7 @@ content_gen/tools/PDF-Extract-Kit
 content_gen/.env
 credentials/
 *.json
+gemini_creds.json
 !pyrightconfig.json
 !schema_dump.json
 !package.json
@@ -35,3 +36,8 @@ content_gen/data/outputs/
 content_gen/data/*.json
 content_gen/data/*.txt
 qc_viewer/drafts/
+
+# Ignore all large PDF binaries by default
+*.pdf
+# Exception for a dummy test file
+!sample.pdf

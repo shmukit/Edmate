@@ -52,14 +52,19 @@ class PDFExtractKitWrapper:
             # Default to data/extracted relative to the content_gen root
             script_path = Path(__file__).parent.absolute()
             self.output_dir = script_path.parent.parent / "data" / "extracted"
-        self.base_name = Path(pdf_path).stem
-        # Create PDF-specific subfolder for images
-        self.images_dir = self.output_dir / "images" / self.base_name
-        self.images_dir.mkdir(parents=True, exist_ok=True)
+        if self.pdf_path:
+            self.base_name = Path(pdf_path).stem
+            # Create PDF-specific subfolder for images
+            self.images_dir = self.output_dir / "images" / self.base_name
+            self.images_dir.mkdir(parents=True, exist_ok=True)
 
-        # Sub-folder for processed text files (relative to data root)
-        self.outputs_dir = self.output_dir.parent / "outputs"
-        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+            # Sub-folder for processed text files (relative to data root)
+            self.outputs_dir = self.output_dir.parent / "outputs"
+            self.outputs_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            self.base_name = None
+            self.images_dir = None
+            self.outputs_dir = None
 
         # Initialize PDF-Extract-Kit models
         self._init_models()

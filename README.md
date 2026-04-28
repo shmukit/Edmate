@@ -56,6 +56,9 @@ pip install -r content_gen/requirements.txt
 cp content_gen/.env.example content_gen/.env
 ```
 
+### ⚠️ Note on PDFs and Git
+> By default, large PDF files are ignored by git (`.gitignore` excludes `*.pdf` except for `sample.pdf`) to prevent repository bloat. Please keep your heavy exam papers local to your machine!
+
 ### Option A: Use the Visual Automation Hub (UI)
 Start the FastAPI backend to access the drag-and-drop dashboard:
 ```bash
@@ -104,9 +107,9 @@ graph TD
         C --> P
         P --> R
         
-        R -.->|OpenAI| E[Extraction Agent]
-        R -.->|Gemini| E
-        R -.->|Anthropic / Local| E
+        R -.->|Provider A| E[Extraction Agent]
+        R -.->|Provider B| E
+        R -.->|Self-Hosted/Local| E
     end
 
     %% 3. Output
@@ -130,11 +133,7 @@ graph TD
         SA -->|Headless| DB3[JSON Export]
     end
 
-    style Input fill:#f8fafc,stroke:#94a3b8,color:#0f172a
-    style Intelligence fill:#f0f9ff,stroke:#0ea5e9,color:#0f172a
     style R fill:#fbbf24,stroke:#111827,color:#111827
-    style Output fill:#fdf4ff,stroke:#d946ef,color:#0f172a
-    style Persistence fill:#fefce8,stroke:#eab308,color:#0f172a
     style SA fill:#1e1b4b,stroke:#fbbf24,color:#fff
 ```
 

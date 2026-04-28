@@ -4,7 +4,7 @@ import os
 
 # Configuration
 API_BASE_URL = "http://localhost:8000/api/v1"
-PDF_PATH = "sample.pdf"  # Replace with a real PDF
+PDF_PATH = "content_gen/data/inputs/9701_s24_qp_11 (1).pdf"  # Using a real test PDF
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") 
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
