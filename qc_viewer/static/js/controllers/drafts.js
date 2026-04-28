@@ -53,7 +53,8 @@ export const DraftController = {
 
         let hasProcessing = false;
         draftList.innerHTML = drafts.map(d => {
-            const isProcessing = d.status === 'PROCESSING' || d.status === 'EXTRACTING';
+            const status = d.status || 'UNKNOWN';
+            const isProcessing = status === 'PROCESSING' || status === 'EXTRACTING';
             if (isProcessing) hasProcessing = true;
             
             const dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Recently';
@@ -72,7 +73,7 @@ export const DraftController = {
                     ` : ''}
                 </div>
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <span class="status-badge status-${d.status.toLowerCase()}">${d.status}</span>
+                    <span class="status-badge status-${status.toLowerCase()}">${status}</span>
                     <div class="action-buttons">
                         ${this.renderActionButton(d)}
                         <button class="btn btn-outline btn-sm btn-delete" data-id="${d.id}" style="border:none; color:var(--danger)">×</button>

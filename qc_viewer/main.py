@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 import shutil
 import json
 import uuid
+import base64
 from datetime import datetime
 
 # Import local services
@@ -309,6 +310,18 @@ async def run_automation_pipeline(
 
             generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
             for q in generated:
+                # Handle diagram extraction/encoding
+                diagram_b64 = None
+                stem_images = q.metadata.get("stem_images", [])
+                if stem_images and len(stem_images) > 0:
+                    try:
+                        img_path = Path(stem_images[0])
+                        if img_path.exists():
+                            with open(img_path, "rb") as img_f:
+                                diagram_b64 = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
+                    except Exception as img_e:
+                        print(f"Failed to encode diagram: {img_e}")
+
                 # Map to the exact schema review.js expects
                 legacy_q = {
                     "question_number": q.question_number,
@@ -316,6 +329,7 @@ async def run_automation_pipeline(
                     "options": q.options,
                     "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
                     "status": "Draft",
+                    "diagram_base64": diagram_b64,
                     "generated_content": {
                         "core_concept": q.explanation_body or "",
                         "detailed_explanation": q.option_wise_explanation or "",
@@ -350,12 +364,16 @@ async def run_automation_pipeline(
         print(f"Background Processing Error: {e}")
         try:
             with open(meta_path, "r") as f:
-                data = json.load(f)
-            data.update({"status": "FAILED", "error": str(e)})
+                fail_meta = json.load(f)
+            fail_meta.update({
+                "status": "FAILED",
+                "error": str(e),
+                "progress": 0
+            })
             with open(meta_path, "w") as f:
-                json.dump(data, f)
-        except Exception:
-            pass
+                json.dump(fail_meta, f)
+        except Exception as inner_e:
+            print(f"Failed to update metadata with error: {inner_e}")
 
 
 @app.get("/api/automate/drafts")
@@ -384,13 +402,20 @@ async def list_drafts():
             except Exception:
                 continue
 
-    # Convert timestamps for sorting if they are strings/floats
+    # Convert timestamps for sorting (handles both floats and ISO strings)
     def get_time(x):
         ts = x.get("timestamp") or x.get("created_at") or ""
+        if not ts: return 0.0
         try:
+             # Try float first (old format)
              return float(ts)
-        except:
-             return 0.0
+        except (ValueError, TypeError):
+             # Try ISO string
+             try:
+                 from datetime import datetime
+                 return datetime.fromisoformat(ts).timestamp()
+             except:
+                 return 0.0
 
     return sorted(drafts, key=get_time, reverse=True)
 
