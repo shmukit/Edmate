@@ -19,23 +19,29 @@ graph TB
     %% 1. Ingestion
     subgraph Ingestion ["1. Multi-Modal Ingestion"]
         A[PDF / Docx / Excel]
-        M[Modality Extractor: Text, Image, Table]
-        A --> M
+        O[Pipeline Orchestrator]
+        A --> O
     end
 
-    %% 2. Intelligence
-    subgraph Intelligence ["2. Intelligence & Pedagogy"]
-        C[Curriculum Config: GCSE, National, Custom]
-        P[Pedagogy Rules: Learning Science, HIA]
+    %% 2. Extraction Adapters
+    subgraph Extraction ["2. Extraction Layer (Adapters)"]
+        O -->|vision| V[VisionExtractionAdapter]
+        O -->|kit| K[KitExtractionAdapter]
+        O -->|lightweight| P[PyMuPDFAdapter]
+        
+        V -->|Vision AI| S1[Structured Data]
+        K -->|Local ML| S1
+        P -->|Regex| S1
+    end
+
+    %% 3. Intelligence
+    subgraph Intelligence ["3. Generation Layer"]
         Router{LLM Router: BYOK}
+        S1 --> Router
         
-        M --> C
-        C --> P
-        P --> Router
-        
-        Router -.->|Provider A| E[Extraction & Validation Agent]
-        Router -.->|Provider B| E
-        Router -.->|Self-Hosted| E
+        Router -.->|Provider A| G[Content Generator]
+        Router -.->|Provider B| G
+        Router -.->|Self-Hosted| G
     end
 
     %% 3. Output
@@ -70,16 +76,22 @@ Provides a single entry point for all LLM interactions. It uses **LiteLLM** to d
 - **Economic Kill-Switch:** Automatically halts execution if the session cost exceeds the user-defined `max_budget`.
 - **Hybrid Metrics:** Tracks cost and token usage in real-time.
 
-### 2. Storage Adapter Layer (`adapters/`)
-Implements the **Adapter Pattern** to ensure the pipeline is "Database Blind."
+### 2. Extraction Adapters (`adapters/`)
+Implements the **Adapter Pattern** for multi-engine PDF parsing.
+- **VisionExtractionAdapter:** Uses multimodal LLMs (Gemini/GPT-4o) to "see" the document layout and extract diagrams with spatial awareness.
+- **KitExtractionAdapter:** Leverages local ML (YOLO) for layout detection.
+- **PyMuPDFAdapter:** Lightweight, regex-based text extraction.
+
+### 3. Storage Adapter Layer (`adapters/`)
+Ensures the pipeline is "Database Blind."
 - **BaseStorageAdapter:** The abstract contract for all storage targets.
 - **PostgresStorageAdapter:** Maps standardized question data to the legacy Edmate SQL schema.
 
-### 3. Orchestrator (`pipeline_orchestrator.py`)
+### 4. Orchestrator (`pipeline_orchestrator.py`)
 Coordinates the end-to-end flow:
-1. **Extraction:** Invokes `PDFExtractKitWrapper`.
+1. **Extraction:** Invokes the configured `ExtractionAdapter` (Vision, Kit, or Lightweight).
 2. **Persistence:** Initializes schema via `StorageAdapter.initialize_schema()`.
-3. **Loop:** Iterate through questions, invoking the Router for intelligence and the Adapter for storage.
+3. **Loop:** Iterate through extracted questions, invoking the `ContentGenerator` for enrichment and the `StorageAdapter` for persistence.
 
 ---
 

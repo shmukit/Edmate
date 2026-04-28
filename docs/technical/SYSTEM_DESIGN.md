@@ -50,32 +50,33 @@ Edmate transforms raw Cambridge A/O-Level exam PDFs into structured, pedagogical
 
 ```mermaid
 graph TB
-    A[Raw PDF Files] --> B[Phase 1: PDF Extraction]
-    B --> C[Structured JSON]
-    B --> D[PNG Images]
-    C --> E[Phase 2: Content Generation - Gemini API]
-    E --> F[Enhanced Content JSON]
-    F --> G[Phase 2.5: LLM-as-Judge Evaluation]
-    G --> H[Verified Content]
-    H --> I[Phase 3: Content Formatting - ChatGPT]
-    I --> J[Google Docs / DB-Ready Text]
-    D --> K[Phase 4: CDN Upload - Cloudflare R2]
-    K --> L[Public CDN URLs]
-    J --> M[Phase 5: Database Import]
-    L --> M
-    M --> N[Supabase / PostgreSQL]
+    A[Raw PDF Files] --> B[Phase 1: Multi-Engine Extraction]
+    B -->|vision| V[VisionExtractionAdapter]
+    B -->|kit| K[KitExtractionAdapter]
+    B -->|lightweight| P[PyMuPDFAdapter]
+    
+    V --> C[Standardized JSON]
+    K --> C
+    P --> C
+    V --> D[PNG Images]
+    K --> D
+    
+    C --> E[Phase 2: Content Generation - LLM Router]
+    E --> F[Enriched Content JSON]
+    D --> G[Asset Persistence - Cloudflare R2]
+    F --> H[Database Import - Postgres]
+    G --> H
 ```
 
 ### Pipeline Phases
 
 | Phase | Name | Status | Key Script |
 |-------|------|--------|------------|
-| 1 | PDF Extraction | ✅ Implemented | `smart_extract.py`, `pdf_extract_kit_wrapper.py` |
-| 2 | Content Generation | ✅ Manual (Gemini) | `content_generator.py`, `prompts.py` |
+| 1 | Multi-Engine Extraction | ✅ Implemented | `adapters/vision_extraction_adapter.py`, `kit_extraction_adapter.py`, `pymupdf_adapter.py` |
+| 2 | Content Generation | ✅ Implemented | `content_generator.py`, `model_router.py` |
 | 2.5 | LLM-as-Judge QC | ⚠️ Planned | — |
-| 3 | Content Formatting | ✅ Manual (ChatGPT) | Workflow prompt |
-| 4 | CDN Upload | ✅ Implemented | `upload_to_storage.py` |
-| 5 | Database Import | ✅ Implemented | `import_to_db.py` |
+| 3 | Asset Storage | ✅ Implemented | `upload_to_storage.py` |
+| 4 | Database Import | ✅ Implemented | `import_to_db.py` |
 | — | Orchestration | ✅ Implemented | `pipeline_orchestrator.py` |
 
 ---

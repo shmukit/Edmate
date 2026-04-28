@@ -1,5 +1,5 @@
 model_routing:
-  extraction: "gemini/gemini-1.5-pro"
+  extraction: "vertex_ai/gemini-1.5-pro"
   generation: "openai/gpt-4o"
   validation: "openai/gpt-4o"
 
@@ -10,7 +10,7 @@ storage_settings:
   image_mode: "base64"
 
 extraction_settings:
-  engine: "pymupdf"
+  engine: "vision"
 
 observability:
   litellm_callbacks: ["opik"]

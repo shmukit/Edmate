@@ -93,54 +93,52 @@ graph TD
     %% 1. Ingestion
     subgraph Input ["1. Multi-Modal Ingestion"]
         A[PDF / Docx / Excel]
-        M[Modality Extractor: Text, Image, Table]
-        A --> M
+        O[Pipeline Orchestrator]
+        A --> O
     end
 
-    %% 2. Intelligence
-    subgraph Intelligence ["2. Intelligence & Pedagogy"]
-        C[Curriculum Config: GCSE, National, Custom]
-        P[Pedagogy Rules: Learning Science, HIA]
+    %% 2. Extraction Adapters
+    subgraph Extraction ["2. Extraction Layer (Adapters)"]
+        O -->|vision| V[VisionExtractionAdapter]
+        O -->|kit| K[KitExtractionAdapter]
+        O -->|lightweight| P[PyMuPDFAdapter]
+        
+        V -->|Vision AI| S1[Structured Data]
+        K -->|Local ML| S1
+        P -->|Regex| S1
+    end
+
+    %% 3. Intelligence
+    subgraph Intelligence ["3. Generation Layer"]
         R{LLM Router: BYOK}
+        S1 --> R
         
-        M --> C
-        C --> P
-        P --> R
-        
-        R -.->|Provider A| E[Extraction Agent]
-        R -.->|Provider B| E
-        R -.->|Self-Hosted/Local| E
-    end
-
-    %% 3. Output
-    subgraph Output ["3. Output Generation"]
-        O1[Simple Output: Q&A, Diagrams, Tables]
-        O2[Enriched Output: Explanations, Flashcards, Concept Gaps]
-        
-        E --> O1
-        E --> O2
-        
-        O1 --> S[Standardized Edmate JSON Schema]
-        O2 --> S
+        R --> G[ContentGenerator]
+        G -->|Explainers| O2[Enriched Output]
+        G -->|Flashcards| O2
+        G -->|HIA Logic| O2
     end
 
     %% 4. Storage
     subgraph Persistence ["4. Persistence Layer"]
         SA{Storage Adapters}
-        S --> SA
-        SA -->|Relational| DB1[(Postgres)]
-        SA -->|Semantic| DB2[(Vector DB)]
-        SA -->|Headless| DB3[JSON Export]
+        O2 --> SA
+        SA -->|Postgres| DB1[(Production DB)]
+        SA -->|JSON| DB3[Drafts]
     end
 
+    style O fill:#fbbf24,stroke:#111827,color:#111827
     style R fill:#fbbf24,stroke:#111827,color:#111827
     style SA fill:#1e1b4b,stroke:#fbbf24,color:#fff
 ```
 
 ### 🧩 Dimensions of Modularity
 1. **Multi-Modal Ingestion (Input):** Accepts Unstructured PDFs, Docx, and Excel/CSV files.
-2. **Modality Extraction:** Intelligently separates and processes Text, Tables, and Images/Diagrams independently.
-3. **Pedagogical Engine:** Applies Learning Science techniques (like our HIA engine) dynamically during the extraction stage.
+2. **Pluggable Extraction Engines:**
+    - **Vision (High-Fidelity):** Multimodal LLMs "see" the page to capture complex layouts and diagrams.
+    - **Kit (Local ML):** Uses YOLO-based layout detection for local, GPU-accelerated extraction.
+    - **Lightweight:** Regex-based extraction for fast, CPU-only processing.
+3. **Pedagogical Engine:** Applies Learning Science techniques (like our HIA engine) dynamically during the generation stage.
 4. **Curriculum Agnostic:** Plug and play your specific curriculum format (e.g., GCSE A/O level, or any National Curriculum).
 5. **Model Router (BYOK):** Bring Your Own Key. Route tasks to any LLM of your choice (OpenAI, Gemini, Anthropic, or Local models).
 6. **Multi-Tier Output Generation:** Extracts simple raw content (Q/A, Diagrams, Tables as-is) alongside enriched metadata (rationales for right/wrong answers, concept gaps, and 3D flashcards).

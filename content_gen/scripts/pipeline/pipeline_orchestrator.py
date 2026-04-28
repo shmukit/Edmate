@@ -13,6 +13,7 @@ from content_gen.adapters.postgres_adapter import PostgresStorageAdapter
 # Import local modules
 from content_gen.adapters.kit_extraction_adapter import KitExtractionAdapter
 from content_gen.adapters.pymupdf_adapter import PyMuPDFAdapter
+from content_gen.adapters.vision_extraction_adapter import VisionExtractionAdapter
 from content_gen.scripts.processing.upload_to_storage import StorageUploader
 from content_gen.scripts.processing.content_generator import ContentGenerator
 
@@ -41,8 +42,15 @@ class PipelineOrchestrator:
         engine = self.router.config.extraction_engine
         if engine == "pymupdf":
             self.extractor = PyMuPDFAdapter()
+        elif engine in ["vision", "multimodal", "pdf_extract_kit"]:
+            # Default to Vision if high-fidelity is requested, or Kit if explicitly set
+            if engine == "pdf_extract_kit":
+                self.extractor = KitExtractionAdapter()
+            else:
+                self.extractor = VisionExtractionAdapter(router=self.router)
         else:
-            self.extractor = KitExtractionAdapter()
+            # Fallback to Vision as the 'Golden' standard for Edmate
+            self.extractor = VisionExtractionAdapter(router=self.router)
 
     def _convert_to_base64(self, image_path: Path) -> str:
         """Converts an image file to a base64 Data URI."""
