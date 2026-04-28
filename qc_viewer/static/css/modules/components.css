@@ -189,9 +189,10 @@
 }
 .progress-bar {
     height: 100%;
-    background: var(--primary-light);
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
     width: 0%;
-    transition: width 0.3s;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 15px rgba(var(--brand-amber-rgb), 0.3);
 }
 
 /* Toast Notifications */

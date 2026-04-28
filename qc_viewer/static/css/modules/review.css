@@ -19,8 +19,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .draft-card:hover {
@@ -36,6 +42,31 @@
 .draft-info p {
     color: var(--text-dim);
     font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.question-count-badge {
+    background: rgba(var(--brand-amber-rgb), 0.1);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border: 1px solid rgba(var(--brand-amber-rgb), 0.15);
+}
+
+.processing-active {
+    border-color: var(--primary-light) !important;
+    background: rgba(var(--brand-amber-rgb), 0.02) !important;
+    animation: pulseBorder 2s infinite;
+}
+
+@keyframes pulseBorder {
+    0% { box-shadow: 0 0 0 0 rgba(var(--brand-amber-rgb), 0.1); }
+    70% { box-shadow: 0 0 0 10px rgba(var(--brand-amber-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--brand-amber-rgb), 0); }
 }
 
 .status-badge {

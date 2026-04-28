@@ -12,24 +12,49 @@ export const DraftController = {
         try {
             const subject = document.getElementById('curriculumSelect')?.value || 'General';
             const paperCode = document.getElementById('targetTableSelect')?.value || '';
+            
+            text.textContent = 'Uploading: 0%';
+            
             const result = await AutomationAPI.uploadPDF(file, subject, paperCode, (percent) => {
                 bar.style.width = percent + '%';
                 text.textContent = `Uploading: ${percent}%`;
+                if (percent === 100) {
+                    text.textContent = 'Upload complete! Starting extraction...';
+                }
             });
 
             this.showToast('✅ Upload complete. Starting extraction...');
-            this.fetchDrafts();
+            
+            // Immediate local update: Add the new draft record to the UI without waiting for poll
+            if (result && result.id) {
+                const initialDraft = {
+                    id: result.id,
+                    filename: file.name,
+                    status: 'PROCESSING',
+                    progress: 10,
+                    status_message: 'Extracting content...',
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Fetch current list and prepend
+                const drafts = await AutomationAPI.fetchDrafts();
+                // Ensure the new one is at the top if not already there
+                if (!drafts.find(d => d.id === result.id)) {
+                    drafts.unshift(initialDraft);
+                }
+                this.renderDrafts(drafts);
+            }
 
-            // Start polling so the progress bar updates in real-time
+            // Start polling immediately
             if (!this.pollingInterval) {
-                this.pollingInterval = setInterval(() => this.fetchDrafts(), 3000);
+                this.pollingInterval = setInterval(() => this.fetchDrafts(), 2000); // Poll faster initially
             }
 
             setTimeout(() => {
                 container.style.display = 'none';
                 bar.style.width = '0%';
                 text.textContent = 'Click to upload or drag and drop';
-            }, 2000);
+            }, 3000);
         } catch (error) {
             this.showToast('❌ Upload failed: ' + error.message, 'danger');
         }
@@ -57,17 +82,32 @@ export const DraftController = {
             const isProcessing = status === 'PROCESSING' || status === 'EXTRACTING';
             if (isProcessing) hasProcessing = true;
             
-            const dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Recently';
-            const reviewedStr = d.last_reviewed_at ? ` | Reviewed: ${new Date(d.last_reviewed_at).toLocaleTimeString()}` : '';
+            const dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Recently';
+            
+            let reviewedStr = '';
+            if (d.last_reviewed_at) {
+                const revDate = new Date(d.last_reviewed_at);
+                if (!isNaN(revDate.getTime())) {
+                    reviewedStr = ` | Reviewed: ${revDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                }
+            }
+            const qCount = d.questions?.length || d.processed_count || 0;
+            const statusMsg = d.status_message || (isProcessing ? 'Processing...' : '');
 
             return `
             <div class="draft-card ${isProcessing ? 'processing-active' : ''}" data-id="${d.id}">
                 <div class="draft-info">
-                    <h3>${d.filename || 'Untitled Document'}</h3>
-                    <p>${dateStr}${reviewedStr}</p>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+                        <h3 style="margin:0;">${d.filename || 'Untitled Document'}</h3>
+                        ${qCount > 0 ? `<span class="question-count-badge">${qCount} Questions</span>` : ''}
+                    </div>
+                    <p>
+                        <span>${dateStr}${reviewedStr}</span>
+                        ${statusMsg ? `<span style="opacity:0.6; font-size:0.75rem;">• ${statusMsg}</span>` : ''}
+                    </p>
                     ${isProcessing ? `
                         <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
-                            <div style="width: ${d.progress || 0}%; height: 100%; background: var(--primary-light); transition: width 0.5s;"></div>
+                            <div style="width: ${d.progress || 0}%; height: 100%; background: var(--primary-light); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
                         </div>
                         <span style="font-size: 0.7rem; color: var(--primary-light);">${d.progress || 0}% complete</span>
                     ` : ''}

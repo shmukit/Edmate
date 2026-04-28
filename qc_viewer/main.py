@@ -293,54 +293,69 @@ async def run_automation_pipeline(
         draft_dir = str(file_path.parent)
         
         questions_payload = []
-        try:
-            # Update progress: extraction phase
+        # Update progress: extraction phase
+        with open(meta_path, "r") as f:
+            meta = json.load(f)
+        meta.update({"status": "PROCESSING", "progress": 40})
+        with open(meta_path, "w") as f:
+            json.dump(meta, f)
+
+        extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+
+        # Update progress: generation phase
+        meta.update({"progress": 60, "status_message": "Generating initial questions..."})
+        with open(meta_path, "w") as f:
+            json.dump(meta, f)
+
+        generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
+        
+        total_questions = len(generated)
+        for i, q in enumerate(generated):
+            # Update progress for each question
+            processed_count = i + 1
+            progress_val = 60 + int((processed_count / total_questions) * 35)
+            
             with open(meta_path, "r") as f:
-                meta = json.load(f)
-            meta.update({"status": "PROCESSING", "progress": 40})
+                current_meta = json.load(f)
+            
+            current_meta.update({
+                "progress": progress_val,
+                "processed_count": processed_count,
+                "total_count": total_questions,
+                "status_message": f"Processing question {processed_count} of {total_questions}..."
+            })
+            
             with open(meta_path, "w") as f:
-                json.dump(meta, f)
+                json.dump(current_meta, f)
 
-            extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+            # Handle diagram extraction/encoding
+            diagram_b64 = None
+            stem_images = q.metadata.get("stem_images", [])
+            if stem_images and len(stem_images) > 0:
+                try:
+                    img_path = Path(stem_images[0])
+                    if img_path.exists():
+                        with open(img_path, "rb") as img_f:
+                            diagram_b64 = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
+                except Exception as img_e:
+                    print(f"Failed to encode diagram: {img_e}")
 
-            # Update progress: generation phase
-            meta.update({"progress": 70})
-            with open(meta_path, "w") as f:
-                json.dump(meta, f)
-
-            generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
-            for q in generated:
-                # Handle diagram extraction/encoding
-                diagram_b64 = None
-                stem_images = q.metadata.get("stem_images", [])
-                if stem_images and len(stem_images) > 0:
-                    try:
-                        img_path = Path(stem_images[0])
-                        if img_path.exists():
-                            with open(img_path, "rb") as img_f:
-                                diagram_b64 = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
-                    except Exception as img_e:
-                        print(f"Failed to encode diagram: {img_e}")
-
-                # Map to the exact schema review.js expects
-                legacy_q = {
-                    "question_number": q.question_number,
-                    "text": q.question_text,
-                    "options": q.options,
-                    "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
-                    "status": "Draft",
-                    "diagram_base64": diagram_b64,
-                    "generated_content": {
-                        "core_concept": q.explanation_body or "",
-                        "detailed_explanation": q.option_wise_explanation or "",
-                        "option_analysis": {k: "" for k in q.options},
-                        "flashcards": [{"question": f.front_text, "answer": f.back_text} for f in q.flashcards]
-                    }
+            # Map to the exact schema review.js expects
+            legacy_q = {
+                "question_number": q.question_number,
+                "text": q.question_text,
+                "options": q.options,
+                "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
+                "status": "Draft",
+                "diagram_base64": diagram_b64,
+                "generated_content": {
+                    "core_concept": q.explanation_body or "",
+                    "detailed_explanation": q.option_wise_explanation or "",
+                    "option_analysis": {k: "" for k in q.options},
+                    "flashcards": [{"question": f.front_text, "answer": f.back_text} for f in q.flashcards]
                 }
-                questions_payload.append(legacy_q)
-        except Exception as gen_e:
-            print(f"Generation error: {gen_e}")
-            questions_payload = []
+            }
+            questions_payload.append(legacy_q)
 
         # Load existing meta to preserve filename
         with open(meta_path, "r") as f:
@@ -350,6 +365,9 @@ async def run_automation_pipeline(
             "questions": questions_payload,
             "status": "PROCESSED",
             "progress": 100,
+            "processed_count": total_questions,
+            "total_count": total_questions,
+            "status_message": "Generation complete!",
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
@@ -368,7 +386,8 @@ async def run_automation_pipeline(
             fail_meta.update({
                 "status": "FAILED",
                 "error": str(e),
-                "progress": 0
+                "progress": 0,
+                "status_message": f"Error: {str(e)}"
             })
             with open(meta_path, "w") as f:
                 json.dump(fail_meta, f)
@@ -456,9 +475,9 @@ async def update_draft(draft_id: str, updates: dict):
         with open(meta_path, "r") as f:
             data = json.load(f)
         
-        # Merge updates (deep merge for questions if needed, but usually it's a full list replacement)
+        # Merge updates
         data.update(updates)
-        data["timestamp"] = datetime.now().isoformat()
+        data["last_updated_at"] = datetime.now().isoformat()
 
         with open(meta_path, "w") as f:
             json.dump(data, f)
@@ -562,30 +581,6 @@ async def refine_explanation(feedback: str, original_q: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.patch("/api/automate/draft/{draft_id}")
-async def update_draft(draft_id: str, updates: dict):
-    meta_path = Path(__file__).parent / "static" / "drafts" / draft_id / "metadata.json"
-    if not meta_path.exists():
-        raise HTTPException(status_code=404, detail="Draft not found")
-    
-    with open(meta_path, "r") as f:
-        data = json.load(f)
-    
-    data.update(updates)
-    with open(meta_path, "w") as f:
-        json.dump(data, f)
-    return data
-
-
-@app.delete("/api/automate/draft/{draft_id}")
-async def delete_draft(draft_id: str):
-    draft_dir = Path(__file__).parent / "static" / "drafts" / draft_id
-    if not draft_dir.exists():
-        raise HTTPException(status_code=404, detail="Draft not found")
-    shutil.rmtree(draft_dir)
-    return {"status": "success"}
 
 
 # Static Fallback Mount 

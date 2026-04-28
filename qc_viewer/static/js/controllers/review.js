@@ -212,7 +212,7 @@ export const ReviewController = {
     },
 
     async saveCurrentEdits(manual = false) {
-        if (this.currentQuestionIndex === null) return;
+        if (this.currentQuestionIndex === null || !this.isDirty) return;
         const q = this.currentDraftData.questions[this.currentQuestionIndex];
         
         q.text = document.getElementById('edit-text').value;
@@ -229,7 +229,13 @@ export const ReviewController = {
         if (statusEl) statusEl.textContent = 'Saving changes...';
 
         try {
-            await AutomationAPI.updateDraft(this.currentDraftData.id, { questions: this.currentDraftData.questions });
+            const lastReviewed = new Date().toISOString();
+            await AutomationAPI.updateDraft(this.currentDraftData.id, { 
+                questions: this.currentDraftData.questions,
+                last_reviewed_at: lastReviewed
+            });
+            this.currentDraftData.last_reviewed_at = lastReviewed; // Update local state
+            
             const now = new Date().toLocaleTimeString();
             if (statusEl) statusEl.textContent = `Last saved at ${now}`;
             this.setDirty(false);
@@ -317,7 +323,7 @@ export const ReviewController = {
     closeModal(id) { document.getElementById(id).style.display = 'none'; },
 
     closeReview() {
-        this.saveCurrentEdits();
+        if (this.isDirty) this.saveCurrentEdits();
         document.getElementById('reviewPanel').classList.remove('active');
         window.location.hash = '';
         this.fetchDrafts();
