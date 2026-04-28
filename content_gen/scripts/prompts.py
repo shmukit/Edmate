@@ -4,11 +4,16 @@ Central repository for system prompts used in the content generation pipeline.
 
 # The primary system prompt for Gemini to generate educational content
 CONTENT_GENERATION_PROMPT = """
-You are an expert Cambridge O/A-Level teacher. Provide a detailed explanation for the following multiple-choice question.
+You are an expert [Subject] teacher specializing in Cambridge O/A-Level curriculum. 
+I am providing you with a batch of questions (Range: [Range]).
 
-CRITICAL INSTRUCTION: Even if the question text or options appear corrupted, incomplete, missing diagrams, or contain unreadable OCR artifacts (e.g. garbled chemical structure text), DO NOT REFUSE to generate a response. Make your best-possible deduction from the available text and ALWAYS output a complete, fully structured response with all markers filled in. Never say "this question lacks a valid structure" — always produce content across all sections.
+### YOUR MISSION:
+For EACH question provided in the "EXTRACTED DATA" section below, you must provide a detailed educational analysis.
+
+CRITICAL INSTRUCTION: Even if the question text or options appear corrupted, incomplete, missing diagrams, or contain unreadable OCR artifacts, DO NOT REFUSE to generate a response. Make your best-possible deduction from the available context and ALWAYS output a complete, fully structured response for EVERY question in the batch.
 
 ### Output Formatting Rules (CRITICAL):
+For EACH question, start your response with "Question [NUMBER]" followed by these markers:
 1. **Markers**: Use the exact markers [DE_START], [DE_END], [OE_START], [OE_END], [GA_START], and [GA_END].
 2. **Sections**:
    - [DE_START] ... [DE_END]: Detailed step-by-step logic. MUST include the line: "**Final Correct Answer: [LETTER]**" (matching one of the options) at the end.
@@ -16,20 +21,12 @@ CRITICAL INSTRUCTION: Even if the question text or options appear corrupted, inc
    - [GA_START] ... [GA_END]: Identify conceptual gaps for wrong options and provide 2-3 flashcards per option. 
      Format flashcards as: "Flashcard X: Question? Back: Answer".
 
-### Structure for Detailed Explanation:
+### Structure for Detailed Explanation ([DE_START]):
 - State the Core Concept.
-- Analyze Step 1, concluding the intermediate result.
-- Analyze Step 2, concluding the intermediate result.
-- Analyze Step 3, detailing the calculation/reasoning, and concluding the result.
+- Analyze Step 1, 2, and 3, detailing the logic/calculation.
 - State the Final Correct Answer clearly as "**Final Correct Answer: [LETTER]**".
 
-Question:
-{question_text}
-
-Options:
-{options_text}
-
-Provide your response in the specified format with the markers.
+Provide your response for all questions in the batch.
 """
 
 # Prompt for ChatGPT to format content for Google Docs

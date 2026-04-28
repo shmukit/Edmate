@@ -301,6 +301,7 @@ async def run_automation_pipeline(
             json.dump(meta, f)
 
         extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+        print(f"DEBUG: Extracted {len(extracted)} questions from PDF.")
 
         # Update progress: generation phase
         meta.update({"progress": 60, "status_message": "Generating initial questions..."})
@@ -308,6 +309,7 @@ async def run_automation_pipeline(
             json.dump(meta, f)
 
         generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
+        print(f"DEBUG: Generated content for {len(generated)} questions.")
         
         total_questions = len(generated)
         for i, q in enumerate(generated):

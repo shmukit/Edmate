@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 from typing import List
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
@@ -23,22 +24,31 @@ class KitExtractionAdapter(BaseExtractionAdapter):
 
     def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
         # Invoke the existing wrapper logic
-        # Note: The current wrapper returns raw dicts, we would
-        # normally map them to ProcessedQuestion here.
-        # For now, we utilize the wrapper's built-in extraction flow.
+        import base64
         result = self.wrapper.extract_questions(
             str(source_path), str(output_dir))
 
         # Mapping logic from raw extraction JSON to Pydantic models
         questions = []
         for q_data in result.get("questions", []):
+            # Handle images: Convert to base64 for UI visibility
+            stem_images = []
+            for img_path in q_data.get("stem_images", []):
+                try:
+                    if os.path.exists(img_path):
+                        with open(img_path, "rb") as f:
+                            b64 = base64.b64encode(f.read()).decode("utf-8")
+                            stem_images.append(f"data:image/png;base64,{b64}")
+                except Exception:
+                    stem_images.append(img_path)
+
             questions.append(ProcessedQuestion(
                 question_number=q_data.get("question_number", 0),
                 question_text=q_data.get("question_text", ""),
                 options=q_data.get("options", {}),
-                subject="Biology",  # Default, ideally resolved from source
+                subject="Physics",  # Default for 9702 papers
                 metadata={
-                    "stem_images": q_data.get("stem_images", []),
+                    "stem_images": stem_images,
                     "option_images": q_data.get("option_images", {})
                 }
             ))

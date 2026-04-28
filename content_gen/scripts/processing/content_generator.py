@@ -53,7 +53,7 @@ class ContentGenerator:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")
 
-    def generate_for_questions(self, questions: List[ProcessedQuestion], subject: str, batch_size: int = 5) -> List[ProcessedQuestion]:
+    def generate_for_questions(self, questions: List[ProcessedQuestion], subject: str, batch_size: int = 3) -> List[ProcessedQuestion]:
         """
         Generate detailed analysis for a list of questions using the modular router.
         """
@@ -73,7 +73,7 @@ class ContentGenerator:
             context = self._prepare_prompt_context(batch, subject)
 
             try:
-                # Use the modular router instead of private _call_llm
+                # Use the modular router
                 raw_response = self.router.generate_content(
                     prompt=context,
                     task_type="generation",
@@ -97,12 +97,13 @@ class ContentGenerator:
                             for f in content.get("flashcards_generated", "").split("\n") 
                             if ":" in f
                         ]
-                    
-                    processed_results.append(q)
-
             except Exception as e:
-                print(
-                    f"   ❌ Error generating content for batch {batch_indices}: {e}")
+                print(f"   ❌ Error generating content for batch {batch_indices}: {e}")
+                # We don't return here, we continue to ensure the batch is added to results
+            
+            # ALWAYS append the batch questions to processed_results, 
+            # even if the generation for this batch failed.
+            processed_results.extend(batch)
 
         return processed_results
 
@@ -111,16 +112,17 @@ class ContentGenerator:
         q_range = f"{min(q.question_number for q in batch)}-{max(q.question_number for q in batch)}"
 
         # Construct the core prompt
+        # We replace the [Subject] and [Range] placeholders in the system prompt
         prompt = CONTENT_GENERATION_PROMPT.replace(
             "[Subject]", subject).replace("[Range]", q_range)
 
         # Append the extracted question data
-        data_block = "\n\nEXTRACTED DATA:\n"
+        data_block = "\n\nEXTRACTED DATA FOR ANALYSIS:\n"
         for q in batch:
             data_block += f"\n--- Question {q.question_number} ---\n"
-            data_block += f"Text: {q.question_text}\n"
-            opts = q.options
-            data_block += f"Options: A: {opts.get('A', '')}, B: {opts.get('B', '')}, C: {opts.get('C', '')}, D: {opts.get('D', '')}\n"
+            data_block += f"Original Text: {q.question_text}\n"
+            opts = q.options or {}
+            data_block += f"Options provided: A: {opts.get('A', '')}, B: {opts.get('B', '')}, C: {opts.get('C', '')}, D: {opts.get('D', '')}\n"
 
         return prompt + data_block
 
@@ -130,26 +132,28 @@ class ContentGenerator:
         """
         results = {}
 
-        # Log response (keep all for debugging)
+        # Log response
         log_dir = Path("content_gen/logs")
         log_dir.mkdir(parents=True, exist_ok=True)
         with open(log_dir / "all_llm_responses.log", "a", encoding="utf-8") as f:
             f.write(f"\n\n{'='*50}\nBatch: {batch_indices}\n{'='*50}\n")
             f.write(response)
 
-        with open(log_dir / "llm_response_last.txt", "w", encoding="utf-8") as f:
-            f.write(response)
-
-        # More robust splitting: handles ### Question 1, --- Question 1 ---, **Question 1**, etc.
-        # It also looks for "Question 1" even if it's the very first text in the response.
-        header_pattern = r'(?i)(?:^|\n)(?:[#\-\*]+)?\s*Question\s*[:\s]*(\d+)\s*(?:[#\-\*]+)?'
+        # More robust splitting
+        # Look for "Question X", "Q1", "### 1", etc.
+        header_pattern = r'(?i)(?:^|\n)(?:[#\-\*]+)?\s*(?:Question|Q)\s*[:\s]*(\d+)\s*(?:[#\-\*]+)?'
         sections = re.split(header_pattern, response)
 
-        # Fallback: if we only have 1 question and we couldn't find a clear header,
-        # assume the whole response (or from the first marker) belongs to the first question.
-        if len(sections) < 3 and len(batch_indices) == 1:
-            results[batch_indices[0]] = self._parse_single_content(response)
-            return results
+        # Fallback for single question batches or if headers were omitted
+        if len(sections) < 3:
+            if len(batch_indices) == 1:
+                results[batch_indices[0]] = self._parse_single_content(response)
+                return results
+            else:
+                # If we have multiple questions but no headers, it's a major failure.
+                # But let's try to at least return the first one if possible.
+                results[batch_indices[0]] = self._parse_single_content(response)
+                return results
 
         for i in range(1, len(sections), 2):
             try:

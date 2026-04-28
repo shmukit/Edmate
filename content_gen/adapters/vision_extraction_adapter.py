@@ -11,18 +11,22 @@ from content_gen.core.model_router import ModelRoutingEngine
 
 EXTRACTION_SYSTEM_PROMPT = """
 You are an expert at extracting structured educational content from exam paper images.
-Your goal is to identify each question and its options accurately.
-IMPORTANT: Ignore any reference tables, constants, or headers/footers that are not part of a specific question.
-Spatial context is key: if text is grouped with an image, they belong to the same question.
+Your goal is to identify each question and its options with 100% accuracy.
+
+### CRITICAL RULES:
+1. **Identification**: Every question typically starts with a number. Capture the full text of the question (the "stem").
+2. **Options**: MCQs always have options (usually A, B, C, D). If you see options, extract them into the "options" object.
+3. **Spatial Intelligence**: If a diagram, graph, or table is placed near a question, it belongs to that question. Provide its coordinates.
+4. **No Refusals**: Even if the text is blurry, use your domain knowledge (O/A-Level) to reconstruct the most likely intended text.
 
 For each question found, return a JSON object with:
 - question_number: (int)
 - question_text: (str) include the stem and any text before options.
 - options: (dict) mapping A, B, C, D to their text.
 - correct_answer: (str) optional, if identifiable (e.g. "A").
-- diagram_coords: [ymin, xmin, ymax, xmax] (list of 4 ints, 0-1000) if a diagram, table, or graph belongs to this question.
+- diagram_coords: [ymin, xmin, ymax, xmax] (list of 4 ints, 0-1000) for relevant visuals.
 
-Return a JSON array of these objects.
+Return a JSON array of these objects under a "questions" key.
 """
 
 class VisionExtractionAdapter(BaseExtractionAdapter):
