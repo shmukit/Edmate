@@ -44,7 +44,7 @@ Edmate is a **Content Factory Infrastructure**. Its mission ends where the learn
 
 ## 🚀 30-Second Quick Start
 
-Get Edmate running in seconds using the CLI orchestrator.
+Get Edmate running locally in seconds.
 
 ```bash
 # 1. Clone & Install
@@ -54,10 +54,30 @@ pip install -r content_gen/requirements.txt
 
 # 2. Configure (Set your keys)
 cp content_gen/.env.example content_gen/.env
+```
 
-# 3. Process a PDF
+### Option A: Use the Visual Automation Hub (UI)
+Start the FastAPI backend to access the drag-and-drop dashboard:
+```bash
+uvicorn qc_viewer.main:app --host 0.0.0.0 --port 8000
+```
+Navigate to `http://localhost:8000/automate` in your browser.
+
+### Option B: Use the CLI Orchestrator (Headless)
+Process a PDF headlessly via terminal:
+```bash
 python3 content_gen/scripts/pipeline/pipeline_orchestrator.py --single-pdf path/to/your_paper.pdf
 ```
+
+---
+
+## 🔌 API Integration & BYOK
+
+If you are a developer looking to integrate Edmate directly into your own platform using our **Bring Your Own Key (BYOK)** architecture, you can interact with the API directly.
+
+1. **Start the API Server**: `uvicorn qc_viewer.main:app --host 0.0.0.0 --port 8000`
+2. **Interactive API Docs**: Navigate to `http://localhost:8000/docs` to view the auto-generated Swagger UI which interactively documents all available endpoints.
+3. **Python Example**: Check out the fully runnable Python example at [`examples/client_request.py`](examples/client_request.py). It demonstrates how to hit the `/api/v1/extract` endpoint, pass your LLM API keys via HTTP headers, and poll the job status until completion.
 
 ---
 
