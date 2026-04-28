@@ -245,11 +245,13 @@ async def receive_draft(
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
+            "filename": file.filename,
             "curriculum": curriculum,
             "ls_profile": ls_profile,
             "hia_mode": hia_mode,
             "llm_provider": x_llm_provider or "env-default",
-            "status": "EXTRACTING",
+            "status": "PROCESSING",
+            "progress": 10,
             "timestamp": datetime.now().isoformat()
         }, f)
 
@@ -307,10 +309,24 @@ async def run_automation_pipeline(
         # we bypass the internal DB persistence of process_pdf or fetch from it.
         # However, to avoid a huge rewrite of PipelineOrchestrator, we reconstruct the UI format:
         
+        # ...
+        
         questions_payload = []
         # Fallback to pure generation if we want to mimic the old AutomationEngine
         try:
+            # Update progress
+            with open(meta_path, "r") as f:
+                meta = json.load(f)
+            meta.update({"status": "PROCESSING", "progress": 40})
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+
             extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+            
+            meta.update({"progress": 70})
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+
             generated = orchestrator.generator.generate_for_questions(extracted, subject=subject, system_prompt=system_prompt)
             for q in generated:
                 # Map to legacy UI format
@@ -330,18 +346,23 @@ async def run_automation_pipeline(
             print(f"Generation error: {gen_e}")
             questions_payload = []
 
-        results = {
+        # Load existing meta to preserve filename
+        with open(meta_path, "r") as f:
+            final_meta = json.load(f)
+
+        final_meta.update({
             "questions": questions_payload,
-            "status": "REVIEW_READY",
+            "status": "PROCESSED",
+            "progress": 100,
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
             "pedagogy_profile": pedagogy.get_profile_summary(),
             "timestamp": datetime.now().isoformat()
-        }
+        })
 
         with open(meta_path, "w") as f:
-            json.dump(results, f)
+            json.dump(final_meta, f)
 
     except Exception as e:
         print(f"Background Processing Error: {e}")

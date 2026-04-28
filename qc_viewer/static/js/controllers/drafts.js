@@ -47,11 +47,11 @@ export const DraftController = {
 
         let hasProcessing = false;
         draftList.innerHTML = drafts.map(d => {
-            const isProcessing = d.status === 'PROCESSING';
+            const isProcessing = d.status === 'PROCESSING' || d.status === 'EXTRACTING';
             if (isProcessing) hasProcessing = true;
             
-            const dateStr = d.created_at ? new Date(parseFloat(d.created_at) * 1000).toLocaleString() : 'Recently';
-            const reviewedStr = d.last_reviewed_at ? ` | Reviewed: ${new Date(parseFloat(d.last_reviewed_at) * 1000).toLocaleTimeString()}` : '';
+            const dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : 'Recently';
+            const reviewedStr = d.last_reviewed_at ? ` | Reviewed: ${new Date(d.last_reviewed_at).toLocaleTimeString()}` : '';
 
             return `
             <div class="draft-card ${isProcessing ? 'processing-active' : ''}" data-id="${d.id}">
@@ -106,7 +106,7 @@ export const DraftController = {
     renderActionButton(d) {
         if (d.status === 'UPLOADED') {
             return `<button class="btn btn-primary btn-sm btn-process" data-id="${d.id}">Process</button>`;
-        } else if (d.status === 'PROCESSED') {
+        } else if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') {
             return `<button class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>`;
         } else if (d.status === 'FAILED') {
             return `<span style="color:var(--danger); font-size:0.8rem;">Error</span>`;
@@ -125,11 +125,16 @@ export const DraftController = {
     },
 
     async triggerProcess(id) {
-        const modalities = [];
-        if (document.getElementById('mod_core_concept').checked) modalities.push('core_concept');
-        if (document.getElementById('mod_detailed_explanation').checked) modalities.push('detailed_explanation');
-        if (document.getElementById('mod_option_analysis').checked) modalities.push('option_analysis');
-        if (document.getElementById('mod_flashcards').checked) modalities.push('flashcards');
+        const modalities = ['core_concept', 'detailed_explanation', 'option_analysis', 'flashcards'];
+        // Optional override from UI if elements exist
+        if (document.getElementById('mod_core_concept')) {
+            const active = [];
+            if (document.getElementById('mod_core_concept').checked) active.push('core_concept');
+            if (document.getElementById('mod_detailed_explanation').checked) active.push('detailed_explanation');
+            if (document.getElementById('mod_option_analysis').checked) active.push('option_analysis');
+            if (document.getElementById('mod_flashcards').checked) active.push('flashcards');
+            if (active.length > 0) modalities = active;
+        }
 
         const config = {
             provider: document.getElementById('providerSelect').value,
