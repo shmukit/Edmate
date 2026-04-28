@@ -12,20 +12,53 @@ This document defines the **modular agentic workflow** for educational content g
 
 ```mermaid
 graph TB
-    A[Raw PDF Files] --> B[Skill 1: PDF Extraction]
-    B --> C[Structured JSON]
-    B --> D[PNG Images]
-    
-    C --> E[Skill 2: Model Routing Engine]
-    E -->|Route to Gemini/GPT-4| F[AI Content Generation]
-    F --> G[Pydantic Standardized Data]
-    
-    G --> H[Skill 3: Storage Adapter Layer]
-    H -->|Postgres| I[Production DB]
-    H -->|S3/R2| J[Asset Storage]
-    
-    K[External AI Agents] -->|MCP| E
-    L[Automation Hub UI] -->|API| E
+    %% External Interfaces
+    K[External AI Agents] -->|MCP| Router
+    L[Automation Hub UI] -->|API| Router
+
+    %% 1. Ingestion
+    subgraph Ingestion ["1. Multi-Modal Ingestion"]
+        A[PDF / Docx / Excel]
+        M[Modality Extractor: Text, Image, Table]
+        A --> M
+    end
+
+    %% 2. Intelligence
+    subgraph Intelligence ["2. Intelligence & Pedagogy"]
+        C[Curriculum Config: GCSE, National, Custom]
+        P[Pedagogy Rules: Learning Science, HIA]
+        Router{LLM Router: BYOK}
+        
+        M --> C
+        C --> P
+        P --> Router
+        
+        Router -.->|OpenAI| E[Extraction & Validation Agent]
+        Router -.->|Gemini| E
+        Router -.->|Anthropic / Local| E
+    end
+
+    %% 3. Output
+    subgraph Output ["3. Output Generation"]
+        O1[Simple Output: Q&A, Diagrams, Tables]
+        O2[Enriched Output: Explanations, Flashcards, Concept Gaps]
+        
+        E --> O1
+        E --> O2
+        
+        O1 --> S[Pydantic Standardized Data]
+        O2 --> S
+    end
+
+    %% 4. Storage
+    subgraph Persistence ["4. Storage Adapter Layer"]
+        SA{Storage Adapters}
+        S --> SA
+        SA -->|PostgresAdapter| DB1[(Production DB)]
+        SA -->|VectorAdapter| DB2[(Vector DB)]
+        SA -->|JSONAdapter| DB3[JSON Export]
+        SA -->|S3Adapter| DB4[Asset Storage]
+    end
 ```
 
 ---
@@ -53,19 +86,21 @@ Coordinates the end-to-end flow:
 ## 🚀 Workflow Phases
 
 ### Phase 1: Multimodal Extraction
-**Skill**: PDF Question Extraction  
-**Tool**: `PDFExtractKitWrapper`
-- Parses PDF pages with spatial awareness.
-- Extracts vector diagrams with High-DPI rendering (3x).
-- Standardizes output into Pydantic-validated JSON.
+**Skill**: Multi-Format Ingestion  
+**Tool**: `Modality Extractor`
+- Parses diverse unstructured inputs: **PDFs, Docx, and Excel/CSV**.
+- Decouples modalities: extracts and handles **Text, Tables, and Images/Diagrams** independently with spatial awareness.
+- Extracts vector diagrams with High-DPI rendering.
 
 ### Phase 2: Intelligent Generation & Routing
-**Skill**: Model Routing Engine  
+**Skill**: Pedagogy & Model Routing Engine  
 **Configuration**: `edmate_config.yaml`
-- **Dynamic Routing:**
+- **Pedagogy & Curriculum Injection:** Dynamically applies Learning Science principles (e.g., HIA for AI Critiques, Isomorphic Variants) based on the selected curriculum format (GCSE, National, Custom).
+- **Dynamic Routing (BYOK):**
     - `extraction`: Gemini 1.5 Pro (Multimodal)
-    - `generation`: Claude 3 Haiku (Fast/Cost-effective)
-    - `review`: GPT-4o (High Reasoning)
+    - `generation`: Claude 3 Haiku / GPT-4o (High Reasoning)
+    - `open_source`: Llama 3 / Mixtral
+- **Multi-Tier Output:** Generates simple text/images alongside enriched data (explanations, flashcards, concept gaps).
 - **Budget Monitoring:** Session cost is tracked dynamically.
 
 ### Phase 3: Modular Persistence

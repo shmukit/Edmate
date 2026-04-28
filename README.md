@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <b>The Modular Academic Content Automation Service based on Learning Science.</b>
+  <b>The Modular Automation Engine for Academic Assessments, Powered by Learning Science.</b>
 </p>
 
 <p align="center">
@@ -83,21 +83,68 @@ If you are a developer looking to integrate Edmate directly into your own platfo
 
 ## 🏗️ Modular Architecture
 
-Edmate is built for extensibility. It uses the **Adapter Pattern** to remain decoupled from specific AI models and database schemas.
+Edmate is built for extreme extensibility. It uses the **Adapter Pattern** to remain decoupled across all layers of the platform, from data ingestion to database schemas.
 
 ```mermaid
 graph TD
-    A[Unstructured PDF/Doc] --> B[Extraction Agent]
-    B --> C{Model Router}
-    C -->|Primary LLM| D[High-Fidelity Extraction]
-    C -->|Secondary LLM| E[Logical Verification]
-    D & E --> F[Standardized JSON]
-    F --> G[Storage Adapter]
-    G -->|Postgres| H[(Main DB)]
-    G -->|JSON| I[External Export]
-    style C fill:#fbbf24,stroke:#111827,color:#111827
-    style G fill:#1e1b4b,stroke:#fbbf24,color:#fff
+    %% 1. Ingestion
+    subgraph Input ["1. Multi-Modal Ingestion"]
+        A[PDF / Docx / Excel]
+        M[Modality Extractor: Text, Image, Table]
+        A --> M
+    end
+
+    %% 2. Intelligence
+    subgraph Intelligence ["2. Intelligence & Pedagogy"]
+        C[Curriculum Config: GCSE, National, Custom]
+        P[Pedagogy Rules: Learning Science, HIA]
+        R{LLM Router: BYOK}
+        
+        M --> C
+        C --> P
+        P --> R
+        
+        R -.->|OpenAI| E[Extraction Agent]
+        R -.->|Gemini| E
+        R -.->|Anthropic / Local| E
+    end
+
+    %% 3. Output
+    subgraph Output ["3. Output Generation"]
+        O1[Simple Output: Q&A, Diagrams, Tables]
+        O2[Enriched Output: Explanations, Flashcards, Concept Gaps]
+        
+        E --> O1
+        E --> O2
+        
+        O1 --> S[Standardized Edmate JSON Schema]
+        O2 --> S
+    end
+
+    %% 4. Storage
+    subgraph Persistence ["4. Persistence Layer"]
+        SA{Storage Adapters}
+        S --> SA
+        SA -->|Relational| DB1[(Postgres)]
+        SA -->|Semantic| DB2[(Vector DB)]
+        SA -->|Headless| DB3[JSON Export]
+    end
+
+    style Input fill:#f8fafc,stroke:#94a3b8,color:#0f172a
+    style Intelligence fill:#f0f9ff,stroke:#0ea5e9,color:#0f172a
+    style R fill:#fbbf24,stroke:#111827,color:#111827
+    style Output fill:#fdf4ff,stroke:#d946ef,color:#0f172a
+    style Persistence fill:#fefce8,stroke:#eab308,color:#0f172a
+    style SA fill:#1e1b4b,stroke:#fbbf24,color:#fff
 ```
+
+### 🧩 Dimensions of Modularity
+1. **Multi-Modal Ingestion (Input):** Accepts Unstructured PDFs, Docx, and Excel/CSV files.
+2. **Modality Extraction:** Intelligently separates and processes Text, Tables, and Images/Diagrams independently.
+3. **Pedagogical Engine:** Applies Learning Science techniques (like our HIA engine) dynamically during the extraction stage.
+4. **Curriculum Agnostic:** Plug and play your specific curriculum format (e.g., GCSE A/O level, or any National Curriculum).
+5. **Model Router (BYOK):** Bring Your Own Key. Route tasks to any LLM of your choice (OpenAI, Gemini, Anthropic, or Local models).
+6. **Multi-Tier Output Generation:** Extracts simple raw content (Q/A, Diagrams, Tables as-is) alongside enriched metadata (rationales for right/wrong answers, concept gaps, and 3D flashcards).
 
 ---
 
