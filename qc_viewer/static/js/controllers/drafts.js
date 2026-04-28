@@ -10,15 +10,21 @@ export const DraftController = {
         text.textContent = 'Uploading: 0%';
 
         try {
-            const result = await AutomationAPI.uploadPDF(file, (percent) => {
+            const subject = document.getElementById('curriculumSelect')?.value || 'General';
+            const paperCode = document.getElementById('targetTableSelect')?.value || '';
+            const result = await AutomationAPI.uploadPDF(file, subject, paperCode, (percent) => {
                 bar.style.width = percent + '%';
                 text.textContent = `Uploading: ${percent}%`;
             });
 
             this.showToast('✅ Upload complete. Starting extraction...');
             this.fetchDrafts();
-            this.triggerProcess(result.id);
-            
+
+            // Start polling so the progress bar updates in real-time
+            if (!this.pollingInterval) {
+                this.pollingInterval = setInterval(() => this.fetchDrafts(), 3000);
+            }
+
             setTimeout(() => {
                 container.style.display = 'none';
                 bar.style.width = '0%';
@@ -85,9 +91,6 @@ export const DraftController = {
             };
         });
 
-        document.querySelectorAll('.btn-process').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); this.triggerProcess(btn.dataset.id); };
-        });
         document.querySelectorAll('.btn-review').forEach(btn => {
             btn.onclick = (e) => { e.stopPropagation(); this.openReview(btn.dataset.id); };
         });
@@ -104,9 +107,7 @@ export const DraftController = {
     },
 
     renderActionButton(d) {
-        if (d.status === 'UPLOADED') {
-            return `<button class="btn btn-primary btn-sm btn-process" data-id="${d.id}">Process</button>`;
-        } else if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') {
+        if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') {
             return `<button class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>`;
         } else if (d.status === 'FAILED') {
             return `<span style="color:var(--danger); font-size:0.8rem;">Error</span>`;
@@ -124,32 +125,7 @@ export const DraftController = {
         } catch (e) { this.showToast('Delete failed', 'danger'); }
     },
 
-    async triggerProcess(id) {
-        const modalities = ['core_concept', 'detailed_explanation', 'option_analysis', 'flashcards'];
-        // Optional override from UI if elements exist
-        if (document.getElementById('mod_core_concept')) {
-            const active = [];
-            if (document.getElementById('mod_core_concept').checked) active.push('core_concept');
-            if (document.getElementById('mod_detailed_explanation').checked) active.push('detailed_explanation');
-            if (document.getElementById('mod_option_analysis').checked) active.push('option_analysis');
-            if (document.getElementById('mod_flashcards').checked) active.push('flashcards');
-            if (active.length > 0) modalities = active;
-        }
-
-        const config = {
-            provider: document.getElementById('providerSelect').value,
-            modalities: modalities,
-            language: document.getElementById('languageSelect').value,
-            curriculum: document.getElementById('curriculumSelect').value
-        };
-
-        try {
-            await AutomationAPI.triggerProcess(id, config);
-            this.showToast('✨ AI Extraction initiated');
-            this.fetchDrafts();
-        } catch (error) {
-            this.showToast('❌ AI Error: ' + error.message, 'danger');
-            this.fetchDrafts();
-        }
+    openReview(id) {
+        window.AutomationUI.openReview(id);
     }
 };

@@ -262,7 +262,7 @@ async def receive_draft(
         x_llm_provider, x_api_key, x_model_id
     )
 
-    return {"draft_id": draft_id}
+    return {"id": draft_id, "filename": file.filename, "status": "PROCESSING"}
 
 
 async def run_automation_pipeline(
@@ -289,32 +289,11 @@ async def run_automation_pipeline(
             os.environ["LITELLM_API_KEY"] = api_key # Fallback if provider isn't explicit
             
         orchestrator = PipelineOrchestrator(router=router)
-        
-        # Run extraction and generation
-        # Note: the output directory will just be the draft folder
         draft_dir = str(file_path.parent)
         
-        # Run modular pipeline
-        report = orchestrator.process_pdf(
-            pdf_path=str(file_path),
-            output_dir=draft_dir,
-            subject=subject,
-            difficulty="Medium",
-            topics=[ls_profile]
-        )
-        
-        # The frontend UI expects a "questions" array rather than the complex orchestrator report.
-        # We need to bridge the gap by returning the generated questions.
-        # Since orchestrator.process_pdf currently persists to DB and returns a summary report,
-        # we bypass the internal DB persistence of process_pdf or fetch from it.
-        # However, to avoid a huge rewrite of PipelineOrchestrator, we reconstruct the UI format:
-        
-        # ...
-        
         questions_payload = []
-        # Fallback to pure generation if we want to mimic the old AutomationEngine
         try:
-            # Update progress
+            # Update progress: extraction phase
             with open(meta_path, "r") as f:
                 meta = json.load(f)
             meta.update({"status": "PROCESSING", "progress": 40})
@@ -322,24 +301,27 @@ async def run_automation_pipeline(
                 json.dump(meta, f)
 
             extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
-            
+
+            # Update progress: generation phase
             meta.update({"progress": 70})
             with open(meta_path, "w") as f:
                 json.dump(meta, f)
 
-            generated = orchestrator.generator.generate_for_questions(extracted, subject=subject, system_prompt=system_prompt)
+            generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
             for q in generated:
-                # Map to legacy UI format
+                # Map to the exact schema review.js expects
                 legacy_q = {
                     "question_number": q.question_number,
-                    "question_text": q.question_text,
+                    "text": q.question_text,
                     "options": q.options,
                     "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
-                    "explanations": {
+                    "status": "Draft",
+                    "generated_content": {
                         "core_concept": q.explanation_body or "",
-                        "detailed_logic": q.option_wise_explanation or ""
-                    },
-                    "flashcards": [f"{f.front_text}: {f.back_text}" for f in q.flashcards]
+                        "detailed_explanation": q.option_wise_explanation or "",
+                        "option_analysis": {k: "" for k in q.options},
+                        "flashcards": [{"question": f.front_text, "answer": f.back_text} for f in q.flashcards]
+                    }
                 }
                 questions_payload.append(legacy_q)
         except Exception as gen_e:
