@@ -53,7 +53,7 @@ class ContentGenerator:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")
 
-    def generate_for_questions(self, questions: List[Dict], subject: str, batch_size: int = 5) -> List[ProcessedQuestion]:
+    def generate_for_questions(self, questions: List[ProcessedQuestion], subject: str, batch_size: int = 5) -> List[ProcessedQuestion]:
         """
         Generate detailed analysis for a list of questions using the modular router.
         """
@@ -67,7 +67,7 @@ class ContentGenerator:
 
         for i in range(0, len(questions), batch_size):
             batch = questions[i:i+batch_size]
-            batch_indices = [q['question_number'] for q in batch]
+            batch_indices = [q.question_number for q in batch]
             print(f"   Processing batch: Questions {batch_indices}")
 
             context = self._prepare_prompt_context(batch, subject)
@@ -84,22 +84,21 @@ class ContentGenerator:
                     raw_response, batch_indices)
 
                 for q in batch:
-                    q_num = q['question_number']
+                    q_num = q.question_number
                     content = parsed_content.get(q_num, {})
 
-                    # Convert to standardized ProcessedQuestion
-                    processed_q = ProcessedQuestion(
-                        question_number=q_num,
-                        question_text=q.get('question_text', ''),
-                        options=q.get('options', {}),
-                        subject=subject,
-                        explanation_body=content.get("explanation_generated"),
-                        option_wise_explanation=content.get(
-                            "options_explanation_generated"),
-                        flashcards=[Flashcard(front_text=f.split(":")[0], back_text=f.split(":")[1])
-                                    for f in content.get("flashcards_generated", "").split("\n") if ":" in f]
-                    )
-                    processed_results.append(processed_q)
+                    # Enrich the existing ProcessedQuestion with generated content
+                    q.explanation_body = content.get("explanation_generated")
+                    q.option_wise_explanation = content.get("options_explanation_generated")
+                    
+                    if content.get("flashcards_generated"):
+                        q.flashcards = [
+                            Flashcard(front_text=f.split(":")[0], back_text=f.split(":")[1])
+                            for f in content.get("flashcards_generated", "").split("\n") 
+                            if ":" in f
+                        ]
+                    
+                    processed_results.append(q)
 
             except Exception as e:
                 print(
@@ -107,9 +106,9 @@ class ContentGenerator:
 
         return processed_results
 
-    def _prepare_prompt_context(self, batch: List[Dict], subject: str) -> str:
+    def _prepare_prompt_context(self, batch: List[ProcessedQuestion], subject: str) -> str:
         """Formats the extraction data into the prompt format defined in prompts.py"""
-        q_range = f"{min(q['question_number'] for q in batch)}-{max(q['question_number'] for q in batch)}"
+        q_range = f"{min(q.question_number for q in batch)}-{max(q.question_number for q in batch)}"
 
         # Construct the core prompt
         prompt = CONTENT_GENERATION_PROMPT.replace(
@@ -118,9 +117,9 @@ class ContentGenerator:
         # Append the extracted question data
         data_block = "\n\nEXTRACTED DATA:\n"
         for q in batch:
-            data_block += f"\n--- Question {q['question_number']} ---\n"
-            data_block += f"Text: {q.get('question_text', '')}\n"
-            opts = q.get('options', {})
+            data_block += f"\n--- Question {q.question_number} ---\n"
+            data_block += f"Text: {q.question_text}\n"
+            opts = q.options
             data_block += f"Options: A: {opts.get('A', '')}, B: {opts.get('B', '')}, C: {opts.get('C', '')}, D: {opts.get('D', '')}\n"
 
         return prompt + data_block

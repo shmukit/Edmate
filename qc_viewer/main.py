@@ -15,7 +15,8 @@ import uuid
 from datetime import datetime
 
 # Import local services
-from content_gen.scripts.processing.automation_engine import AutomationEngine
+from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
 from content_gen.scripts.processing.database_service import DatabaseService
 from content_gen.core.pedagogy_engine import PedagogyEngine
 from .router_v1 import router as api_v1_router
@@ -278,27 +279,66 @@ async def run_automation_pipeline(
         pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
         system_prompt = pedagogy.compile_system_prompt()
 
-        engine = AutomationEngine(
-            provider_or_subject=llm_provider or subject,
-            model_id=model_id,
-            api_key=api_key  # None = falls back to .env keys
+        # Initialize the modular PipelineOrchestrator
+        router = ModelRoutingEngine()
+        
+        # Inject BYOK overrides if provided
+        if api_key:
+            os.environ["LITELLM_API_KEY"] = api_key # Fallback if provider isn't explicit
+            
+        orchestrator = PipelineOrchestrator(router=router)
+        
+        # Run extraction and generation
+        # Note: the output directory will just be the draft folder
+        draft_dir = str(file_path.parent)
+        
+        # Run modular pipeline
+        report = orchestrator.process_pdf(
+            pdf_path=str(file_path),
+            output_dir=draft_dir,
+            subject=subject,
+            difficulty="Medium",
+            topics=[ls_profile]
         )
-        config = {
-            "curriculum": curriculum,
-            "ls_profile": ls_profile,
-            "hia_mode": hia_mode,
-            "system_prompt": system_prompt,
-        }
-        results = engine.process_pdf(str(file_path), config)
+        
+        # The frontend UI expects a "questions" array rather than the complex orchestrator report.
+        # We need to bridge the gap by returning the generated questions.
+        # Since orchestrator.process_pdf currently persists to DB and returns a summary report,
+        # we bypass the internal DB persistence of process_pdf or fetch from it.
+        # However, to avoid a huge rewrite of PipelineOrchestrator, we reconstruct the UI format:
+        
+        questions_payload = []
+        # Fallback to pure generation if we want to mimic the old AutomationEngine
+        try:
+            extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+            generated = orchestrator.generator.generate_for_questions(extracted, subject=subject, system_prompt=system_prompt)
+            for q in generated:
+                # Map to legacy UI format
+                legacy_q = {
+                    "question_number": q.question_number,
+                    "question_text": q.question_text,
+                    "options": q.options,
+                    "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
+                    "explanations": {
+                        "core_concept": q.explanation_body or "",
+                        "detailed_logic": q.option_wise_explanation or ""
+                    },
+                    "flashcards": [f"{f.front_text}: {f.back_text}" for f in q.flashcards]
+                }
+                questions_payload.append(legacy_q)
+        except Exception as gen_e:
+            print(f"Generation error: {gen_e}")
+            questions_payload = []
 
-        results.update({
+        results = {
+            "questions": questions_payload,
             "status": "REVIEW_READY",
             "id": draft_id,
             "subject": subject,
             "paper_code": paper_code,
             "pedagogy_profile": pedagogy.get_profile_summary(),
             "timestamp": datetime.now().isoformat()
-        })
+        }
 
         with open(meta_path, "w") as f:
             json.dump(results, f)
@@ -482,12 +522,14 @@ async def refine_explanation(feedback: str, original_q: str):
         raise HTTPException(
             status_code=400, detail="Missing feedback or original_q")
 
-    engine = AutomationEngine("Chemistry")  # Default or dynamic
+    router = ModelRoutingEngine()
+    prompt = f"Original Question and Explanation:\n{original_q}\n\nUser Feedback:\n{feedback}\n\nPlease refine the explanation to address the feedback. Keep the tone educational and clear."
+
     try:
-        refined = engine.refine_explanation(original_q, feedback)
+        refined = router.generate_content(prompt, task_type="generation")
         return {
             "explanation": refined,
-            "model": engine.model_id,
+            "model": router.config.get_model_id("generation"),
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:

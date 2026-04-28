@@ -1,0 +1,16 @@
+model_routing:
+  extraction: "gemini/gemini-1.5-pro"
+  generation: "openai/gpt-4o"
+  validation: "openai/gpt-4o"
+
+budget:
+  max_daily_usd: 10.0
+
+storage_settings:
+  image_mode: "base64"
+
+extraction_settings:
+  engine: "pymupdf"
+
+observability:
+  litellm_callbacks: ["opik"]

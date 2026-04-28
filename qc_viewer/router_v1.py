@@ -6,8 +6,9 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
-from content_gen.scripts.processing.automation_engine import AutomationEngine
-from content_gen.core.schema import EdmateQuestion
+from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
+from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.core.schemas import ProcessedQuestion
 
 router = APIRouter(prefix="/api/v1", tags=["Service API v1"])
 
@@ -75,47 +76,41 @@ async def process_service_job(
     gemini_key: Optional[str]
 ):
     try:
-        # Determine provider and key
-        # For this experimental run, we prioritize Gemini as the default engine
-        provider = "gemini"
+        import os
+        
+        # Determine key
         api_key = gemini_key
-
         if openai_key and not gemini_key:
-            provider = "openai"
             api_key = openai_key
 
         # Initialize engine with BYOK
-        engine = AutomationEngine(provider_or_subject=provider)
         if api_key:
-            # Manually override api_key if provided by the user
-            # We will refactor AutomationEngine to accept this properly in the next step
-            engine.api_key = api_key
-            if provider == "openai":
-                from openai import OpenAI
-                engine.client = OpenAI(api_key=api_key)
-            else:
-                from google import genai
-                engine.client = genai.Client(api_key=api_key)
+            os.environ["LITELLM_API_KEY"] = api_key
+            
+        router = ModelRoutingEngine()
+        orchestrator = PipelineOrchestrator(router=router)
 
         # Execute processing
-        config = {
-            "curriculum": curriculum,
-            "subject": subject
-        }
+        draft_dir = str(Path(file_path).parent)
         
-        raw_results = engine.process_pdf(file_path, config=config)
+        extracted = orchestrator.extractor.extract_content(Path(file_path), Path(draft_dir))
+        generated_questions = orchestrator.generator.generate_for_questions(extracted, subject=subject)
         
-        # Validate results against the Standard Schema
+        # Bridge the gap: Map the modular ProcessedQuestion model back to the legacy UI dictionary format
         validated_questions = []
-        for q in raw_results.get("questions", []):
-            try:
-                # Map raw engine output to the standard schema
-                # This bridge logic is key for Milestone B
-                std_q = map_to_standard_schema(q, subject, curriculum)
-                validated_questions.append(std_q)
-            except Exception as e:
-                print(f"Validation error for question: {e}")
-                continue
+        for q in generated_questions:
+            legacy_q = {
+                "question_number": q.question_number,
+                "question_text": q.question_text,
+                "options": q.options,
+                "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
+                "explanations": {
+                    "core_concept": q.explanation_body or "",
+                    "detailed_logic": q.option_wise_explanation or ""
+                },
+                "flashcards": [f"{f.front_text}: {f.back_text}" for f in q.flashcards]
+            }
+            validated_questions.append(legacy_q)
 
         JOBS[job_id].update({
             "status": "COMPLETED",
@@ -129,35 +124,3 @@ async def process_service_job(
             "status": "FAILED",
             "error": str(e)
         })
-
-def map_to_standard_schema(raw_q: dict, subject: str, curriculum: str) -> dict:
-    """
-    Bridge logic to convert heterogeneous engine output to Edmate Lab_QA v1.0.0 Schema.
-    """
-    gen_content = raw_q.get("generated_content", {})
-    
-    return {
-        "$schema_version": "1.0.0",
-        "metadata": {
-            "curriculum": curriculum,
-            "subject": subject,
-            "topic": raw_q.get("topic_id", "General"),
-            "difficulty": raw_q.get("difficulty_level", "Medium")
-        },
-        "question_text": raw_q.get("text", ""),
-        "options": [
-            {
-                "id": k, 
-                "text": v, 
-                "is_correct": k == raw_q.get("correct_answer"), 
-                "explanation": gen_content.get("option_analysis", {}).get(k, "")
-            } 
-            for k, v in raw_q.get("options", {}).items()
-        ],
-        "explanations": {
-            "core_concept": gen_content.get("core_concept", ""),
-            "detailed_logic": gen_content.get("detailed_explanation", ""),
-            "final_answer_display": f"**Final Correct Answer: {raw_q.get('correct_answer', 'N/A')}**"
-        },
-        "flashcards": gen_content.get("flashcards", [])
-    }
