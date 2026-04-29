@@ -89,14 +89,14 @@ export const ReviewController = {
                     <div class="critique-box">
                         <label class="field-label">AI-Generated Answer (Stimulus)</label>
                         <textarea class="editable-field" id="edit-hia-stimulus" style="height:100px;">${hia.ai_generated_answer || ''}</textarea>
-                        <div id="preview-hia-stimulus" class="preview-render-box">${hia.ai_generated_answer || ''}</div>
+                        <div id="preview-hia-stimulus" class="preview-render-box"></div>
                     </div>
                     <label class="field-label">Planted Errors (Student must identify)</label>
                     <div id="hia-errors-list">
                         ${(hia.planted_errors || []).map((err, i) => `
                             <div class="error-item">
                                 <span class="error-tag">Error ${i+1}</span>
-                                <div>${err}</div>
+                                <div id="preview-hia-error-${i}" class="preview-render-box" style="margin:0; min-height:0; padding:8px 10px;"></div>
                             </div>
                         `).join('')}
                     </div>
@@ -110,7 +110,7 @@ export const ReviewController = {
                         ${Object.entries(hia.viva_probes || {}).map(([stage, probe]) => `
                             <div class="viva-card">
                                 <h4>${stage}</h4>
-                                <p>${probe}</p>
+                                <div id="preview-viva-probe-${stage.toLowerCase().replace(/\s+/g,'-')}" class="preview-render-box" style="margin:0; min-height:0; padding:8px 10px;"></div>
                             </div>
                         `).join('')}
                     </div>
@@ -149,6 +149,7 @@ export const ReviewController = {
         // Attach live preview listeners
         this.attachLivePreviews();
         this.updateAllPreviews();
+        this.renderAdditionalBlocks(qType, hia);
     },
 
     toggleEditMode() {
@@ -189,11 +190,15 @@ export const ReviewController = {
     },
 
     updateAllPreviews() {
-        this.renderContent(document.getElementById('edit-text').value, 'preview-text');
-        this.renderContent(document.getElementById('edit-core-concept').value, 'preview-core-concept');
-        this.renderContent(document.getElementById('edit-explanation').value, 'preview-explanation');
+        const textEl = document.getElementById('edit-text');
+        const coreEl = document.getElementById('edit-core-concept');
+        const expEl = document.getElementById('edit-explanation');
+        if (textEl) this.renderContent(textEl.value, 'preview-text');
+        if (coreEl) this.renderContent(coreEl.value, 'preview-core-concept');
+        if (expEl) this.renderContent(expEl.value, 'preview-explanation');
         ['A', 'B', 'C', 'D'].forEach(opt => {
-            this.renderContent(document.getElementById(`edit-opt-${opt}`).value, `preview-opt-${opt}`);
+            const optEl = document.getElementById(`edit-opt-${opt}`);
+            if (optEl) this.renderContent(optEl.value, `preview-opt-${opt}`);
         });
     },
 
@@ -211,15 +216,35 @@ export const ReviewController = {
         }
     },
 
+    renderAdditionalBlocks(qType, hia = {}) {
+        if (qType === 'ai_critique') {
+            this.renderContent(hia.ai_generated_answer || '', 'preview-hia-stimulus');
+            (hia.planted_errors || []).forEach((err, i) => {
+                this.renderContent(err || '', `preview-hia-error-${i}`);
+            });
+        } else if (qType === 'viva_prompt') {
+            Object.entries(hia.viva_probes || {}).forEach(([stage, probe]) => {
+                const id = `preview-viva-probe-${stage.toLowerCase().replace(/\s+/g, '-')}`;
+                this.renderContent(probe || '', id);
+            });
+        }
+    },
+
     async saveCurrentEdits(manual = false) {
         if (this.currentQuestionIndex === null || !this.isDirty) return;
         const q = this.currentDraftData.questions[this.currentQuestionIndex];
         
         q.text = document.getElementById('edit-text').value;
-        q.options.A = document.getElementById('edit-opt-A').value;
-        q.options.B = document.getElementById('edit-opt-B').value;
-        q.options.C = document.getElementById('edit-opt-C').value;
-        q.options.D = document.getElementById('edit-opt-D').value;
+        const optA = document.getElementById('edit-opt-A');
+        const optB = document.getElementById('edit-opt-B');
+        const optC = document.getElementById('edit-opt-C');
+        const optD = document.getElementById('edit-opt-D');
+        if (optA && optB && optC && optD && q.options) {
+            q.options.A = optA.value;
+            q.options.B = optB.value;
+            q.options.C = optC.value;
+            q.options.D = optD.value;
+        }
         
         if (!q.generated_content) q.generated_content = {};
         q.generated_content.core_concept = document.getElementById('edit-core-concept').value;

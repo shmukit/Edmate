@@ -335,6 +335,19 @@ async def run_automation_pipeline(
                 result[label] = re.sub(r'\s+', ' ', match.group(2)).strip()
         return result
 
+    def _extract_core_concept(explanation: str) -> str:
+        if not explanation:
+            return ""
+        core_match = re.search(
+            r'Core Concept\s*:?\s*(.*?)(?=\n\s*(?:Step\s*1|Analyze Step 1|Final Correct Answer|Option\s+[A-D]:)|$)',
+            explanation,
+            re.IGNORECASE | re.DOTALL
+        )
+        if core_match:
+            return re.sub(r'\s+', ' ', core_match.group(1)).strip(" -*\n\t")
+        first_line = next((ln.strip() for ln in explanation.splitlines() if ln.strip()), "")
+        return first_line
+
     try:
         # Build pedagogical system prompt from selected profile
         pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
@@ -412,6 +425,8 @@ async def run_automation_pipeline(
             option_text = q.option_wise_explanation or ""
             option_analysis = _extract_option_analysis(option_text, list((q.options or {}).keys()))
             correct_answer = q.correct_options[0] if q.correct_options else _extract_correct_answer(explanation_text)
+            core_concept = _extract_core_concept(explanation_text)
+            quality_report = (q.metadata or {}).get("generation_quality", {})
 
             # Map to the exact schema review.js expects
             legacy_q = {
@@ -422,11 +437,12 @@ async def run_automation_pipeline(
                 "status": "Draft",
                 "diagram_base64": diagram_b64,
                 "generated_content": {
-                    "core_concept": explanation_text,
+                    "core_concept": core_concept,
                     "detailed_explanation": explanation_text,
                     "option_analysis": option_analysis,
                     "flashcards": [{"question": f.front_text, "answer": f.back_text} for f in q.flashcards]
-                }
+                },
+                "quality_report": quality_report
             }
             questions_payload.append(legacy_q)
 

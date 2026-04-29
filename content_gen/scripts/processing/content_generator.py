@@ -104,10 +104,19 @@ class ContentGenerator:
                 for q in batch:
                     q_num = q.question_number
                     content = parsed_content.get(q_num, {})
+                    needs_retry = not content
+                    quality_report = self._validate_generated_content(content)
+                    if quality_report["retry_required"]:
+                        needs_retry = True
+
+                    if needs_retry:
+                        content = self._regenerate_single_question(q, subject)
+                        quality_report = self._validate_generated_content(content)
 
                     # Enrich the existing ProcessedQuestion with generated content
                     q.explanation_body = content.get("explanation_generated")
                     q.option_wise_explanation = content.get("options_explanation_generated")
+                    q.metadata["generation_quality"] = quality_report
                     
                     if content.get("flashcards_generated"):
                         q.flashcards = self._parse_flashcards(
@@ -134,6 +143,46 @@ class ContentGenerator:
             data_block += f"Options provided: A: {opts.get('A', '')}, B: {opts.get('B', '')}, C: {opts.get('C', '')}, D: {opts.get('D', '')}\n"
 
         return data_block
+
+    def _regenerate_single_question(self, question: ProcessedQuestion, subject: str) -> Dict:
+        """Low-cost retry path for only failed questions."""
+        context = self._prepare_prompt_context([question], subject)
+        strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
+            "[Subject]", subject
+        ).replace("[Range]", str(question.question_number))
+        retry_prompt = (
+            "Your prior output did not satisfy the required section markers or completeness.\n"
+            "Regenerate this question using exact markers and include all required sections.\n\n"
+            f"{context}"
+        )
+        try:
+            raw_response = self.router.generate_content(
+                prompt=retry_prompt,
+                task_type="generation",
+                system_prompt=strict_system_prompt
+            )
+            parsed = self._parse_response(raw_response, [question.question_number])
+            return parsed.get(question.question_number, {})
+        except Exception:
+            return {}
+
+    def _validate_generated_content(self, content: Dict) -> Dict:
+        """Deterministic quality checks; no extra API calls."""
+        explanation = (content.get("explanation_generated") or "").strip()
+        options_exp = (content.get("options_explanation_generated") or "").strip()
+        flashcards_raw = (content.get("flashcards_generated") or "").strip()
+        parsed_flashcards = self._parse_flashcards(flashcards_raw) if flashcards_raw else []
+        option_letters = re.findall(r'Option\s*([A-D])\s*:', options_exp, flags=re.IGNORECASE)
+        report = {
+            "has_explanation": bool(explanation) and explanation != "[PARSING_FAILED]",
+            "has_final_answer": bool(re.search(r'Final Correct Answer\s*:\s*[A-D]', explanation, flags=re.IGNORECASE)),
+            "has_option_analysis": len(set([m.upper() for m in option_letters])) >= 3,
+            "has_flashcards": len(parsed_flashcards) >= 2,
+        }
+        report["retry_required"] = not (
+            report["has_explanation"] and report["has_final_answer"] and report["has_option_analysis"]
+        )
+        return report
 
     def _parse_flashcards(self, gap_body: str) -> List[Flashcard]:
         """Extract flashcards reliably from GA section."""
@@ -163,20 +212,21 @@ class ContentGenerator:
             f.write(response)
 
         # More robust splitting
-        # Look for "Question X", "Q1", "### 1", etc.
+        # Look for "Question X", "Q1", markdown headers, etc.
         header_pattern = r'(?i)(?:^|\n)(?:[#\-\*]+)?\s*(?:Question|Q)\s*[:\s]*(\d+)\s*(?:[#\-\*]+)?'
         sections = re.split(header_pattern, response)
+        if len(sections) < 3:
+            alt_pattern = r'(?m)^\s*(?:#+\s*)?(\d{1,3})[\)\.\:\-]\s+'
+            sections = re.split(alt_pattern, response)
 
         # Fallback for single question batches or if headers were omitted
         if len(sections) < 3:
             if len(batch_indices) == 1:
                 results[batch_indices[0]] = self._parse_single_content(response)
                 return results
-            else:
-                # If we have multiple questions but no headers, it's a major failure.
-                # But let's try to at least return the first one if possible.
-                results[batch_indices[0]] = self._parse_single_content(response)
-                return results
+            # For multi-question batches with malformed headers, return empty mapping
+            # so caller can selectively retry failed questions only.
+            return results
 
         for i in range(1, len(sections), 2):
             try:

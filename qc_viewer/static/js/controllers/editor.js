@@ -11,7 +11,7 @@ export const EditorController = {
         }
 
         return `
-            <div class="image-wrapper" style="${isSmall ? 'max-height:150px; margin-bottom:8px;' : ''}">
+            <div class="image-wrapper ${isSmall ? 'image-wrapper-small' : 'image-wrapper-main'}" style="${isSmall ? 'margin-bottom:8px;' : ''}">
                 <img src="${base64}" id="img-${fieldId}" />
                 <div class="image-actions">
                     <button class="img-btn" onclick="AutomationUI.openImageEditor('${fieldId}')" title="Edit/Crop">✏</button>

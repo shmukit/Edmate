@@ -94,3 +94,29 @@ def test_wrapper_question_number_range_is_configurable():
     assert wrapper._is_valid_question_number(85) is True
     wrapper.max_question_number = 40
     assert wrapper._is_valid_question_number(85) is False
+
+
+def test_parse_response_returns_empty_for_multi_without_headers():
+    generator = ContentGenerator(router=MagicMock())
+    parsed = generator._parse_response(
+        "This is a combined response with no explicit question headers.",
+        [1, 2, 3]
+    )
+    assert parsed == {}
+
+
+def test_validate_generated_content_flags_missing_sections():
+    generator = ContentGenerator(router=MagicMock())
+    bad = generator._validate_generated_content({
+        "explanation_generated": "Short text",
+        "options_explanation_generated": "Option A: one",
+        "flashcards_generated": "",
+    })
+    assert bad["retry_required"] is True
+
+    good = generator._validate_generated_content({
+        "explanation_generated": "Core Concept: X\nFinal Correct Answer: B",
+        "options_explanation_generated": "Option A: a\nOption B: b\nOption C: c\nOption D: d",
+        "flashcards_generated": "Flashcard 1: Q? Back: A\nFlashcard 2: Q2? Back: A2",
+    })
+    assert good["retry_required"] is False
