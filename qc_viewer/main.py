@@ -4,7 +4,7 @@ import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Form, Header
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -14,6 +14,7 @@ import json
 import uuid
 import base64
 import re
+import asyncio
 from datetime import datetime
 
 # Import local services
@@ -26,6 +27,9 @@ from .router_v1 import router as api_v1_router
 # Load environment variables from content_gen/.env
 env_path = Path(__file__).parent.parent / "content_gen" / ".env"
 load_dotenv(dotenv_path=env_path)
+
+# Global for tracking cancellation of background tasks
+CANCELLATION_EVENTS: dict[str, asyncio.Event] = {}
 
 app = FastAPI(title="Edmate Lab_QA Service")
 
@@ -266,6 +270,9 @@ async def receive_draft(
             "timestamp": datetime.now().isoformat()
         }, f)
 
+    # Initialize cancellation event
+    CANCELLATION_EVENTS[draft_id] = asyncio.Event()
+
     background_tasks.add_task(
         run_automation_pipeline,
         draft_id, subject, paper_code, file_path,
@@ -291,6 +298,24 @@ async def run_automation_pipeline(
 ):
     """Heavy lifting background task. Supports BYOK and PedagogyEngine."""
     meta_path = file_path.parent / "metadata.json"
+
+    def _update_progress(progress: int, message: str):
+        # Check for cancellation before updating
+        if draft_id in CANCELLATION_EVENTS and CANCELLATION_EVENTS[draft_id].is_set():
+            raise asyncio.CancelledError(f"Task {draft_id} was cancelled by user.")
+
+        try:
+            with open(meta_path, "r") as f:
+                meta = json.load(f)
+            meta.update({
+                "progress": progress,
+                "status_message": message,
+                "last_updated_at": datetime.now().isoformat()
+            })
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+        except Exception as e:
+            print(f"Error updating progress: {e}")
 
     def _extract_correct_answer(explanation: str) -> str:
         match = re.search(r'Final Correct Answer\s*:\s*([A-D])', explanation or "", re.IGNORECASE)
@@ -333,51 +358,34 @@ async def run_automation_pipeline(
         orchestrator = PipelineOrchestrator(router=router)
         draft_dir = str(file_path.parent)
         
+        # Phase 1: Extraction
+        _update_progress(15, "Starting AI-powered extraction pipeline...")
+        
         questions_payload = []
-        # Update progress: extraction phase
-        with open(meta_path, "r") as f:
-            meta = json.load(f)
-        meta.update({
-            "status": "PROCESSING",
-            "progress": 40,
-            "resolved_extraction_settings": {
-                "min_question_number": router.config.min_question_number,
-                "max_question_number": router.config.max_question_number,
-                "question_detection_mode": router.config.question_detection_mode,
-            }
-        })
-        with open(meta_path, "w") as f:
-            json.dump(meta, f)
-
-        extracted = orchestrator.extractor.extract_content(file_path, Path(draft_dir))
+        extracted = orchestrator.extractor.extract_content(
+            file_path, 
+            Path(draft_dir), 
+            progress_callback=_update_progress
+        )
         print(f"DEBUG: Extracted {len(extracted)} questions from PDF.")
 
-        # Update progress: generation phase
-        meta.update({"progress": 60, "status_message": "Generating initial questions..."})
-        with open(meta_path, "w") as f:
-            json.dump(meta, f)
-
-        generated = orchestrator.generator.generate_for_questions(extracted, subject=subject)
+        # Phase 2: Generation
+        _update_progress(60, "Applying Learning Science & Pedagogy Analysis...")
+        
+        generated = orchestrator.generator.generate_for_questions(
+            extracted, 
+            subject=subject,
+            progress_callback=_update_progress
+        )
         print(f"DEBUG: Generated content for {len(generated)} questions.")
         
         total_questions = len(generated)
         for i, q in enumerate(generated):
             # Update progress for each question
             processed_count = i + 1
-            progress_val = 60 + int((processed_count / total_questions) * 35)
+            progress_val = 90 + int((processed_count / total_questions) * 9) # Final polish phase
             
-            with open(meta_path, "r") as f:
-                current_meta = json.load(f)
-            
-            current_meta.update({
-                "progress": progress_val,
-                "processed_count": processed_count,
-                "total_count": total_questions,
-                "status_message": f"Processing question {processed_count} of {total_questions}..."
-            })
-            
-            with open(meta_path, "w") as f:
-                json.dump(current_meta, f)
+            _update_progress(progress_val, f"Finalizing question {processed_count} of {total_questions}...")
 
             # Handle diagram extraction/encoding
             diagram_b64 = None
@@ -443,6 +451,15 @@ async def run_automation_pipeline(
         with open(meta_path, "w") as f:
             json.dump(final_meta, f)
 
+    except asyncio.CancelledError:
+        print(f"Task {draft_id} cancelled.")
+        _update_progress(0, "Processing stopped by user.")
+        with open(meta_path, "r") as f:
+            meta = json.load(f)
+        meta["status"] = "FAILED" # Or "CANCELLED"
+        meta["status_message"] = "Stopped by user"
+        with open(meta_path, "w") as f:
+            json.dump(meta, f)
     except Exception as e:
         print(f"Background Processing Error: {e}")
         try:
@@ -520,6 +537,75 @@ async def get_draft_results(draft_id: str):
 
     with open(meta_path, "r") as f:
         return json.load(f)
+
+
+@app.get("/api/automate/draft/{draft_id}/stream")
+async def stream_draft_progress(draft_id: str):
+    """
+    Server-Sent Events (SSE) endpoint to stream draft progress updates.
+    """
+    meta_path = Path(__file__).parent / "drafts" / draft_id / "metadata.json"
+    
+    if not meta_path.exists():
+        # Legacy fallback
+        meta_path = Path(__file__).parent / "drafts" / f"{draft_id}.json"
+
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+    async def event_generator():
+        last_meta = None
+        while True:
+            try:
+                if not meta_path.exists():
+                    break
+                    
+                with open(meta_path, "r") as f:
+                    current_meta = json.load(f)
+                
+                # Only stream if metadata has changed meaningfully
+                current_summary = {
+                    "progress": current_meta.get("progress"),
+                    "status": current_meta.get("status"),
+                    "status_message": current_meta.get("status_message"),
+                    "processed_count": current_meta.get("processed_count")
+                }
+                
+                if current_summary != last_meta:
+                    last_meta = current_summary
+                    yield f"data: {json.dumps(current_meta)}\n\n"
+                
+                if current_meta.get("status") in ["PROCESSED", "FAILED"]:
+                    break
+                    
+                await asyncio.sleep(0.5) # Poll the file every 500ms
+            except Exception as e:
+                print(f"Streaming error: {e}")
+                break
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@app.post("/api/automate/draft/{draft_id}/stop")
+async def stop_draft_processing(draft_id: str):
+    """Signals a background task to stop."""
+    if draft_id in CANCELLATION_EVENTS:
+        CANCELLATION_EVENTS[draft_id].set()
+        return {"status": "stopping"}
+    
+    # Check if it's already failed or processed
+    meta_path = Path(__file__).parent / "drafts" / draft_id / "metadata.json"
+    if meta_path.exists():
+        with open(meta_path, "r") as f:
+            meta = json.load(f)
+        if meta.get("status") == "PROCESSING":
+             meta["status"] = "FAILED"
+             meta["status_message"] = "Stopped by user"
+             with open(meta_path, "w") as f:
+                 json.dump(meta, f)
+             return {"status": "stopped"}
+             
+    return {"status": "not_running"}
 
 
 @app.patch("/api/automate/draft/{draft_id}")
@@ -650,6 +736,10 @@ async def refine_explanation(feedback: str, original_q: str):
 
 # Static Fallback Mount 
 # This allows relative paths like css/viewer.css to work from clean URLs
+docs_path = Path(__file__).resolve().parent.parent / "docs" / "pedagogy"
+if docs_path.exists():
+    app.mount("/docs", StaticFiles(directory=str(docs_path)), name="docs")
+
 app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 

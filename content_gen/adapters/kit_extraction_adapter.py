@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-from typing import List
+from typing import List, Optional, Callable
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
 from content_gen.scripts.extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
@@ -33,11 +33,16 @@ class KitExtractionAdapter(BaseExtractionAdapter):
                 "or switch the 'extraction_engine' config to 'pymupdf' in edmate_config.yaml to use the lightweight extractor."
             ) from e
 
-    def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
+    def extract_content(
+        self, 
+        source_path: Path, 
+        output_dir: Path, 
+        progress_callback: Optional[Callable[[int, str], None]] = None
+    ) -> List[ProcessedQuestion]:
         # Invoke the existing wrapper logic
         import base64
         result = self.wrapper.extract_questions(
-            str(source_path), str(output_dir))
+            str(source_path), str(output_dir), progress_callback=progress_callback)
 
         # Mapping logic from raw extraction JSON to Pydantic models
         questions = []

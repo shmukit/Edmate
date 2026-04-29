@@ -266,6 +266,8 @@ aside.collapsed .nav-item {
 /* Main Content Area */
 main {
     flex: 1;
+    height: 100%;
+    min-height: 0;
     padding: 40px;
     overflow-y: auto;
     background-color: var(--bg);
@@ -284,6 +286,8 @@ main {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    height: 100%;
+    min-height: 0;
     overflow-y: auto;
     transition: transform 0.3s ease, margin-right 0.3s ease;
 }

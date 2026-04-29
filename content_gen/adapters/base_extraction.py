@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional, Callable
 from pathlib import Path
 from ..core.schemas import ProcessedQuestion
 
@@ -12,7 +12,12 @@ class BaseExtractionAdapter(ABC):
     """
 
     @abstractmethod
-    def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
+    def extract_content(
+        self, 
+        source_path: Path, 
+        output_dir: Path, 
+        progress_callback: Optional[callable] = None
+    ) -> List[ProcessedQuestion]:
         """
         Extracts structured content from a source PDF.
         Should handle both text extraction and image/diagram extraction.

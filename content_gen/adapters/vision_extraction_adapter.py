@@ -3,7 +3,7 @@ import base64
 import json
 import io
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Callable
 from PIL import Image
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
@@ -38,8 +38,16 @@ class VisionExtractionAdapter(BaseExtractionAdapter):
     def __init__(self, router: ModelRoutingEngine):
         self.router = router
 
-    def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
+    def extract_content(
+        self, 
+        source_path: Path, 
+        output_dir: Path, 
+        progress_callback: Optional[Callable[[int, str], None]] = None
+    ) -> List[ProcessedQuestion]:
         print(f"👁️  Extracting via Vision LLM: {source_path.name}")
+        
+        if progress_callback:
+            progress_callback(20, "Initializing Vision AI context...")
         
         doc = fitz.open(str(source_path))
         all_questions = []
@@ -50,6 +58,10 @@ class VisionExtractionAdapter(BaseExtractionAdapter):
 
         for i, page in enumerate(doc):
             print(f"  Processing page {i+1}/{len(doc)}...")
+            
+            if progress_callback:
+                prog = 20 + int(((i + 1) / len(doc)) * 30)
+                progress_callback(prog, f"Extracting content from page {i+1} via Vision AI...")
             
             # 1. Convert page to high-res image for LLM
             zoom = 2

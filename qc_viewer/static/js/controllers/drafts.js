@@ -1,6 +1,9 @@
 import { AutomationAPI } from '../automate_api.js';
 
 export const DraftController = {
+    activeStreams: {},
+    currentUploadingDraftId: null,
+
     async handleUpload(file) {
         const container = document.getElementById('progressContainer');
         const bar = document.getElementById('progressBar');
@@ -27,6 +30,7 @@ export const DraftController = {
             
             // Immediate local update: Add the new draft record to the UI without waiting for poll
             if (result && result.id) {
+                this.currentUploadingDraftId = result.id;
                 const initialDraft = {
                     id: result.id,
                     filename: file.name,
@@ -45,16 +49,19 @@ export const DraftController = {
                 this.renderDrafts(drafts);
             }
 
-            // Start polling immediately
-            if (!this.pollingInterval) {
-                this.pollingInterval = setInterval(() => this.fetchDrafts(), 2000); // Poll faster initially
+            // Start streaming immediately
+            if (result && result.id) {
+                this.setupStreaming(result.id);
             }
 
-            setTimeout(() => {
-                container.style.display = 'none';
-                bar.style.width = '0%';
-                text.textContent = 'Click to upload or drag and drop';
-            }, 3000);
+            // Do not hide container immediately if streaming
+            if (!result || !result.id) {
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    bar.style.width = '0%';
+                    text.textContent = 'Click to upload or drag and drop';
+                }, 3000);
+            }
         } catch (error) {
             this.showToast('❌ Upload failed: ' + error.message, 'danger');
         }
@@ -138,12 +145,111 @@ export const DraftController = {
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => { e.stopPropagation(); this.deleteDraft(btn.dataset.id); };
         });
+        document.querySelectorAll('.btn-stop').forEach(btn => {
+            btn.onclick = (e) => { e.stopPropagation(); this.stopProcessing(btn.dataset.id); };
+        });
 
         if (hasProcessing && !this.pollingInterval) {
-            this.pollingInterval = setInterval(() => this.fetchDrafts(), 3000);
+            this.pollingInterval = setInterval(() => this.fetchDrafts(), 10000); // Slower polling if streaming is active
+            
+            // Ensure all processing drafts have a stream
+            drafts.forEach(d => {
+                const isProcessing = d.status === 'PROCESSING' || d.status === 'EXTRACTING';
+                if (isProcessing) this.setupStreaming(d.id);
+            });
         } else if (!hasProcessing && this.pollingInterval) {
             clearInterval(this.pollingInterval);
             this.pollingInterval = null;
+        }
+    },
+
+    setupStreaming(draftId) {
+        if (this.activeStreams[draftId]) return;
+
+        console.log(`📡 Starting stream for draft: ${draftId}`);
+        const eventSource = new EventSource(`/api/automate/draft/${draftId}/stream`);
+        this.activeStreams[draftId] = eventSource;
+
+        eventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                this.updateDraftUI(data);
+                
+                if (data.status === 'PROCESSED' || data.status === 'FAILED') {
+                    console.log(`✅ Stream complete for ${draftId}`);
+                    eventSource.close();
+                    delete this.activeStreams[draftId];
+                    // Final fetch to sync everything
+                    setTimeout(() => this.fetchDrafts(), 1000);
+                }
+            } catch (e) {
+                console.error('SSE Parse Error:', e);
+            }
+        };
+
+        eventSource.onerror = (err) => {
+            console.error('SSE Error:', err);
+            eventSource.close();
+            delete this.activeStreams[draftId];
+        };
+    },
+
+    updateDraftUI(d) {
+        // 1. Update the top-level upload zone if this is the active upload
+        if (d.id === this.currentUploadingDraftId) {
+            const topBar = document.getElementById('progressBar');
+            const topText = document.getElementById('uploadText');
+            const topContainer = document.getElementById('progressContainer');
+            
+            if (topBar) topBar.style.width = `${d.progress || 0}%`;
+            if (topText) topText.textContent = d.status_message || `${d.progress || 0}% complete`;
+            if (topContainer) topContainer.style.display = 'block';
+
+            if (d.status === 'PROCESSED' || d.status === 'FAILED') {
+                setTimeout(() => {
+                    if (this.currentUploadingDraftId === d.id) {
+                        topContainer.style.display = 'none';
+                        topText.textContent = 'Click to upload or drag and drop';
+                        this.currentUploadingDraftId = null;
+                    }
+                }, 5000);
+            }
+        }
+
+        // 2. Update the specific draft card
+        const card = document.querySelector(`.draft-card[data-id="${d.id}"]`);
+        if (!card) return;
+
+        // Update progress bar
+        const bar = card.querySelector('.mini-progress-container div');
+        if (bar) bar.style.width = `${d.progress || 0}%`;
+
+        // Update percentage text
+        const pctText = card.querySelector('.draft-info span[style*="color: var(--primary-light)"]');
+        if (pctText) pctText.textContent = `${d.progress || 0}% complete`;
+
+        // Update status message
+        const statusMsgContainer = card.querySelector('.draft-info p');
+        let statusMsgSpan = statusMsgContainer.querySelector('span[style*="opacity:0.6"]');
+        if (!statusMsgSpan) {
+            statusMsgSpan = document.createElement('span');
+            statusMsgSpan.style.opacity = '0.6';
+            statusMsgSpan.style.fontSize = '0.75rem';
+            statusMsgContainer.appendChild(statusMsgSpan);
+        }
+        statusMsgSpan.textContent = ` • ${d.status_message || 'Processing...'}`;
+        
+        // Update question count if available
+        const qCount = d.questions?.length || d.processed_count || 0;
+        if (qCount > 0) {
+            let badge = card.querySelector('.question-count-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'question-count-badge';
+                const titleBlock = card.querySelector('div[style*="display:flex; align-items:center"]');
+                if (titleBlock) titleBlock.appendChild(badge);
+            }
+            badge.textContent = `${qCount} Questions`;
         }
     },
 
@@ -152,8 +258,25 @@ export const DraftController = {
             return `<button class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>`;
         } else if (d.status === 'FAILED') {
             return `<span style="color:var(--danger); font-size:0.8rem;">Error</span>`;
+        } else if (d.status === 'PROCESSING' || d.status === 'EXTRACTING') {
+            return `
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="loader" style="width:16px; height:16px;"></span>
+                    <button class="btn btn-outline btn-sm btn-stop" data-id="${d.id}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
+                </div>
+            `;
         } else {
             return `<span class="loader" style="width:16px; height:16px;"></span>`;
+        }
+    },
+
+    async stopProcessing(id) {
+        try {
+            await AutomationAPI.stopDraft(id);
+            this.showToast('🛑 Stopping process...');
+            this.fetchDrafts();
+        } catch (e) {
+            this.showToast('Failed to stop process', 'danger');
         }
     },
 

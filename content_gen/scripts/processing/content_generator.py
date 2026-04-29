@@ -2,7 +2,7 @@ import os
 import re
 import json
 import time
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Callable
 from pathlib import Path
 
 # Try to import LLM libraries
@@ -54,7 +54,13 @@ class ContentGenerator:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")
 
-    def generate_for_questions(self, questions: List[ProcessedQuestion], subject: str, batch_size: int = 3) -> List[ProcessedQuestion]:
+    def generate_for_questions(
+        self, 
+        questions: List[ProcessedQuestion], 
+        subject: str, 
+        batch_size: int = 3,
+        progress_callback: Optional[Callable[[int, str], None]] = None
+    ) -> List[ProcessedQuestion]:
         """
         Generate detailed analysis for a list of questions using the modular router.
         """
@@ -63,6 +69,9 @@ class ContentGenerator:
 
         print(
             f"🧠 Generating content for {len(questions)} questions using Modular Router...")
+        
+        if progress_callback:
+            progress_callback(60, "Applying Learning Science & Pedagogy Analysis...")
 
         processed_results = []
 
@@ -70,6 +79,10 @@ class ContentGenerator:
             batch = questions[i:i+batch_size]
             batch_indices = [q.question_number for q in batch]
             print(f"   Processing batch: Questions {batch_indices}")
+            
+            if progress_callback:
+                prog = 65 + int((i / len(questions)) * 30)
+                progress_callback(prog, f"Generating educational content (Question {min(batch_indices)}-{max(batch_indices)})...")
 
             context = self._prepare_prompt_context(batch, subject)
             q_range = f"{min(batch_indices)}-{max(batch_indices)}"

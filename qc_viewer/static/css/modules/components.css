@@ -191,7 +191,7 @@
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
     width: 0%;
-    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 0 15px rgba(var(--brand-amber-rgb), 0.3);
 }
 
@@ -294,3 +294,26 @@ select {
 
 [data-theme="light"] .theme-icon-light { display: block; }
 [data-theme="light"] .theme-icon-dark { display: none; }
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+.settings-panel, main, .sidebar-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--card-border) transparent;
+}

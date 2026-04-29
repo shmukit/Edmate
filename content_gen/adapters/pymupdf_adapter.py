@@ -1,6 +1,6 @@
 import fitz  # PyMuPDF
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Callable
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
 
@@ -11,7 +11,12 @@ class PyMuPDFAdapter(BaseExtractionAdapter):
     Optimized for text extraction without the overhead of vision models.
     """
 
-    def extract_content(self, source_path: Path, output_dir: Path) -> List[ProcessedQuestion]:
+    def extract_content(
+        self, 
+        source_path: Path, 
+        output_dir: Path, 
+        progress_callback: Optional[Callable[[int, str], None]] = None
+    ) -> List[ProcessedQuestion]:
         print(f"📄 Extracting text via PyMuPDF (Regex-Enabled): {source_path.name}")
         import re
         doc = fitz.open(str(source_path))

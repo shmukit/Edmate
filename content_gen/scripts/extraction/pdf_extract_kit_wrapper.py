@@ -24,7 +24,7 @@ except (ImportError, ModuleNotFoundError):
 import json
 import re
 import fitz
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Callable
 
 
 class PDFExtractKitWrapper:
@@ -113,7 +113,7 @@ class PDFExtractKitWrapper:
         self.layout_detector = task_instances["layout_detection"]
         print("✅ Models loaded successfully")
 
-    def extract(self) -> Dict:
+    def extract(self, progress_callback: Optional[Callable[[int, str], None]] = None) -> Dict:
         """
         Extract questions and diagrams from PDF
 
@@ -147,6 +147,9 @@ class PDFExtractKitWrapper:
 
         print(f"📄 Processing: {self.pdf_path}")
         print(f"   Pages: {len(doc)}")
+        
+        if progress_callback:
+            progress_callback(25, "Extracting diagrams and images via Vision AI...")
 
         for page_num in range(len(doc)):
             page = doc[page_num]
@@ -154,6 +157,9 @@ class PDFExtractKitWrapper:
             all_questions.extend(questions_on_page)
 
         doc.close()
+
+        if progress_callback:
+            progress_callback(45, "Parsing text and layout structures...")
 
         merged_questions = self._merge_questions(all_questions)
         output = {
@@ -186,7 +192,7 @@ class PDFExtractKitWrapper:
 
         return output
 
-    def extract_questions(self, source_path: str, output_dir: str) -> Dict:
+    def extract_questions(self, source_path: str, output_dir: str, progress_callback: Optional[Callable[[int, str], None]] = None) -> Dict:
         """
         Adapter-compatible extraction method
         """
@@ -202,7 +208,7 @@ class PDFExtractKitWrapper:
         self.outputs_dir = self.output_dir.parent / "outputs"
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
 
-        return self.extract()
+        return self.extract(progress_callback=progress_callback)
 
     def _process_page(self, page, page_num: int, doc) -> List[Dict]:
         """

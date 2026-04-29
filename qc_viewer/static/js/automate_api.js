@@ -87,6 +87,12 @@ export const AutomationAPI = {
         return await response.json();
     },
 
+    async stopDraft(id) {
+        const response = await fetch(`/api/automate/draft/${id}/stop`, { method: 'POST' });
+        if (!response.ok) throw new Error('Failed to stop processing');
+        return await response.json();
+    },
+
     async publishQuestion(payload) {
         // payload: { draft_id, table_name, question_data }
         const response = await fetch('/api/automate/publish', {
