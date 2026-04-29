@@ -52,8 +52,20 @@ export const DraftController = {
                 this.setupStreaming(result.id);
             }
 
-            // Do not hide container immediately if streaming
-            if (!result || !result.id) {
+            // Reset upload zone and focus on the list
+            if (result && result.id) {
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    bar.style.width = '0%';
+                    // Reset text to default state
+                    const uploadPrompt = document.querySelector('.upload-prompt');
+                    if (uploadPrompt) uploadPrompt.style.display = 'flex';
+                    text.textContent = 'Click to upload or drag and drop';
+                    
+                    // Smooth scroll to the draft list
+                    document.getElementById('draftList')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 1500);
+            } else {
                 setTimeout(() => {
                     container.style.display = 'none';
                     bar.style.width = '0%';

@@ -3,10 +3,13 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+import threading
 
 from fastapi import HTTPException
 
 from qc_viewer.config import DRAFTS_ROOT
+
+METADATA_LOCK = threading.Lock()
 
 
 def ensure_drafts_root() -> None:
@@ -36,13 +39,15 @@ def resolve_metadata_path(draft_id: str) -> Path:
 
 
 def read_json(path: Path) -> dict[str, Any]:
-    with open(path, "r") as f:
-        return json.load(f)
+    with METADATA_LOCK:
+        with open(path, "r") as f:
+            return json.load(f)
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
-    with open(path, "w") as f:
-        json.dump(payload, f)
+    with METADATA_LOCK:
+        with open(path, "w") as f:
+            json.dump(payload, f)
 
 
 def list_draft_metadata() -> list[dict[str, Any]]:
