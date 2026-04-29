@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edmate | How it Works</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/automate.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Markdown & Math Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$' , '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="mainSidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                    <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+                </svg>
+                <span>Edmate AI</span>
+            </div>
+            <button class="btn-collapse" id="btnCollapseSidebar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+        </div>
+        <nav>
+            <a href="/" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Standard Viewer</span>
+            </a>
+            <a href="/automate" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Automation Hub</span>
+            </a>
+            <a href="/analytics" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Analytics</span>
+            </a>
+            <a href="/how-it-works" class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <circle cx="12" cy="11" r="3"></circle>
+                </svg>
+                <span>How it Works</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="container" style="max-width: 900px;">
+            <nav class="breadcrumb-nav">
+                <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
+                <div class="breadcrumb-item"><a href="/automate">Automation Hub</a></div>
+                <div class="breadcrumb-item active">Documentation</div>
+            </nav>
+
+            <div id="docContent" class="preview-render-box" style="background: var(--card-bg); border-color: var(--card-border); padding: 40px; min-height: 80vh;">
+                <div class="loader" style="margin: 40px auto;"></div>
+                <p style="text-align: center; color: var(--text-dim);">Loading documentation...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Pane: Documentation Navigation -->
+    <div class="settings-panel">
+        <h2 style="font-family: 'Outfit', sans-serif;">Documentation</h2>
+        <p class="subtitle" style="margin-bottom: 20px;">Explore the technology behind Edmate AI.</p>
+
+        <div class="doc-menu">
+            <div class="nav-item active doc-nav-item" data-section="pedagogy">
+                <span>Learning Science (Pedagogy)</span>
+            </div>
+            <div class="nav-item doc-nav-item" data-section="extraction">
+                <span>Vision Extraction Pipeline</span>
+            </div>
+            <div class="nav-item doc-nav-item" data-section="routing">
+                <span>AI Model Routing</span>
+            </div>
+            <div class="nav-item doc-nav-item" data-section="hia">
+                <span>High-Impact Accuracy (HIA)</span>
+            </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+        <div class="theme-toggle-container">
+            <button class="btn-theme-toggle" id="themeToggle">
+                <span class="theme-icon-dark">🌙</span>
+                <span class="theme-icon-light">☀️</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { LayoutManager } from '/js/ui.js';
+        import { ThemeManager } from '/js/theme.js';
+        import { DocsController } from '/js/controllers/docs.js';
+        
+        ThemeManager.init();
+        LayoutManager.init();
+        DocsController.init();
+    </script>
+</body>
+</html>

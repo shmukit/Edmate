@@ -64,6 +64,13 @@ async def serve_analytics():
          raise HTTPException(status_code=404, detail="analytics.html not found")
     return FileResponse(static_path)
 
+@app.get("/how-it-works")
+async def serve_docs():
+    static_path = Path(__file__).resolve().parent / "static" / "how_it_works.html"
+    if not static_path.exists():
+         raise HTTPException(status_code=404, detail="how_it_works.html not found")
+    return FileResponse(static_path)
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 TABLES = [

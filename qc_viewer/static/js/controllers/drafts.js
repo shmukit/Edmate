@@ -22,35 +22,33 @@ export const DraftController = {
                 bar.style.width = percent + '%';
                 text.textContent = `Uploading: ${percent}%`;
                 if (percent === 100) {
-                    text.textContent = 'Upload complete! Starting extraction...';
+                    text.textContent = 'Upload received! Initializing extraction...';
                 }
             });
 
             this.showToast('✅ Upload complete. Starting extraction...');
             
-            // Immediate local update: Add the new draft record to the UI without waiting for poll
+            // IMMEDIATE HANDOVER: Transition to 15% right away to eliminate the sync gap
             if (result && result.id) {
                 this.currentUploadingDraftId = result.id;
-                const initialDraft = {
+                const handoverState = {
                     id: result.id,
                     filename: file.name,
                     status: 'PROCESSING',
-                    progress: 10,
-                    status_message: 'Extracting content...',
+                    progress: 15,
+                    status_message: 'Initializing AI pipeline...',
                     timestamp: new Date().toISOString()
                 };
                 
-                // Fetch current list and prepend
+                // Add to list and update UI immediately
                 const drafts = await AutomationAPI.fetchDrafts();
-                // Ensure the new one is at the top if not already there
                 if (!drafts.find(d => d.id === result.id)) {
-                    drafts.unshift(initialDraft);
+                    drafts.unshift(handoverState);
                 }
                 this.renderDrafts(drafts);
-            }
+                this.updateDraftUI(handoverState);
 
-            // Start streaming immediately
-            if (result && result.id) {
+                // Start streaming
                 this.setupStreaming(result.id);
             }
 
@@ -230,10 +228,10 @@ export const DraftController = {
 
         // Update status message
         const statusMsgContainer = card.querySelector('.draft-info p');
-        let statusMsgSpan = statusMsgContainer.querySelector('span[style*="opacity:0.6"]');
+        let statusMsgSpan = statusMsgContainer.querySelector('.status-message-streaming');
         if (!statusMsgSpan) {
             statusMsgSpan = document.createElement('span');
-            statusMsgSpan.style.opacity = '0.6';
+            statusMsgSpan.className = 'status-message-streaming';
             statusMsgSpan.style.fontSize = '0.75rem';
             statusMsgContainer.appendChild(statusMsgSpan);
         }

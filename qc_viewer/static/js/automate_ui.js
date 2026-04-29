@@ -77,14 +77,7 @@ export const AutomationUI = {
         });
         document.getElementById('btnCloseAnalytics')?.addEventListener('click', () => this.closeAnalytics());
 
-        // Pedagogy Nav
-        document.getElementById('navPedagogy')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openPedagogy();
-        });
-        document.getElementById('closePedagogy')?.addEventListener('click', () => {
-            document.getElementById('pedagogyOverlay').style.display = 'none';
-        });
+        document.getElementById('btnCloseAnalytics')?.addEventListener('click', () => this.closeAnalytics());
     },
 
     async openPedagogy() {
