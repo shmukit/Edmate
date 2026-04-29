@@ -7,9 +7,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/shmukit/edmate?style=flat-square&color=fbbf24" alt="License">
-  <img src="https://img.shields.io/github/issues/shmukit/edmate?style=flat-square&color=fbbf24" alt="Issues">
-  <img src="https://img.shields.io/github/stars/shmukit/edmate?style=flat-square&color=fbbf24" alt="Stars">
+  <img src="https://img.shields.io/github/license/shmukit/Edmate?style=flat-square&color=fbbf24" alt="License">
+  <img src="https://img.shields.io/github/issues/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Issues">
+  <img src="https://img.shields.io/github/stars/shmukit/Edmate?style=flat-square&color=fbbf24" alt="Stars">
   <img src="https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square&color=1e1b4b" alt="Python">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&color=fbbf24" alt="PRs Welcome">
 </p>
@@ -223,6 +223,6 @@ We welcome contributions of all kinds! Whether it's a new Storage Adapter, an ex
 ---
 
 ## 📄 License
-MIT License - Open Source
+Licensed under the MIT License. See `LICENSE`.
 
 **Built with ❤️ for an accessible, AI-powered education system.**
