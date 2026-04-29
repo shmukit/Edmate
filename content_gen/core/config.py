@@ -1,5 +1,6 @@
 import yaml
 from pathlib import Path
+from typing import Optional
 from content_gen.core.schemas import ModelConfig
 
 
@@ -9,15 +10,20 @@ class CoreConfig:
     """
 
     @staticmethod
-    def load_from_yaml(config_path: str = "edmate_config.yaml") -> ModelConfig:
+    def load_from_yaml(config_path: Optional[str] = None) -> ModelConfig:
         """
         Loads a YAML file and parses it into a ModelConfig object.
-        If the file doesn't exist, returns default configuration.
+        If config_path is not provided, looks for 'edmate_config.yaml' in the project root.
         """
-        path = Path(config_path)
+        if config_path is None:
+            # Look for config in the project root relative to this file
+            root_path = Path(__file__).parent.parent.parent
+            path = root_path / "edmate_config.yaml"
+        else:
+            path = Path(config_path)
 
         if not path.exists():
-            print(f"ℹ️ Config file {config_path} not found. Using defaults.")
+            print(f"ℹ️ Config file {path} not found. Using defaults.")
             return ModelConfig()
 
         try:
@@ -39,7 +45,10 @@ class CoreConfig:
                 validation_model=routing.get("validation") or "openai/gpt-4o",
                 max_budget=budget.get("max_daily_usd", 10.0),
                 image_mode=img_settings.get("image_mode") or "cdn",
-                extraction_engine=ext_settings.get("engine") or "pdf_extract_kit"
+                extraction_engine=ext_settings.get("engine") or "pdf_extract_kit",
+                min_question_number=ext_settings.get("min_question_number", 1),
+                max_question_number=ext_settings.get("max_question_number", 40),
+                question_detection_mode=ext_settings.get("question_detection_mode") or "balanced"
             )
         except Exception as e:
             print(f"⚠️ Error loading config: {e}. Using defaults.")
@@ -61,7 +70,10 @@ class CoreConfig:
                 "image_mode": "cdn"
             },
             "extraction_settings": {
-                "engine": "pdf_extract_kit"
+                "engine": "pdf_extract_kit",
+                "min_question_number": 1,
+                "max_question_number": 40,
+                "question_detection_mode": "balanced"
             },
             "observability": {
                 "litellm_callbacks": ["opik"]

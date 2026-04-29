@@ -1,16 +1,76 @@
 model_routing:
-  extraction: "vertex_ai/gemini-1.5-pro"
-  generation: "openai/gpt-4o"
-  validation: "openai/gpt-4o"
+  extraction: "vertex_ai/gemini-2.5-flash"
+  generation: "vertex_ai/gemini-2.5-flash"
+  validation: "vertex_ai/gemini-2.5-flash"
 
 budget:
-  max_daily_usd: 10.0
+  max_daily_usd: 20.0
 
 storage_settings:
   image_mode: "base64"
 
 extraction_settings:
-  engine: "pdf_extract_kit"
+  engine: "pymupdf"
 
 observability:
   litellm_callbacks: ["opik"]
+
+# ============================================================
+# Learning Science Profile
+# All techniques are ON by default. Adjust to fit your context.
+# Profiles: "default" | "exam_prep" | "beginner" | "flashcard_only" | "custom"
+# ============================================================
+learning_science:
+  profile: "default"
+
+  bloom_taxonomy:
+    enabled: true
+    # All 6 levels by default. Narrow this for context-specific needs.
+    # e.g. beginner profile: ["Remember", "Understand"]
+    # e.g. exam_prep profile: ["Apply", "Analyze", "Evaluate"]
+    target_levels:
+      - "Remember"
+      - "Understand"
+      - "Apply"
+      - "Analyze"
+      - "Evaluate"
+      - "Create"
+
+  spaced_repetition:
+    enabled: true
+    algorithm: "sm2"  # Options: "sm2" | "anki" | "leitner"
+
+  elaborative_interrogation:
+    enabled: true  # Option-wise explanations + concept_gap for every wrong option
+
+  cognitive_load:
+    enabled: true
+    # "full"       -> Core Concept + Step-by-Step + Final Answer (default)
+    # "core_only"  -> One-sentence summary only (fast/beginner mode)
+    # "steps_only" -> Step-by-step + Final Answer (no summary)
+    explanation_depth: "full"
+
+  retrieval_practice:
+    enabled: true
+    generate_variants: false  # Set true to generate MCQ + T/F + Cloze for same concept
+
+  interleaving:
+    enabled: true  # Adds concept_links[] and interleaving_tags[] to metadata
+
+  formative_summative_tagging:
+    enabled: true
+    # Default role applied when not inferable from source material
+    default_role: "formative"  # Options: "formative" | "summative" | "diagnostic" | "practice"
+
+  assessment_role_tagging:
+    enabled: true
+
+# ============================================================
+# High-Integrity Assessment (HIA) Settings
+# ============================================================
+hia_settings:
+  enabled: true
+  default_resilience_target: "High"
+  generate_critique_exercises: true
+  generate_variants: true
+  variant_count: 3

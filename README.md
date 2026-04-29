@@ -145,12 +145,35 @@ graph TD
 
 ---
 
-## 📂 Repository Layout
+## 📂 Repository Architecture
 
-- `content_gen/core/`: The "Brain"—Routing, Budgeting, and Schema logic.
-- `content_gen/adapters/`: The "Connectors"—Postgres and Base storage interfaces.
-- `qc_viewer/`: The "Heart"—FastAPI backend and Vanilla JS Automation Hub.
-- `docs/`: Deep-dive documentation on system design and database schemas.
+### 🏗️ Root Directory
+| Path | Description |
+| :--- | :--- |
+| `content_gen/` | **The Brain**: Core AI pipeline for ingestion, extraction, and content generation. |
+| `qc_viewer/` | **The Heart**: FastAPI backend and Automation Hub dashboard for review. |
+| `docs/` | Comprehensive documentation on system design, pedagogy, and brand. |
+| `examples/` | Client integration examples (BYOK usage, API polling). |
+| `credentials/` | Secure storage for API keys (e.g., Gemini service accounts). |
+| `edmate_config.yaml` | Global project configuration (models, budgets, engines). |
+
+### 🧠 Content Generation (`content_gen/`)
+| Path | Description |
+| :--- | :--- |
+| `adapters/` | Pluggable connectors for storage (Postgres, JSON) and extraction. |
+| `core/` | Internal logic: LLM routing, daily budgeting, and data schemas. |
+| `data/` | Pipeline workspace: `inputs/`, `extracted/` text, and `outputs/`. |
+| `scripts/` | CLI entry points for orchestrating the full pipeline. |
+| `tools/` | Utility toolbox for PDF manipulation and image handling. |
+| `tests/` | Unit and integration tests for the generation engine. |
+
+### 📊 Automation Hub (`qc_viewer/`)
+| Path | Description |
+| :--- | :--- |
+| `static/` | Frontend assets (Vanilla HTML/JS/CSS) for the dashboard. |
+| `drafts/` | Persistence for human-in-the-loop content review tasks. |
+| `jobs/` | Real-time tracking for asynchronous background generation tasks. |
+| `main.py` | Entry point for the FastAPI server. |
 
 ---
 
