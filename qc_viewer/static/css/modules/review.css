@@ -222,6 +222,15 @@
     color: var(--text-main);
 }
 
+.preview-render-box a {
+    color: var(--primary-light);
+    text-underline-offset: 2px;
+}
+
+[data-theme="light"] .preview-render-box a {
+    color: var(--primary-dark);
+}
+
 .field-label {
     font-size: 0.75rem;
     color: var(--text-dim);

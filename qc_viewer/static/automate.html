@@ -205,8 +205,12 @@
             </select>
         </div>
 
-        <div class="settings-group" style="background: rgba(255,107,0,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.2);">
-            <span class="settings-label" style="color: var(--accent); font-weight: 600;">🛡️ Model Routing & Budget</span>
+        <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(255,107,0,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.2);">
+            <button type="button" class="settings-group-toggle" aria-expanded="true">
+                <span class="settings-label" style="color: var(--accent); font-weight: 600; margin-bottom: 0;">🛡️ Model Routing & Budget</span>
+                <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
+            </button>
+            <div class="settings-group-content">
             <div style="margin-bottom: 12px;">
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
                     <span>Session Cost</span>
@@ -223,6 +227,7 @@
                 <option value="high_quality">High Quality (GPT-4o)</option>
                 <option value="turbo">Cost Effective (Haiku / Flash)</option>
             </select>
+            </div>
         </div>
 
         <div class="settings-group">
@@ -249,8 +254,12 @@
         </div>
 
         <!-- Pedagogy & Integrity Settings -->
-        <div class="settings-group" style="background: rgba(14, 165, 233, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(14, 165, 233, 0.2); margin-top: 20px;">
-            <span class="settings-label" style="color: var(--primary); font-weight: 600;">🧠 Pedagogy & Integrity</span>
+        <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(14, 165, 233, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(14, 165, 233, 0.2); margin-top: 12px;">
+            <button type="button" class="settings-group-toggle" aria-expanded="true">
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">🧠 Pedagogy & Integrity</span>
+                <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
+            </button>
+            <div class="settings-group-content">
             
             <span class="settings-label" style="font-size:0.7rem; margin-top: 8px;">Learning Science Profile</span>
             <select id="lsProfileSelect" style="font-size:0.8rem; height:32px;">
@@ -267,10 +276,15 @@
                 <option value="High" selected>High (AI-Resilient)</option>
                 <option value="Very High">Very High (HIA Only)</option>
             </select>
+            </div>
         </div>
 
-        <div class="settings-group" style="background: rgba(16, 185, 129, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 20px;">
-            <span class="settings-label" style="color: var(--primary); font-weight: 600;">Extraction Guardrails (Admin)</span>
+        <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(16, 185, 129, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 12px;">
+            <button type="button" class="settings-group-toggle" aria-expanded="true">
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">Extraction Guardrails (Admin)</span>
+                <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
+            </button>
+            <div class="settings-group-content">
             <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 10px;">Optional per-run override. Leave blank to use backend defaults from config.</p>
 
             <span class="settings-label" style="font-size:0.7rem;">Detection Mode</span>
@@ -288,11 +302,16 @@
             <span class="settings-label" style="font-size:0.7rem;">Maximum Question Number</span>
             <input type="number" id="maxQuestionNumberInput" min="1" placeholder="Use backend default"
                 style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); box-sizing:border-box;">
+            </div>
         </div>
 
         <!-- BYOK API Key Configuration -->
-        <div class="settings-group" style="background: rgba(251,191,36,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); margin-top: 20px;">
-            <span class="settings-label" style="color: var(--primary); font-weight: 600;">🔑 API Key (BYOK)</span>
+        <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(251,191,36,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); margin-top: 12px;">
+            <button type="button" class="settings-group-toggle" aria-expanded="true">
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">🔑 API Key (BYOK)</span>
+                <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
+            </button>
+            <div class="settings-group-content">
             <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 10px;">Session-only. Never stored on server. Leave blank to use server-configured key.</p>
 
             <span class="settings-label" style="font-size:0.7rem;">LLM Provider</span>
@@ -310,6 +329,7 @@
             <span class="settings-label" style="font-size:0.7rem;">Model ID (optional)</span>
             <input type="text" id="byokModelId" placeholder="e.g. gpt-4o, gemini-2.5-flash"
                 style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); box-sizing:border-box;">
+            </div>
         </div>
 
         <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--card-border);">

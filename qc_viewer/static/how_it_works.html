@@ -88,6 +88,28 @@
                 <div class="breadcrumb-item active">Documentation</div>
             </nav>
 
+            <header class="workspace-header">
+                <div class="header-title-group">
+                    <h1 style="font-size: 1.8rem; margin-bottom: 6px;">How it Works</h1>
+                    <p class="subtitle" style="margin-bottom: 0;">Technical and pedagogy documentation for the pipeline.</p>
+                </div>
+                <div class="header-actions-group">
+                    <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="theme-toggle-container">
+                        <button class="btn-theme-toggle" id="themeToggle" title="Toggle Theme">
+                            <span class="theme-icon-dark">🌙</span>
+                            <span class="theme-icon-light">☀️</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
             <div id="docContent" class="preview-render-box" style="background: var(--card-bg); border-color: var(--card-border); padding: 40px; min-height: 80vh;">
                 <div class="loader" style="margin: 40px auto;"></div>
                 <p style="text-align: center; color: var(--text-dim);">Loading documentation...</p>
@@ -113,14 +135,6 @@
             <div class="nav-item doc-nav-item" data-section="hia">
                 <span>High-Impact Accuracy (HIA)</span>
             </div>
-        </div>
-
-        <div class="sidebar-divider"></div>
-        <div class="theme-toggle-container">
-            <button class="btn-theme-toggle" id="themeToggle">
-                <span class="theme-icon-dark">🌙</span>
-                <span class="theme-icon-light">☀️</span>
-            </button>
         </div>
     </div>
 

@@ -217,6 +217,46 @@
 /* Settings Switch */
 .settings-group { margin-bottom: 20px; }
 .settings-label { color: var(--text-dim); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; display: block; }
+.settings-panel .settings-group {
+    margin-bottom: 0;
+}
+.settings-group-collapsible .settings-group-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.settings-group-collapsible .settings-group-toggle-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.settings-group-collapsible .settings-group-content {
+    display: none;
+}
+
+.settings-group-collapsible.settings-group-expanded .settings-group-content {
+    display: block;
+    margin-top: 10px;
+}
 
 .toggle-container {
     display: flex;

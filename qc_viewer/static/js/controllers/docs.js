@@ -5,10 +5,10 @@
 
 export const DocsController = {
     sections: {
-        pedagogy: '/docs/PEDAGOGY.md',
-        extraction: '/docs/EXTRACTION.md', // Need to create or find these
-        routing: '/docs/ROUTING.md',
-        hia: '/docs/HIA.md'
+        pedagogy: '/docs/pedagogy/PEDAGOGY.md',
+        extraction: '/docs/technical/ARCHITECTURE.md', 
+        routing: '/docs/technical/ARCHITECTURE.md',
+        hia: '/docs/pedagogy/PEDAGOGY.md'
     },
 
     init() {

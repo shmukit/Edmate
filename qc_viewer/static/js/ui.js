@@ -21,6 +21,13 @@ export const LayoutManager = {
                 return;
             }
 
+            // Settings Group Collapse/Expand
+            const groupToggle = e.target.closest('.settings-group-toggle');
+            if (groupToggle) {
+                this.toggleSettingsGroup(groupToggle);
+                return;
+            }
+
             // Mobile Nav Toggle
             const mobileBtn = e.target.closest('#btnMobileNav');
             if (mobileBtn) {
@@ -60,6 +67,18 @@ export const LayoutManager = {
         panel.classList.toggle('hidden');
         const isHidden = panel.classList.contains('hidden');
         localStorage.setItem('edmate-settings-hidden', isHidden);
+    },
+
+    toggleSettingsGroup(toggleButton) {
+        const group = toggleButton.closest('.settings-group-collapsible');
+        if (!group) return;
+
+        const isExpanded = group.classList.toggle('settings-group-expanded');
+        toggleButton.setAttribute('aria-expanded', String(isExpanded));
+        const icon = toggleButton.querySelector('.settings-group-toggle-icon');
+        if (icon) {
+            icon.textContent = isExpanded ? '−' : '+';
+        }
     },
 
     restoreState() {

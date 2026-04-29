@@ -78,6 +78,23 @@ export const AutomationUI = {
         document.getElementById('btnCloseAnalytics')?.addEventListener('click', () => this.closeAnalytics());
 
         document.getElementById('btnCloseAnalytics')?.addEventListener('click', () => this.closeAnalytics());
+
+        // Settings section collapse/expand (bound directly for reliability)
+        document.querySelectorAll('.settings-group-toggle').forEach((toggle) => {
+            toggle.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const group = toggle.closest('.settings-group-collapsible');
+                if (!group) return;
+
+                const expanded = group.classList.toggle('settings-group-expanded');
+                toggle.setAttribute('aria-expanded', String(expanded));
+
+                const icon = toggle.querySelector('.settings-group-toggle-icon');
+                if (icon) icon.textContent = expanded ? '−' : '+';
+            };
+        });
     },
 
     async openPedagogy() {
