@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from pathlib import Path
+from typing import Any, Optional, cast
 
 # Load environment variables
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -111,13 +112,13 @@ class DatabaseService:
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT id FROM subjects WHERE name ILIKE %s", (subject_name,))
-                subject = cur.fetchone()
+                subject = cast(Optional[dict[str, Any]], cur.fetchone())
                 if not subject:
                     return None, None
 
                 cur.execute(
                     "SELECT id FROM topics WHERE name ILIKE %s AND \"subjectId\" = %s", (topic_name, subject['id']))
-                topic = cur.fetchone()
+                topic = cast(Optional[dict[str, Any]], cur.fetchone())
                 if not topic:
                     return subject['id'], None
 

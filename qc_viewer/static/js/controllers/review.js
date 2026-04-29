@@ -252,6 +252,9 @@ export const ReviewController = {
         const q = this.currentDraftData.questions[index];
         const gen = q.generated_content || {};
         const tableName = document.getElementById('targetTableSelect').value;
+        const optionToIndex = { A: 0, B: 1, C: 2, D: 3 };
+        const answerLetter = (q.correct_answer || '').toString().trim().toUpperCase();
+        const mappedCorrect = Number.isInteger(optionToIndex[answerLetter]) ? optionToIndex[answerLetter] : 0;
 
         const payload = {
             draft_id: this.currentDraftData.id,
@@ -260,7 +263,7 @@ export const ReviewController = {
                 question_identifier: `${this.currentDraftData.id}/Q${q.question_number}`,
                 title: q.text,
                 options: [q.options.A, q.options.B, q.options.C, q.options.D],
-                correct_options: [0], // Defaulting to A for now
+                correct_options: [mappedCorrect],
                 option_explanations: gen.option_analysis ? [gen.option_analysis.A, gen.option_analysis.B, gen.option_analysis.C, gen.option_analysis.D] : [],
                 detailed_explanation: gen.detailed_explanation,
                 topic_id: null, 

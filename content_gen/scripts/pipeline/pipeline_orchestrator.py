@@ -45,7 +45,11 @@ class PipelineOrchestrator:
         elif engine in ["vision", "multimodal", "pdf_extract_kit"]:
             # Default to Vision if high-fidelity is requested, or Kit if explicitly set
             if engine == "pdf_extract_kit":
-                self.extractor = KitExtractionAdapter()
+                self.extractor = KitExtractionAdapter(
+                    min_question_number=self.router.config.min_question_number,
+                    max_question_number=self.router.config.max_question_number,
+                    question_detection_mode=self.router.config.question_detection_mode,
+                )
             else:
                 self.extractor = VisionExtractionAdapter(router=self.router)
         else:
@@ -108,7 +112,10 @@ class PipelineOrchestrator:
         if self.storage:
             # 2. Storage Upload (Conditional)
             cdn_mapping = {}
-            images = list(Path(output_dir).glob("*.png"))
+            images_root = Path(output_dir) / "images" / pdf_name
+            if not images_root.exists():
+                images_root = Path(output_dir) / "images"
+            images = list(images_root.rglob("*.png")) if images_root.exists() else []
             if self.router.config.image_mode == "base64":
                 print("📦 Encoding images to Base64...")
                 for img_path in images:
@@ -123,7 +130,7 @@ class PipelineOrchestrator:
                     f"☁️ Uploading {len(images)} images to {storage_bucket}...")
                 uploader = StorageUploader()
                 cdn_mapping, _ = uploader.upload_directory(
-                    images_dir=str(Path(output_dir)),
+                    images_dir=str(images_root),
                     container=storage_bucket,
                     base_path=f"diagrams/{pdf_name}",
                 )

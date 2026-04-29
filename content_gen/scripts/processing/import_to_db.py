@@ -407,7 +407,7 @@ class DatabaseImporter:
         option_explanations: List[str],
         summary_explanation: str,
         detailed_explanation: str,
-        quick_explanation: str = None,
+        quick_explanation: Optional[str] = None,
     ):
         """
         Update a question row with AI-generated content.

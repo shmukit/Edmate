@@ -32,8 +32,15 @@ class PDFExtractKitWrapper:
     Wrapper for PDF-Extract-Kit that provides a simple interface
     compatible with the old smart_extract.py output format
     """
-
-    def __init__(self, pdf_path: Optional[str] = None, output_dir: Optional[str] = None, use_gpu: bool = False):
+    def __init__(
+        self,
+        pdf_path: Optional[str] = None,
+        output_dir: Optional[str] = None,
+        use_gpu: bool = False,
+        min_question_number: int = 1,
+        max_question_number: Optional[int] = 40,
+        question_detection_mode: str = "balanced",
+    ):
         """
         Initialize PDF extractor
 
@@ -45,6 +52,9 @@ class PDFExtractKitWrapper:
         self.use_gpu = use_gpu
         self.pdf_path = pdf_path
         self.output_dir = Path(output_dir) if output_dir else None
+        self.min_question_number = min_question_number
+        self.max_question_number = max_question_number
+        self.question_detection_mode = question_detection_mode
 
         # Determine working directory or use provided output_dir
         if output_dir:
@@ -145,10 +155,17 @@ class PDFExtractKitWrapper:
 
         doc.close()
 
+        merged_questions = self._merge_questions(all_questions)
         output = {
             "source": self.pdf_path,
             "base_name": self.base_name,
-            "questions": all_questions
+            "questions": merged_questions,
+            "raw_questions": all_questions,
+            "extraction_settings": {
+                "min_question_number": self.min_question_number,
+                "max_question_number": self.max_question_number,
+                "question_detection_mode": self.question_detection_mode,
+            }
         }
 
         # Save JSON
@@ -160,7 +177,7 @@ class PDFExtractKitWrapper:
         self._generate_processed_text(output)
 
         print(f"\n✅ Extraction complete!")
-        print(f"   Questions: {len(all_questions)}")
+        print(f"   Questions: {len(merged_questions)}")
         print(f"   JSON: {json_path}")
         print(
             f"   Text Output: {self.outputs_dir / f'{self.base_name}_processed.txt'}")
@@ -201,7 +218,7 @@ class PDFExtractKitWrapper:
 
         questions = {}
         for q_num, _ in question_positions:
-            if 1 <= q_num <= 40:
+            if self._is_valid_question_number(q_num):
                 questions[q_num] = {
                     "question_number": q_num,
                     "page": page_num,
@@ -412,27 +429,10 @@ class PDFExtractKitWrapper:
             raise ValueError("outputs_dir and base_name must be initialized before generating processed text")
         text_path = outputs_dir / f"{base_name}_processed.txt"
 
-        # Group duplicates (e.g. question split across pages)
-        final_questions = {}
-        for q in output_data["questions"]:
-            num = q["question_number"]
-            if 1 <= num <= 100:
-                if num not in final_questions:
-                    final_questions[num] = q
-                else:
-                    # Merge content
-                    if q["question_text"]:
-                        final_questions[num]["question_text"] += " " + \
-                            q["question_text"]
-                    for opt in ["A", "B", "C", "D"]:
-                        if q["options"][opt]:
-                            final_questions[num]["options"][opt] += " " + \
-                                q["options"][opt]
-                    final_questions[num]["stem_images"].extend(
-                        q["stem_images"])
-
-        sorted_qs = sorted(final_questions.values(),
-                           key=lambda x: x["question_number"])
+        sorted_qs = sorted(
+            output_data.get("questions", []),
+            key=lambda x: x["question_number"]
+        )
 
         with open(text_path, 'w', encoding='utf-8') as f:
             for q in sorted_qs:
@@ -494,10 +494,13 @@ class PDFExtractKitWrapper:
                         continue  # Skip indented lines (answer options)
 
                     # Pattern 1: Number on same line as question text (Q10+)
-                    match = re.match(r'^(\d+)\s+([A-Z\d])', line_text)
+                    marker_pattern = r'^(\d+)\s+([A-Z])'
+                    if self.question_detection_mode == "open":
+                        marker_pattern = r'^(\d+)\s+([A-Z\d])'
+                    match = re.match(marker_pattern, line_text)
                     if match:
                         q_num = int(match.group(1))
-                        if 1 <= q_num <= 100:  # Increased limit
+                        if self._is_valid_question_number(q_num):
                             y_pos = line["bbox"][1]
                             question_positions.append((q_num, y_pos))
                             continue
@@ -505,7 +508,7 @@ class PDFExtractKitWrapper:
                     # Pattern 2: Number on separate line (Q1-9)
                     if re.match(r'^\d+$', line_text):
                         q_num = int(line_text)
-                        if 1 <= q_num <= 100:  # Increased limit
+                        if self._is_valid_question_number(q_num):
                             # Check next line/block for validation
                             is_question = False
 
@@ -530,8 +533,16 @@ class PDFExtractKitWrapper:
                                 y_pos = line["bbox"][1]
                                 question_positions.append((q_num, y_pos))
 
-        # Sort by Y position (top to bottom)
-        return sorted(question_positions, key=lambda x: x[1])
+        # Sort by Y position and de-duplicate by question number (keep first sighting).
+        sorted_positions = sorted(question_positions, key=lambda x: x[1])
+        deduped: List[tuple] = []
+        seen = set()
+        for q_num, y_pos in sorted_positions:
+            if q_num in seen:
+                continue
+            seen.add(q_num)
+            deduped.append((q_num, y_pos))
+        return deduped
 
     def _assign_to_question(
         self,
@@ -561,8 +572,8 @@ class PDFExtractKitWrapper:
             if y_pos >= q_y:  # Element is below this question
                 return q_num
 
-        # If element is above all questions, assign to first question
-        return question_positions[0][0]
+        # If element is above all questions, treat it as preamble/instruction noise.
+        return None
 
     def _extract_bbox_image(
         self,
@@ -583,8 +594,10 @@ class PDFExtractKitWrapper:
         Returns:
             Path to saved image
         """
-        # Minimal padding for tight clipping - no surrounding text
-        pad = 5  # Just enough to avoid cutting edges
+        # Adaptive padding preserves labels/axes around detector boxes.
+        width = max(1.0, bbox[2] - bbox[0])
+        height = max(1.0, bbox[3] - bbox[1])
+        pad = max(12.0, min(width, height) * 0.08)
 
         final_bbox = [
             max(0, bbox[0] - pad),
@@ -606,6 +619,55 @@ class PDFExtractKitWrapper:
         pix.save(str(img_path))
 
         return img_path
+
+    def _merge_questions(self, questions: List[Dict]) -> List[Dict]:
+        """Merge question fragments across pages into canonical runtime questions."""
+        merged: Dict[int, Dict] = {}
+        for q in questions:
+            num = q.get("question_number", 0)
+            if not self._is_valid_question_number(num):
+                continue
+
+            if num not in merged:
+                merged[num] = {
+                    "question_number": num,
+                    "page": q.get("page"),
+                    "question_text": (q.get("question_text") or "").strip(),
+                    "options": {
+                        "A": (q.get("options", {}).get("A", "") or "").strip(),
+                        "B": (q.get("options", {}).get("B", "") or "").strip(),
+                        "C": (q.get("options", {}).get("C", "") or "").strip(),
+                        "D": (q.get("options", {}).get("D", "") or "").strip()
+                    },
+                    "stem_images": list(dict.fromkeys(q.get("stem_images", []) or [])),
+                    "option_images": q.get("option_images", {}) or {}
+                }
+                continue
+
+            q_text = (q.get("question_text") or "").strip()
+            if q_text:
+                merged[num]["question_text"] = f"{merged[num]['question_text']} {q_text}".strip()
+
+            for opt in ["A", "B", "C", "D"]:
+                opt_text = (q.get("options", {}).get(opt, "") or "").strip()
+                if not opt_text:
+                    continue
+                existing = merged[num]["options"].get(opt, "")
+                merged[num]["options"][opt] = f"{existing} {opt_text}".strip()
+
+            merged[num]["stem_images"] = list(dict.fromkeys(
+                merged[num]["stem_images"] + (q.get("stem_images", []) or [])
+            ))
+
+        return sorted(merged.values(), key=lambda item: item["question_number"])
+
+    def _is_valid_question_number(self, number: int) -> bool:
+        """Question number guardrails, configurable per curriculum/run."""
+        if number < self.min_question_number:
+            return False
+        if self.max_question_number is not None and number > self.max_question_number:
+            return False
+        return True
 
 
 def main():

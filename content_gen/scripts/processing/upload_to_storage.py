@@ -67,6 +67,7 @@ class StorageUploader:
                     raise Exception(
                         f"Failed to upload {local_path} after {retries} attempts: {e}")
                 print(f"⚠️  Upload attempt {attempt + 1} failed, retrying...")
+        raise RuntimeError(f"Upload failed unexpectedly for {local_path}")
 
     def _generate_cdn_url(self, container: str, key: str) -> str:
         """Generate public CDN URL for uploaded file"""

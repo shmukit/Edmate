@@ -17,8 +17,9 @@ import sys
 import json
 import uuid
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional, cast
 from datetime import datetime, timezone
+from content_gen.core.schemas import ProcessedQuestion
 
 # Add parent directory to path to allow imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -106,6 +107,9 @@ def main():
         sys.exit(1)
 
     subject_id = SUBJECT_IDS.get(args.subject)
+    if subject_id is None:
+        print(f"❌ Error: No subject ID mapping for {args.subject}")
+        sys.exit(1)
 
     print(
         f"🚀 Starting Sync for {args.paper_code} ({args.subject} {args.grade})")
@@ -124,9 +128,9 @@ def main():
         questions = questions[:args.limit]
 
         # 2. Generate content
-        gen = ContentGenerator(provider=args.provider)
-        generated_results = gen.generate_for_questions(
-            questions, args.subject, batch_size=args.batch_size)
+        gen = ContentGenerator()
+        generated_results = cast(List[Dict[str, Any]], gen.generate_for_questions(
+            cast(List[ProcessedQuestion], questions), args.subject, batch_size=args.batch_size))
 
         # 3. Process and Sync
         for q in generated_results:
@@ -159,11 +163,10 @@ def main():
                 correct_match = re.search(
                     r"(?i)option\s+([A-D])\s*\.?$", q.get("explanation_generated", "").strip())
 
-            # Map option letter to integer (A=0, B=1, C=2, D=3)
-            option_map = {"A": 0, "B": 1, "C": 2, "D": 3}
-            correct_options = [option_map[correct_match.group(
-                1).upper()]] if correct_match else []
-            print(f"  Correct option indices: {correct_options}")
+            # Store correct option as letter(s) to match DB importer contract
+            correct_options = [correct_match.group(
+                1).upper()] if correct_match else []
+            print(f"  Correct option letters: {correct_options}")
 
             if not args.dry_run:
                 # Update question
@@ -184,7 +187,11 @@ def main():
                 # Let's fetch them from the question row first.
                 importer.cur.execute(
                     f"SELECT topic_id, subtopic_id FROM {table} WHERE id = %s", (q_id,))
-                t_id, st_id = importer.cur.fetchone()
+                topic_row = importer.cur.fetchone()
+                if topic_row is None:
+                    t_id, st_id = None, None
+                else:
+                    t_id, st_id = topic_row
 
                 if flashcards:
                     importer.insert_flashcards(

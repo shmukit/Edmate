@@ -17,10 +17,11 @@ except ImportError:
     OpenAI = None
 
 try:
-    from dotenv import load_dotenv
-    load_dotenv()
+    from dotenv import load_dotenv as _load_dotenv
+    _load_dotenv()
 except ImportError:
-    def load_dotenv(): pass
+    def _load_dotenv(*_args, **_kwargs) -> bool:
+        return False
 
 from ...core.schemas import ProcessedQuestion, Flashcard
 from ...core.model_router import ModelRoutingEngine
@@ -71,13 +72,17 @@ class ContentGenerator:
             print(f"   Processing batch: Questions {batch_indices}")
 
             context = self._prepare_prompt_context(batch, subject)
+            q_range = f"{min(batch_indices)}-{max(batch_indices)}"
+            strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
+                "[Subject]", subject
+            ).replace("[Range]", q_range)
 
             try:
                 # Use the modular router
                 raw_response = self.router.generate_content(
                     prompt=context,
                     task_type="generation",
-                    system_prompt="You are an expert AI educational content generator. Provide deep explanations and flashcards."
+                    system_prompt=strict_system_prompt
                 )
 
                 parsed_content = self._parse_response(
@@ -92,11 +97,9 @@ class ContentGenerator:
                     q.option_wise_explanation = content.get("options_explanation_generated")
                     
                     if content.get("flashcards_generated"):
-                        q.flashcards = [
-                            Flashcard(front_text=f.split(":")[0], back_text=f.split(":")[1])
-                            for f in content.get("flashcards_generated", "").split("\n") 
-                            if ":" in f
-                        ]
+                        q.flashcards = self._parse_flashcards(
+                            content.get("flashcards_generated", "")
+                        )
             except Exception as e:
                 print(f"   ❌ Error generating content for batch {batch_indices}: {e}")
                 # We don't return here, we continue to ensure the batch is added to results
@@ -109,22 +112,29 @@ class ContentGenerator:
 
     def _prepare_prompt_context(self, batch: List[ProcessedQuestion], subject: str) -> str:
         """Formats the extraction data into the prompt format defined in prompts.py"""
-        q_range = f"{min(q.question_number for q in batch)}-{max(q.question_number for q in batch)}"
-
-        # Construct the core prompt
-        # We replace the [Subject] and [Range] placeholders in the system prompt
-        prompt = CONTENT_GENERATION_PROMPT.replace(
-            "[Subject]", subject).replace("[Range]", q_range)
-
-        # Append the extracted question data
-        data_block = "\n\nEXTRACTED DATA FOR ANALYSIS:\n"
+        # Prompt instructions now live in system prompt; user prompt carries only data.
+        data_block = "EXTRACTED DATA FOR ANALYSIS:\n"
         for q in batch:
             data_block += f"\n--- Question {q.question_number} ---\n"
             data_block += f"Original Text: {q.question_text}\n"
             opts = q.options or {}
             data_block += f"Options provided: A: {opts.get('A', '')}, B: {opts.get('B', '')}, C: {opts.get('C', '')}, D: {opts.get('D', '')}\n"
 
-        return prompt + data_block
+        return data_block
+
+    def _parse_flashcards(self, gap_body: str) -> List[Flashcard]:
+        """Extract flashcards reliably from GA section."""
+        flashcards: List[Flashcard] = []
+        pattern = re.compile(
+            r'Flashcard\s*\d+\s*:\s*(.*?)\s*Back\s*:\s*(.*?)(?=Flashcard\s*\d+\s*:|$)',
+            re.IGNORECASE | re.DOTALL
+        )
+        for match in pattern.finditer(gap_body):
+            front = re.sub(r'\s+', ' ', match.group(1)).strip(" -*\n\t")
+            back = re.sub(r'\s+', ' ', match.group(2)).strip(" -*\n\t")
+            if front and back:
+                flashcards.append(Flashcard(front_text=front, back_text=back))
+        return flashcards
 
     def _parse_response(self, response: str, batch_indices: List[int]) -> Dict[int, Dict]:
         """
@@ -236,7 +246,16 @@ class ContentGenerator:
             return
 
         # Generate content
-        generated_data = self.generate_for_questions(questions_data, subject)
+        parsed_questions: List[ProcessedQuestion] = []
+        for item in questions_data:
+            parsed_questions.append(ProcessedQuestion(
+                question_number=item["question_number"],
+                question_text=item["question_text"],
+                options=item["options"],
+                subject=subject
+            ))
+
+        generated_data = self.generate_for_questions(parsed_questions, subject)
 
         # Reconstruct the file content
         new_content = self._inject_content(content, generated_data)
@@ -313,8 +332,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="Path to processed text file")
     parser.add_argument("--subject", default="Chemistry")
-    parser.add_argument("--provider", default="mock")
     args = parser.parse_args()
 
-    gen = ContentGenerator(provider=args.provider)
+    gen = ContentGenerator()
     gen.process_and_update_file(Path(args.file), args.subject)

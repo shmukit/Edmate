@@ -19,6 +19,13 @@ export const AutomationAPI = {
             formData.append('ls_profile', lsProfile);
             formData.append('hia_mode', hiaMode);
 
+            const detectionMode = document.getElementById('questionDetectionModeSelect')?.value || '';
+            const minQ = document.getElementById('minQuestionNumberInput')?.value || '';
+            const maxQ = document.getElementById('maxQuestionNumberInput')?.value || '';
+            if (detectionMode) formData.append('question_detection_mode', detectionMode);
+            if (minQ) formData.append('min_question_number', minQ);
+            if (maxQ) formData.append('max_question_number', maxQ);
+
             // Read BYOK settings from UI (session-only, never persisted)
             const byokProvider = document.getElementById('byokProviderSelect')?.value;
             const byokKey = document.getElementById('byokApiKey')?.value;

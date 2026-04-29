@@ -16,13 +16,13 @@ MODALITIES: Dict[str, Modality] = {
         id="core_concept",
         name="Core Concept",
         prompt_chunk="Summarize the main educational principle behind this question.",
-        schema_fragment={"core_concept": types.Schema(type="STRING")}
+        schema_fragment={"core_concept": types.Schema(type=types.Type.STRING)}
     ),
     "detailed_explanation": Modality(
         id="detailed_explanation",
         name="Detailed Explanation",
         prompt_chunk="Provide a step-by-step logic leading to the answer. CRITICAL: End with '**Final Correct Answer: [LETTER]**'.",
-        schema_fragment={"detailed_explanation": types.Schema(type="STRING")}
+        schema_fragment={"detailed_explanation": types.Schema(type=types.Type.STRING)}
     ),
     "option_analysis": Modality(
         id="option_analysis",
@@ -30,12 +30,12 @@ MODALITIES: Dict[str, Modality] = {
         prompt_chunk="Explain why each option (A, B, C, D) is correct or incorrect.",
         schema_fragment={
             "option_analysis": types.Schema(
-                type="OBJECT",
+                type=types.Type.OBJECT,
                 properties={
-                    "A": types.Schema(type="STRING"),
-                    "B": types.Schema(type="STRING"),
-                    "C": types.Schema(type="STRING"),
-                    "D": types.Schema(type="STRING"),
+                    "A": types.Schema(type=types.Type.STRING),
+                    "B": types.Schema(type=types.Type.STRING),
+                    "C": types.Schema(type=types.Type.STRING),
+                    "D": types.Schema(type=types.Type.STRING),
                 }
             )
         }
@@ -46,12 +46,12 @@ MODALITIES: Dict[str, Modality] = {
         prompt_chunk="Generate 2-3 conceptual flashcards based on this question.",
         schema_fragment={
             "flashcards": types.Schema(
-                type="ARRAY",
+                type=types.Type.ARRAY,
                 items=types.Schema(
-                    type="OBJECT",
+                    type=types.Type.OBJECT,
                     properties={
-                        "question": types.Schema(type="STRING"),
-                        "answer": types.Schema(type="STRING"),
+                        "question": types.Schema(type=types.Type.STRING),
+                        "answer": types.Schema(type=types.Type.STRING),
                     }
                 )
             )

@@ -13,6 +13,7 @@ import shutil
 import json
 import uuid
 import base64
+import re
 from datetime import datetime
 
 # Import local services
@@ -220,6 +221,9 @@ async def receive_draft(
     curriculum: str = Form("Cambridge O/Level"),
     ls_profile: str = Form("default"),
     hia_mode: str = Form("Low"),
+    min_question_number: Optional[int] = Form(None),
+    max_question_number: Optional[int] = Form(None),
+    question_detection_mode: Optional[str] = Form(None),
     x_llm_provider: Optional[str] = Header(None, alias="X-LLM-Provider"),
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     x_model_id: Optional[str] = Header(None, alias="X-Model-ID"),
@@ -251,6 +255,11 @@ async def receive_draft(
             "curriculum": curriculum,
             "ls_profile": ls_profile,
             "hia_mode": hia_mode,
+            "extraction_overrides": {
+                "min_question_number": min_question_number,
+                "max_question_number": max_question_number,
+                "question_detection_mode": question_detection_mode,
+            },
             "llm_provider": x_llm_provider or "env-default",
             "status": "PROCESSING",
             "progress": 10,
@@ -261,7 +270,8 @@ async def receive_draft(
         run_automation_pipeline,
         draft_id, subject, paper_code, file_path,
         curriculum, ls_profile, hia_mode,
-        x_llm_provider, x_api_key, x_model_id
+        x_llm_provider, x_api_key, x_model_id,
+        min_question_number, max_question_number, question_detection_mode
     )
 
     return {"id": draft_id, "filename": file.filename, "status": "PROCESSING"}
@@ -275,9 +285,31 @@ async def run_automation_pipeline(
     llm_provider: Optional[str] = None,
     api_key: Optional[str] = None,
     model_id: Optional[str] = None,
+    min_question_number: Optional[int] = None,
+    max_question_number: Optional[int] = None,
+    question_detection_mode: Optional[str] = None,
 ):
     """Heavy lifting background task. Supports BYOK and PedagogyEngine."""
     meta_path = file_path.parent / "metadata.json"
+
+    def _extract_correct_answer(explanation: str) -> str:
+        match = re.search(r'Final Correct Answer\s*:\s*([A-D])', explanation or "", re.IGNORECASE)
+        return match.group(1).upper() if match else "N/A"
+
+    def _extract_option_analysis(option_text: str, option_keys: list[str]) -> dict[str, str]:
+        result = {k: "" for k in option_keys}
+        if not option_text:
+            return result
+        pattern = re.compile(
+            r'Option\s*([A-D])\s*:\s*(.*?)(?=Option\s*[A-D]\s*:|$)',
+            re.IGNORECASE | re.DOTALL
+        )
+        for match in pattern.finditer(option_text):
+            label = match.group(1).upper()
+            if label in result:
+                result[label] = re.sub(r'\s+', ' ', match.group(2)).strip()
+        return result
+
     try:
         # Build pedagogical system prompt from selected profile
         pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
@@ -285,6 +317,14 @@ async def run_automation_pipeline(
 
         # Initialize the modular PipelineOrchestrator
         router = ModelRoutingEngine()
+        valid_modes = {"strict", "balanced", "open"}
+        requested_mode = (question_detection_mode or "").strip().lower()
+        if requested_mode in valid_modes:
+            router.config.question_detection_mode = requested_mode
+        if min_question_number is not None:
+            router.config.min_question_number = min_question_number
+        if max_question_number is not None:
+            router.config.max_question_number = max_question_number
         
         # Inject BYOK overrides if provided
         if api_key:
@@ -297,7 +337,15 @@ async def run_automation_pipeline(
         # Update progress: extraction phase
         with open(meta_path, "r") as f:
             meta = json.load(f)
-        meta.update({"status": "PROCESSING", "progress": 40})
+        meta.update({
+            "status": "PROCESSING",
+            "progress": 40,
+            "resolved_extraction_settings": {
+                "min_question_number": router.config.min_question_number,
+                "max_question_number": router.config.max_question_number,
+                "question_detection_mode": router.config.question_detection_mode,
+            }
+        })
         with open(meta_path, "w") as f:
             json.dump(meta, f)
 
@@ -334,9 +382,14 @@ async def run_automation_pipeline(
             # Handle diagram extraction/encoding
             diagram_b64 = None
             stem_images = q.metadata.get("stem_images", [])
+            stem_images_b64 = q.metadata.get("stem_images_b64", [])
+            if stem_images_b64:
+                diagram_b64 = stem_images_b64[0]
             if stem_images and len(stem_images) > 0:
                 first_img = stem_images[0]
-                if str(first_img).startswith("data:image"):
+                if diagram_b64:
+                    pass
+                elif str(first_img).startswith("data:image"):
                     diagram_b64 = first_img
                 else:
                     try:
@@ -347,18 +400,23 @@ async def run_automation_pipeline(
                     except Exception as img_e:
                         print(f"Failed to encode diagram: {img_e}")
 
+            explanation_text = q.explanation_body or ""
+            option_text = q.option_wise_explanation or ""
+            option_analysis = _extract_option_analysis(option_text, list((q.options or {}).keys()))
+            correct_answer = q.correct_options[0] if q.correct_options else _extract_correct_answer(explanation_text)
+
             # Map to the exact schema review.js expects
             legacy_q = {
                 "question_number": q.question_number,
                 "text": q.question_text,
                 "options": q.options,
-                "correct_answer": q.correct_options[0] if q.correct_options else "N/A",
+                "correct_answer": correct_answer,
                 "status": "Draft",
                 "diagram_base64": diagram_b64,
                 "generated_content": {
-                    "core_concept": q.explanation_body or "",
-                    "detailed_explanation": q.option_wise_explanation or "",
-                    "option_analysis": {k: "" for k in q.options},
+                    "core_concept": explanation_text,
+                    "detailed_explanation": explanation_text,
+                    "option_analysis": option_analysis,
                     "flashcards": [{"question": f.front_text, "answer": f.back_text} for f in q.flashcards]
                 }
             }

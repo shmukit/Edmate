@@ -264,6 +264,27 @@
             </select>
         </div>
 
+        <div class="settings-group" style="background: rgba(16, 185, 129, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 20px;">
+            <span class="settings-label" style="color: var(--primary); font-weight: 600;">Extraction Guardrails (Admin)</span>
+            <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 10px;">Optional per-run override. Leave blank to use backend defaults from config.</p>
+
+            <span class="settings-label" style="font-size:0.7rem;">Detection Mode</span>
+            <select id="questionDetectionModeSelect" style="font-size:0.8rem; height:32px; margin-bottom:8px;">
+                <option value="">Use Backend Default</option>
+                <option value="strict">Strict</option>
+                <option value="balanced">Balanced</option>
+                <option value="open">Open</option>
+            </select>
+
+            <span class="settings-label" style="font-size:0.7rem;">Minimum Question Number</span>
+            <input type="number" id="minQuestionNumberInput" min="1" placeholder="Use backend default"
+                style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); margin-bottom:8px; box-sizing:border-box;">
+
+            <span class="settings-label" style="font-size:0.7rem;">Maximum Question Number</span>
+            <input type="number" id="maxQuestionNumberInput" min="1" placeholder="Use backend default"
+                style="width:100%; background:var(--bg); border:1px solid var(--card-border); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:var(--text-main); box-sizing:border-box;">
+        </div>
+
         <!-- BYOK API Key Configuration -->
         <div class="settings-group" style="background: rgba(251,191,36,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); margin-top: 20px;">
             <span class="settings-label" style="color: var(--primary); font-weight: 600;">🔑 API Key (BYOK)</span>

@@ -9,6 +9,9 @@ def test_config_load_defaults():
     config = CoreConfig.load_from_yaml("non_existent_config.yaml")
     assert isinstance(config, ModelConfig)
     assert config.max_budget == 10.0  # default
+    assert config.min_question_number == 1
+    assert config.max_question_number == 40
+    assert config.question_detection_mode == "balanced"
 
 
 def test_config_load_valid_yaml(tmp_path):
@@ -21,6 +24,11 @@ def test_config_load_valid_yaml(tmp_path):
         },
         "budget": {
             "max_daily_usd": 50.0
+        },
+        "extraction_settings": {
+            "min_question_number": 2,
+            "max_question_number": 120,
+            "question_detection_mode": "open"
         }
     }
     with open(config_file, "w") as f:
@@ -29,3 +37,6 @@ def test_config_load_valid_yaml(tmp_path):
     config = CoreConfig.load_from_yaml(str(config_file))
     assert config.extraction_model == "test/model"
     assert config.max_budget == 50.0
+    assert config.min_question_number == 2
+    assert config.max_question_number == 120
+    assert config.question_detection_mode == "open"

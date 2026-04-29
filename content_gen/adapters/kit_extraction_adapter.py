@@ -12,9 +12,20 @@ class KitExtractionAdapter(BaseExtractionAdapter):
     Uses multimodal vision models for precise diagram extraction.
     """
 
-    def __init__(self, use_gpu: bool = False):
+    def __init__(
+        self,
+        use_gpu: bool = False,
+        min_question_number: int = 1,
+        max_question_number: int | None = 40,
+        question_detection_mode: str = "balanced",
+    ):
         try:
-            self.wrapper = PDFExtractKitWrapper(use_gpu=use_gpu)
+            self.wrapper = PDFExtractKitWrapper(
+                use_gpu=use_gpu,
+                min_question_number=min_question_number,
+                max_question_number=max_question_number,
+                question_detection_mode=question_detection_mode,
+            )
         except Exception as e:
             raise RuntimeError(
                 f"Failed to initialize PDF-Extract-Kit: {e}\n"
@@ -31,16 +42,16 @@ class KitExtractionAdapter(BaseExtractionAdapter):
         # Mapping logic from raw extraction JSON to Pydantic models
         questions = []
         for q_data in result.get("questions", []):
-            # Handle images: Convert to base64 for UI visibility
-            stem_images = []
-            for img_path in q_data.get("stem_images", []):
+            stem_image_paths = list(q_data.get("stem_images", []))
+            stem_images_b64 = []
+            for img_path in stem_image_paths:
                 try:
                     if os.path.exists(img_path):
                         with open(img_path, "rb") as f:
                             b64 = base64.b64encode(f.read()).decode("utf-8")
-                            stem_images.append(f"data:image/png;base64,{b64}")
+                            stem_images_b64.append(f"data:image/png;base64,{b64}")
                 except Exception:
-                    stem_images.append(img_path)
+                    continue
 
             questions.append(ProcessedQuestion(
                 question_number=q_data.get("question_number", 0),
@@ -48,7 +59,8 @@ class KitExtractionAdapter(BaseExtractionAdapter):
                 options=q_data.get("options", {}),
                 subject="Physics",  # Default for 9702 papers
                 metadata={
-                    "stem_images": stem_images,
+                    "stem_images": stem_image_paths,
+                    "stem_images_b64": stem_images_b64,
                     "option_images": q_data.get("option_images", {})
                 }
             ))

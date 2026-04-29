@@ -56,3 +56,6 @@ class ModelConfig(BaseModel):
     max_budget: float = 10.0  # USD daily cap placeholder
     image_mode: str = "cdn"    # "cdn" or "base64"
     extraction_engine: str = "pdf_extract_kit"  # "pdf_extract_kit" or "pymupdf"
+    min_question_number: int = 1
+    max_question_number: Optional[int] = 40
+    question_detection_mode: str = "balanced"  # "strict" | "balanced" | "open"
