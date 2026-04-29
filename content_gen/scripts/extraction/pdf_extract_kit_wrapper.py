@@ -19,6 +19,7 @@ try:
     HAS_KIT = True
 except (ImportError, ModuleNotFoundError):
     HAS_KIT = False
+    initialize_tasks_and_models = None
     print("⚠️ PDF-Extract-Kit not found. Extraction features using this engine will be disabled.")
 import json
 import re
@@ -32,7 +33,7 @@ class PDFExtractKitWrapper:
     compatible with the old smart_extract.py output format
     """
 
-    def __init__(self, pdf_path: str = None, output_dir: str = None, use_gpu: bool = False):
+    def __init__(self, pdf_path: Optional[str] = None, output_dir: Optional[str] = None, use_gpu: bool = False):
         """
         Initialize PDF extractor
 
@@ -53,7 +54,7 @@ class PDFExtractKitWrapper:
             script_path = Path(__file__).parent.absolute()
             self.output_dir = script_path.parent.parent / "data" / "extracted"
         if self.pdf_path:
-            self.base_name = Path(pdf_path).stem
+            self.base_name = Path(self.pdf_path).stem
             # Create PDF-specific subfolder for images
             self.images_dir = self.output_dir / "images" / self.base_name
             self.images_dir.mkdir(parents=True, exist_ok=True)
@@ -73,6 +74,10 @@ class PDFExtractKitWrapper:
         """Initialize PDF-Extract-Kit AI models"""
         if not HAS_KIT:
             print("❌ Cannot initialize models: PDF-Extract-Kit not found in tools/")
+            self.layout_detector = None
+            return
+        if initialize_tasks_and_models is None:
+            print("❌ Cannot initialize models: config loader is unavailable")
             self.layout_detector = None
             return
 
@@ -118,6 +123,14 @@ class PDFExtractKitWrapper:
         """
         if not HAS_KIT:
             raise RuntimeError("Extraction failed: PDF-Extract-Kit is not installed or found in tools/")
+        if not self.pdf_path:
+            raise ValueError("pdf_path must be set before calling extract()")
+        if not self.output_dir or not self.base_name or not self.images_dir or not self.outputs_dir:
+            raise ValueError(
+                "output_dir/base_name/images_dir/outputs_dir must be initialized before calling extract()"
+            )
+        if self.layout_detector is None:
+            raise RuntimeError("Layout detector is not initialized")
 
         doc = fitz.open(self.pdf_path)
         all_questions = []
@@ -299,11 +312,17 @@ class PDFExtractKitWrapper:
                             questions[q_num]["options"][current_field] += " " + line_text
 
         # Handle images
+        layout_detector = self.layout_detector
+        if layout_detector is None:
+            raise RuntimeError("Layout detector is not initialized")
+        images_dir = self.images_dir
+        if images_dir is None:
+            raise ValueError("images_dir must be initialized before processing page images")
         pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-        temp_img_path = self.images_dir / f"_temp_page_{page_num}.png"
+        temp_img_path = images_dir / f"_temp_page_{page_num}.png"
         pix.save(str(temp_img_path))
-        results = self.layout_detector.predict_images(
-            str(temp_img_path), str(self.images_dir))
+        results = layout_detector.predict_images(
+            str(temp_img_path), str(images_dir))
         layout_result = results[0]
         boxes = layout_result.boxes
 
@@ -312,7 +331,7 @@ class PDFExtractKitWrapper:
             xyxy = box.xyxy[0].tolist()
             pdf_bbox = [c / 2 for c in xyxy]
             y_mid = (pdf_bbox[1] + pdf_bbox[3]) / 2
-            type_name = self.layout_detector.model.id_to_names.get(
+            type_name = layout_detector.model.id_to_names.get(
                 cls, "unknown")
 
             if type_name in ["figure", "table", "isolate_formula"]:
@@ -338,7 +357,27 @@ class PDFExtractKitWrapper:
         return list(questions.values())
 
     def _clean_noise(self, text: str) -> str:
-        """Filter global noise from reconstructed text parts"""
+        """Filter global noise and map symbols from reconstructed text parts"""
+        # Symbol mapping for common Greek/Math characters found in Cambridge papers
+        symbol_map = {
+            "\uf070": "π",
+            "\uf061": "α",
+            "\uf062": "β",
+            "\uf067": "γ",
+            "\uf044": "Δ",
+            "\uf0b0": "°",
+            "\uf0b1": "±",
+            "\uf0e6": "(",
+            "\uf0f6": ")",
+            "\uf0e7": "[",
+            "\uf0f7": "]",
+            "\uf03d": "=",
+            "\uf02b": "+",
+            "\uf02d": "–",
+        }
+        for code, char in symbol_map.items():
+            text = text.replace(code, char)
+            
         text = re.sub(r'\d{4}/\d{2}/\w+/\d{2}', '', text)
         text = re.sub(r'© UCLES.*', '', text, flags=re.I)
         text = re.sub(r'\[Turn over', '', text, flags=re.I)
@@ -367,13 +406,17 @@ class PDFExtractKitWrapper:
 
     def _generate_processed_text(self, output_data: Dict):
         """Generate the standard processed text file in data/outputs following prompts.py"""
-        text_path = self.outputs_dir / f"{self.base_name}_processed.txt"
+        outputs_dir = self.outputs_dir
+        base_name = self.base_name
+        if outputs_dir is None or base_name is None:
+            raise ValueError("outputs_dir and base_name must be initialized before generating processed text")
+        text_path = outputs_dir / f"{base_name}_processed.txt"
 
         # Group duplicates (e.g. question split across pages)
         final_questions = {}
         for q in output_data["questions"]:
             num = q["question_number"]
-            if 1 <= num <= 40:
+            if 1 <= num <= 100:
                 if num not in final_questions:
                     final_questions[num] = q
                 else:
@@ -454,7 +497,7 @@ class PDFExtractKitWrapper:
                     match = re.match(r'^(\d+)\s+([A-Z\d])', line_text)
                     if match:
                         q_num = int(match.group(1))
-                        if 1 <= q_num <= 40:  # STRICT LIMIT
+                        if 1 <= q_num <= 100:  # Increased limit
                             y_pos = line["bbox"][1]
                             question_positions.append((q_num, y_pos))
                             continue
@@ -462,7 +505,7 @@ class PDFExtractKitWrapper:
                     # Pattern 2: Number on separate line (Q1-9)
                     if re.match(r'^\d+$', line_text):
                         q_num = int(line_text)
-                        if 1 <= q_num <= 40:  # STRICT LIMIT
+                        if 1 <= q_num <= 100:  # Increased limit
                             # Check next line/block for validation
                             is_question = False
 
@@ -551,8 +594,11 @@ class PDFExtractKitWrapper:
         ]
 
         # Generate filename
+        images_dir = self.images_dir
+        if images_dir is None:
+            raise ValueError("images_dir must be initialized before extracting images")
         img_name = f"q{q_num}_{element_type}.png"
-        img_path = self.images_dir / img_name
+        img_path = images_dir / img_name
 
         # Extract high-resolution image
         pix = page.get_pixmap(matrix=fitz.Matrix(3, 3),

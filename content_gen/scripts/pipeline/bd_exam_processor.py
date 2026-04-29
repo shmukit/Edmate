@@ -4,7 +4,7 @@ import json
 import re
 from pathlib import Path
 import fitz # PyMuPDF
-from typing import List, Dict
+from typing import List, Dict, cast
 from dotenv import load_dotenv
 
 # Add project root to sys.path
@@ -42,7 +42,7 @@ class BDExamProcessor:
         doc = fitz.open(str(pdf_path))
         text = ""
         for page in doc:
-            text += page.get_text()
+            text += cast(str, page.get_text("text"))
         doc.close()
         return text
 

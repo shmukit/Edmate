@@ -1,14 +1,15 @@
 import os
 import litellm
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, cast
 from content_gen.core.schemas import ModelConfig
 from content_gen.core.config import CoreConfig
 from content_gen.core.metrics import MetricsTracker
 
 # Set up callbacks for observability if requested
 # Users can set LITELLM_CALLBACKS=["opik"] in their .env
-if os.getenv("LITELLM_CALLBACKS"):
-    litellm.success_callback = os.getenv("LITELLM_CALLBACKS").split(",")
+litellm_callbacks = os.getenv("LITELLM_CALLBACKS")
+if litellm_callbacks:
+    litellm.success_callback = litellm_callbacks.split(",")
 
 
 class BudgetExceededError(Exception):
@@ -61,7 +62,7 @@ class ModelRoutingEngine:
 
         # Handle Multimodal
         if images:
-            content = [{"type": "text", "text": prompt}]
+            content: List[Dict[str, Any]] = [{"type": "text", "text": prompt}]
             for img in images:
                 content.append(
                     {"type": "image_url", "image_url": {"url": img}})
@@ -80,7 +81,12 @@ class ModelRoutingEngine:
         # 4. Log usage (The Analytics Layer)
         self.tracker.log_usage(response)
 
-        return response.choices[0].message.content
+        response_obj = cast(Any, response)
+        if not hasattr(response_obj, "choices"):
+            raise RuntimeError("Unexpected streaming response received from litellm.completion")
+
+        content = response_obj.choices[0].message.content
+        return content if isinstance(content, str) else str(content)
 
     def get_summary(self) -> Dict[str, Any]:
         """Returns the current metrics and routing config."""

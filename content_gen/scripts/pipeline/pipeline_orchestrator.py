@@ -2,7 +2,7 @@ import os
 import sys
 import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, cast
 import argparse
 import base64
 
@@ -21,8 +21,8 @@ from content_gen.scripts.processing.content_generator import ContentGenerator
 class PipelineOrchestrator:
     def __init__(
         self,
-        storage_bucket: str = None,
-        db_connection: str = None,
+        storage_bucket: Optional[str] = None,
+        db_connection: Optional[str] = None,
         router: Optional[ModelRoutingEngine] = None
     ):
         """
@@ -67,8 +67,8 @@ class PipelineOrchestrator:
         pdf_path: str,
         output_dir: str,
         subject: str,
-        difficulty: str = "Medium",
-        topics: List[str] = None,
+        difficulty: Optional[str] = "Medium",
+        topics: Optional[List[str]] = None,
         cleanup_images: bool = False
     ) -> Dict:
         """
@@ -116,11 +116,17 @@ class PipelineOrchestrator:
                     if b64_str:
                         cdn_mapping[img_path.name] = b64_str
             else:
+                storage_bucket = self.storage_bucket
+                if storage_bucket is None:
+                    raise ValueError("storage_bucket must be set to upload images")
                 print(
-                    f"☁️ Uploading {len(images)} images to {self.storage_bucket}...")
-                uploader = StorageUploader(self.storage_bucket)
-                cdn_mapping = uploader.upload_batch(
-                    images, base_path=f"diagrams/{pdf_name}")
+                    f"☁️ Uploading {len(images)} images to {storage_bucket}...")
+                uploader = StorageUploader()
+                cdn_mapping, _ = uploader.upload_directory(
+                    images_dir=str(Path(output_dir)),
+                    container=storage_bucket,
+                    base_path=f"diagrams/{pdf_name}",
+                )
 
             try:
                 print("📥 Step 3: Persisting to Database...")
@@ -153,8 +159,8 @@ class PipelineOrchestrator:
         input_dir: str,
         output_dir: str,
         subject: str,
-        difficulty: str = None,
-        topics: List[str] = None,
+        difficulty: Optional[str] = None,
+        topics: Optional[List[str]] = None,
         cleanup_images: bool = False
     ) -> Dict:
         """
@@ -192,7 +198,7 @@ class PipelineOrchestrator:
 
         for pdf_path in pdf_files:
             report = self.process_pdf(
-                pdf_path=pdf_path,
+                pdf_path=str(pdf_path),
                 output_dir=output_dir,
                 subject=subject,
                 difficulty=difficulty,
@@ -262,7 +268,7 @@ def main():
     args = parser.parse_args()
 
     # Get database URL
-    db_url = args.db_url or os.getenv("DATABASE_URL")
+    db_url: Optional[str] = cast(Optional[str], args.db_url or os.getenv("DATABASE_URL"))
 
     # Create schema if requested
     if args.create_schema and db_url:

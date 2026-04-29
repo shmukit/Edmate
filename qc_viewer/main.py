@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Any, Optional, cast
 import uvicorn
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -92,14 +92,15 @@ async def get_papers():
                 cur.execute(
                     f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table}')"
                 )
-                if not cur.fetchone()["exists"]:
+                table_exists_row = cast(Optional[dict[str, Any]], cur.fetchone())
+                if not table_exists_row or not table_exists_row["exists"]:
                     continue
                 # Extract paper code = question_identifier with trailing /Q<n> stripped
                 cur.execute(
                     r"SELECT DISTINCT regexp_replace(question_identifier, '/Q?\d+$', '') AS code"
                     f" FROM {table} WHERE question_identifier IS NOT NULL"
                 )
-                for row in cur.fetchall():
+                for row in cast(list[dict[str, Any]], cur.fetchall()):
                     code = row["code"]
                     if code:
                         papers.append({"code": code, "table": table})
@@ -161,7 +162,7 @@ async def verify_question(table: str, question_id: str, is_verified: bool):
 
 
 @app.get("/api/flashcards")
-async def get_flashcards(topic_id: str = None, subtopic_id: str = None, question_id: str = None):
+async def get_flashcards(topic_id: Optional[str] = None, subtopic_id: Optional[str] = None, question_id: Optional[str] = None):
     conn = get_db()
     if not conn:
         raise HTTPException(
@@ -334,13 +335,17 @@ async def run_automation_pipeline(
             diagram_b64 = None
             stem_images = q.metadata.get("stem_images", [])
             if stem_images and len(stem_images) > 0:
-                try:
-                    img_path = Path(stem_images[0])
-                    if img_path.exists():
-                        with open(img_path, "rb") as img_f:
-                            diagram_b64 = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
-                except Exception as img_e:
-                    print(f"Failed to encode diagram: {img_e}")
+                first_img = stem_images[0]
+                if str(first_img).startswith("data:image"):
+                    diagram_b64 = first_img
+                else:
+                    try:
+                        img_path = Path(first_img)
+                        if img_path.exists():
+                            with open(img_path, "rb") as img_f:
+                                diagram_b64 = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
+                    except Exception as img_e:
+                        print(f"Failed to encode diagram: {img_e}")
 
             # Map to the exact schema review.js expects
             legacy_q = {
@@ -578,7 +583,7 @@ async def refine_explanation(feedback: str, original_q: str):
         refined = router.generate_content(prompt, task_type="generation")
         return {
             "explanation": refined,
-            "model": router.config.get_model_id("generation"),
+            "model": router.config.generation_model,
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
