@@ -36,10 +36,12 @@ export const AutomationAPI = {
             xhr.open('POST', '/api/automate/draft', true);
 
             // Only set BYOK headers if the user provided a key
-            const resolvedProvider = byokProvider || providerHint;
-            if (resolvedProvider) xhr.setRequestHeader('X-LLM-Provider', resolvedProvider);
-            if (byokKey)      xhr.setRequestHeader('X-API-Key', byokKey);
-            if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
+            if (byokKey) {
+                const resolvedProvider = byokProvider || providerHint;
+                if (resolvedProvider) xhr.setRequestHeader('X-LLM-Provider', resolvedProvider);
+                xhr.setRequestHeader('X-API-Key', byokKey);
+                if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
+            }
 
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable && onProgress) {

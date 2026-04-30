@@ -67,6 +67,7 @@ export const ReviewController = {
         const qType = q.type || 'mcq';
 
         if (qType === 'mcq') {
+            const opts = q.options || { A: '', B: '', C: '', D: '' };
             typeSpecificHtml = `
                 <div style="margin-top:20px; border-top: 1px solid #e2e8f0; padding-top:12px;">
                     <b style="color:var(--primary); font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Options</b>
@@ -75,7 +76,7 @@ export const ReviewController = {
                             <div class="edit-group opt-field" id="group-opt-${opt}">
                                 <label class="field-label" style="font-weight:700; text-transform:uppercase; font-size:0.7rem;">Option ${opt}</label>
                                 ${this.renderImageWrapper(q[`option_${opt}_diagram_base64`], `option_${opt}_diagram_base64`, true)}
-                                <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${q.options ? q.options[opt] || '' : ''}</textarea>
+                                <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${opts[opt] || ''}</textarea>
                                 <div id="preview-opt-${opt}" class="preview-render-box" style="padding:8px; font-size:0.88rem; min-height:36px;"></div>
                             </div>
                         `).join('')}
@@ -206,13 +207,23 @@ export const ReviewController = {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Convert Markdown to HTML
-        const html = marked.parse(text || '');
-        container.innerHTML = html;
+        if (!text || text.trim() === '' || text === '[PARSING_FAILED]') {
+            container.innerHTML = '<span style="color:var(--text-dim); font-style:italic; font-size:0.8rem;">No content generated for this section.</span>';
+            return;
+        }
 
-        // Trigger MathJax typesetting
-        if (window.MathJax) {
-            MathJax.typesetPromise([container]).catch((err) => console.log('MathJax Error:', err));
+        // Convert Markdown to HTML
+        try {
+            const html = marked.parse(text || '');
+            container.innerHTML = html;
+
+            // Trigger MathJax typesetting
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]).catch((err) => console.log('MathJax Error:', err));
+            }
+        } catch (e) {
+            console.warn('Markdown parsing failed, falling back to raw text:', e);
+            container.textContent = text;
         }
     },
 
@@ -287,10 +298,16 @@ export const ReviewController = {
             question_data: {
                 question_identifier: `${this.currentDraftData.id}/Q${q.question_number}`,
                 title: q.text,
-                options: [q.options.A, q.options.B, q.options.C, q.options.D],
+                options: [q.options?.A || '', q.options?.B || '', q.options?.C || '', q.options?.D || ''],
                 correct_options: [mappedCorrect],
-                option_explanations: gen.option_analysis ? [gen.option_analysis.A, gen.option_analysis.B, gen.option_analysis.C, gen.option_analysis.D] : [],
-                detailed_explanation: gen.detailed_explanation,
+                option_explanations: [
+                    gen.option_analysis?.A || 'No analysis available.',
+                    gen.option_analysis?.B || 'No analysis available.',
+                    gen.option_analysis?.C || 'No analysis available.',
+                    gen.option_analysis?.D || 'No analysis available.'
+                ],
+                detailed_explanation: gen.detailed_explanation || 'No detailed explanation available.',
+                core_concept: gen.core_concept || '',
                 topic_id: null, 
                 subtopic_id: null,
                 diagrams: q.diagram_base64 ? [q.diagram_base64] : [],

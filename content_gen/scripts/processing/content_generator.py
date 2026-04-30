@@ -228,8 +228,8 @@ class ContentGenerator:
             f.write(response)
 
         # More robust splitting
-        # Look for "Question X", "Q1", markdown headers, etc.
-        header_pattern = r'(?i)(?:^|\n)(?:[#\-\*]+)?\s*(?:Question|Q)\s*[:\s]*(\d+)\s*(?:[#\-\*]+)?'
+        # Look for "Question X", "Q1", markdown headers, or just digits followed by period/brace
+        header_pattern = r'(?mi)^\s*(?:#+\s*)?(?:Question|Q|Problem)?\s*[:\s]*(\d+)\s*[:\.\-\)]*\s*$'
         sections = re.split(header_pattern, response)
         if len(sections) < 3:
             alt_pattern = r'(?m)^\s*(?:#+\s*)?(\d{1,3})[\)\.\:\-]\s+'
@@ -237,11 +237,14 @@ class ContentGenerator:
 
         # Fallback for single question batches or if headers were omitted
         if len(sections) < 3:
+            # If we expected multiple questions but got none, try a simpler digit-only header
+            alt_pattern = r'(?mi)^\s*(\d{1,3})\s*$'
+            sections = re.split(alt_pattern, response)
+
+        if len(sections) < 3:
             if len(batch_indices) == 1:
                 results[batch_indices[0]] = self._parse_single_content(response)
                 return results
-            # For multi-question batches with malformed headers, return empty mapping
-            # so caller can selectively retry failed questions only.
             return results
 
         for i in range(1, len(sections), 2):
@@ -273,11 +276,15 @@ class ContentGenerator:
 
         # Robust fallback for uncooperative LLMs or misplaced markers
         if not explanation_body:
-            # Look for content between Question header and first marker or section title
-            parts = re.split(
-                r'(?is)\[[A-Z_]+_START\]|Explanation|Analysis', content)
-            if len(parts) > 1 and len(parts[0].strip()) > 50:
+            # Look for content before any other marker
+            parts = re.split(r'(?is)\[[A-Z_]+_START\]|Option Wise|Concept Gap|Flashcards|###|---', content)
+            if parts and len(parts[0].strip()) > 30:
                 explanation_body = parts[0].strip()
+            else:
+                # Try to find anything that looks like an explanation
+                fallback_match = re.search(r'(?is)(?:Detailed Explanation|Explanation)\s*[:\s]*(.*?)(?=\[[A-Z_]+_START\]|Option Wise|Concept Gap|Flashcards|###|---|$)', content)
+                if fallback_match:
+                    explanation_body = fallback_match.group(1).strip()
 
         if not options_body and "Option" in content:
             parts = re.split(r'(?is)\[OE_START\]|Option Wise', content)

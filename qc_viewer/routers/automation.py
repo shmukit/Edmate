@@ -13,6 +13,7 @@ from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.scripts.processing.database_service import DatabaseService
 from qc_viewer.config import DRAFTS_ROOT
 from qc_viewer.services.automation_pipeline import CANCELLATION_EVENTS, run_automation_pipeline
+from pydantic import BaseModel
 from qc_viewer.services.draft_store import (
     delete_draft_data,
     ensure_drafts_root,
@@ -23,6 +24,17 @@ from qc_viewer.services.draft_store import (
     sort_key_from_timestamp,
     write_json,
 )
+
+
+class PublishRequest(BaseModel):
+    draft_id: str
+    table_name: str
+    question_data: dict
+
+
+class RefineRequest(BaseModel):
+    feedback: str
+    original_q: dict
 
 
 router = APIRouter()
@@ -204,13 +216,13 @@ async def delete_draft(draft_id: str):
 
 
 @router.post("/api/automate/publish")
-async def publish_draft(draft_id: str, table_name: str, question_data: dict):
-    if not table_name or not question_data:
+async def publish_draft(request: PublishRequest):
+    if not request.table_name or not request.question_data:
         raise HTTPException(status_code=400, detail="Missing table_name or question_data")
 
     db = DatabaseService()
     try:
-        success = db.inject_question(table_name, question_data)
+        success = db.inject_question(request.table_name, request.question_data)
         return {"status": "success" if success else "failed"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -253,20 +265,22 @@ async def get_config():
 
 
 @router.post("/api/automate/refine")
-async def refine_explanation(feedback: str, original_q: str):
-    if not feedback or not original_q:
+async def refine_explanation(request: RefineRequest):
+    if not request.feedback or not request.original_q:
         raise HTTPException(status_code=400, detail="Missing feedback or original_q")
 
     routing_engine = ModelRoutingEngine()
     prompt = (
         "Original Question and Explanation:\n"
-        f"{original_q}\n\n"
+        f"{json.dumps(request.original_q, indent=2)}\n\n"
         "User Feedback:\n"
-        f"{feedback}\n\n"
+        f"{request.feedback}\n\n"
         "Please refine the explanation to address the feedback. Keep the tone educational and clear."
     )
 
     try:
+        # For refinement, we want a more capable model
+        routing_engine.config.generation_model = "openai/gpt-4o"
         refined = routing_engine.generate_content(prompt, task_type="generation")
         return {
             "explanation": refined,
