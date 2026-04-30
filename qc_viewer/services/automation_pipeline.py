@@ -272,7 +272,12 @@ async def run_automation_pipeline(
             explanation_text = q.explanation_body or ""
             option_text = q.option_wise_explanation or ""
             option_analysis = extract_option_analysis(option_text, list((q.options or {}).keys()))
-            core_concept = extract_core_concept(explanation_text)
+            
+            # Prioritize dedicated Core Concept from LLM
+            core_concept = (q.metadata or {}).get("core_concept_generated")
+            if not core_concept:
+                core_concept = extract_core_concept(explanation_text)
+                
             quality_report = (q.metadata or {}).get("generation_quality", {})
 
             # Normalize Correct Answer

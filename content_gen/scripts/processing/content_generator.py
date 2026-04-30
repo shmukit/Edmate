@@ -135,6 +135,8 @@ class ContentGenerator:
         # Enrich the existing ProcessedQuestion with generated content
         q.explanation_body = content.get("explanation_generated")
         q.option_wise_explanation = content.get("options_explanation_generated")
+        # We store the core concept in metadata for extraction by the pipeline later
+        q.metadata["core_concept_generated"] = content.get("core_concept_generated")
         q.metadata["generation_quality"] = quality_report
         
         if content.get("flashcards_generated"):
@@ -263,6 +265,11 @@ class ContentGenerator:
 
     def _parse_single_content(self, content: str) -> Dict:
         """Helper to parse markers from a single question block."""
+        # 0. Core Concept
+        cc_match = re.search(
+            r'(?is)\[CC_START\]\s*(.*?)\s*\[CC_END\]', content)
+        core_concept = cc_match.group(1).strip() if cc_match else ""
+
         # 1. Detailed Explanation
         de_match = re.search(
             r'(?is)\[DE_START\]\s*(.*?)\s*\[DE_END\]', content)
@@ -279,6 +286,13 @@ class ContentGenerator:
         gap_body = ga_match.group(1).strip() if ga_match else ""
 
         # Robust fallback for uncooperative LLMs or misplaced markers
+        if not core_concept and explanation_body:
+            # Try to extract the first part of the explanation as core concept
+            # matching the old behavior but cleaner
+            parts = re.split(r'(?i)Step\s*1|Analyze Step 1|Final Correct Answer', explanation_body)
+            if parts and len(parts[0].strip()) > 10:
+                core_concept = parts[0].strip()
+
         if not explanation_body:
             # Look for content before any other marker
             parts = re.split(r'(?is)\[[A-Z_]+_START\]|Option Wise|Concept Gap|Flashcards|###|---', content)
@@ -307,6 +321,7 @@ class ContentGenerator:
             explanation_body = content.strip()
 
         return {
+            "core_concept_generated": core_concept,
             "explanation_generated": explanation_body or "[PARSING_FAILED]",
             "options_explanation_generated": options_body,
             "flashcards_generated": gap_body
