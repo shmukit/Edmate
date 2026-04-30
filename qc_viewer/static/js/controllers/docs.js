@@ -34,18 +34,6 @@ export const DocsController = {
             gfm: true,
             breaks: true
         });
-
-        const renderer = new marked.Renderer();
-        renderer.code = (codeOrToken, infostring) => {
-            const code = typeof codeOrToken === 'object' ? (codeOrToken.text || '') : codeOrToken;
-            const tokenLang = typeof codeOrToken === 'object' ? codeOrToken.lang : '';
-            const lang = (tokenLang || infostring || '').trim().toLowerCase();
-            if (lang === 'mermaid') {
-                return `<div class="mermaid">${code}</div>`;
-            }
-            return `<pre><code>${this.escapeHtml(code)}</code></pre>`;
-        };
-        marked.use({ renderer });
     },
 
     initializeMermaid() {
@@ -80,6 +68,7 @@ export const DocsController = {
             const md = await resp.text();
             
             content.innerHTML = marked.parse(md);
+            this.normalizeMermaidBlocks(content);
             await this.renderMermaid(content);
             
             // Re-render MathJax
@@ -117,6 +106,20 @@ export const DocsController = {
         } catch (e) {
             console.warn('Mermaid render failed:', e);
         }
+    },
+
+    normalizeMermaidBlocks(container) {
+        const codeBlocks = container.querySelectorAll('pre > code.language-mermaid, pre > code.lang-mermaid');
+        codeBlocks.forEach((code) => {
+            const pre = code.parentElement;
+            if (!pre || !pre.parentElement) return;
+
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            // Use textContent to preserve diagram text exactly as authored.
+            div.textContent = code.textContent || '';
+            pre.parentElement.replaceChild(div, pre);
+        });
     },
 
     escapeHtml(text) {
