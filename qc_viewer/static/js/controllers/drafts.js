@@ -2,80 +2,106 @@ import { AutomationAPI } from '../automate_api.js';
 
 export const DraftController = {
     activeStreams: {},
-    currentUploadingDraftId: null,
 
     async handleUpload(file) {
-        const container = document.getElementById('progressContainer');
-        const bar = document.getElementById('progressBar');
         const text = document.getElementById('uploadText');
+        const uploadPrompt = document.querySelector('.upload-prompt');
         
-        container.style.display = 'block';
-        text.textContent = 'Uploading: 0%';
+        // Disable upload zone temporarily
+        if (uploadPrompt) uploadPrompt.style.opacity = '0.5';
+        text.textContent = `Uploading ${file.name}...`;
 
         try {
             const subject = document.getElementById('curriculumSelect')?.value || 'General';
             const paperCode = document.getElementById('targetTableSelect')?.value || '';
             
-            text.textContent = 'Uploading: 0%';
-            
-            const result = await AutomationAPI.uploadPDF(file, subject, paperCode, (percent) => {
-                bar.style.width = percent + '%';
-                text.textContent = `Uploading: ${percent}%`;
-                if (percent === 100) {
-                    text.textContent = 'Upload received! Initializing extraction...';
-                }
-            });
+            // Upload the file
+            const result = await AutomationAPI.uploadPDF(file, subject, paperCode);
 
-            this.showToast('✅ Upload complete. Starting extraction...');
+            // Toast is enough
+            this.showToast(`✅ Added ${file.name} to processing queue.`);
             
-            // IMMEDIATE HANDOVER: Transition to 15% right away to eliminate the sync gap
+            // Reset upload zone immediately
+            if (uploadPrompt) uploadPrompt.style.opacity = '1';
+            text.textContent = 'Click to upload or drag and drop';
+
+            // IMMEDIATE HANDOVER: Inject the card right away without waiting for any fetches
             if (result && result.id) {
-                this.currentUploadingDraftId = result.id;
                 const handoverState = {
                     id: result.id,
                     filename: file.name,
                     status: 'PROCESSING',
-                    progress: 15,
+                    progress: 10,
                     status_message: 'Initializing AI pipeline...',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    questions: []
                 };
                 
-                // Add to list and update UI immediately
-                // We use a local variable to avoid race conditions with AutomationAPI.fetchDrafts
-                let currentDrafts = [];
-                try {
-                    currentDrafts = await AutomationAPI.fetchDrafts();
-                } catch (e) {
-                    console.warn("Initial fetch failed, using local handover only.");
+                // Read current state from DOM instead of fetching, or just force render
+                // We'll append a dummy card directly to the DOM to be truly instant
+                const draftList = document.getElementById('draftList');
+                if (draftList) {
+                    // Remove "No extraction drafts" message if present
+                    const subtitle = draftList.querySelector('.subtitle');
+                    if (subtitle) subtitle.remove();
+                    
+                    // Prepend the new card HTML
+                    const dateStr = 'Just now';
+                    const newCardHTML = `
+                    <div class="draft-card processing-active" data-id="${result.id}">
+                        <div class="draft-info">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+                                <h3 style="margin:0;">${file.name}</h3>
+                            </div>
+                            <p>
+                                <span>${dateStr}</span>
+                                <span class="status-message-streaming" style="font-size:0.75rem;"> • Initializing AI pipeline...</span>
+                            </p>
+                            <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                                <div style="width: 10%; height: 100%; background: var(--primary-light); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                            </div>
+                            <span style="font-size: 0.7rem; color: var(--primary-light);">10% complete</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span class="status-badge status-processing">PROCESSING</span>
+                            <div class="action-buttons">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="loader" style="width:16px; height:16px;"></span>
+                                    <button class="btn btn-outline btn-sm btn-stop" data-id="${result.id}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
+                                </div>
+                                <button class="btn btn-outline btn-sm btn-delete" data-id="${result.id}" style="border:none; color:var(--danger)">×</button>
+                            </div>
+                        </div>
+                    </div>`;
+                    
+                    draftList.insertAdjacentHTML('afterbegin', newCardHTML);
+                    
+                    // Attach event listeners to the new card
+                    const newCard = draftList.firstElementChild;
+                    newCard.querySelector('.btn-stop')?.addEventListener('click', (e) => { e.stopPropagation(); this.stopProcessing(result.id); });
+                    newCard.querySelector('.btn-delete')?.addEventListener('click', (e) => { e.stopPropagation(); this.deleteDraft(result.id); });
+                    
+                    // Scroll to it
+                    draftList.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
-                if (!currentDrafts.find(d => d.id === result.id)) {
-                    currentDrafts.unshift(handoverState);
-                }
-                
-                this.renderDrafts(currentDrafts);
-                this.updateDraftUI(handoverState);
-
-                // Start streaming
+                // Connect to stream immediately
                 this.setupStreaming(result.id);
+                
+                // Now we can safely fetch in the background to sync other drafts
+                AutomationAPI.fetchDrafts().then(drafts => {
+                    // Ensure our new draft is in the list if the fetch returns quickly
+                    if (!drafts.find(d => d.id === result.id)) {
+                        drafts.unshift(handoverState);
+                    }
+                    this.renderDrafts(drafts);
+                }).catch(e => console.warn("Background fetch failed", e));
             }
 
-            // Reset upload zone and focus on the list
-            setTimeout(() => {
-                container.style.display = 'none';
-                bar.style.width = '0%';
-                // Reset text to default state
-                const uploadPrompt = document.querySelector('.upload-prompt');
-                if (uploadPrompt) uploadPrompt.style.display = 'flex';
-                text.textContent = 'Click to upload or drag and drop';
-                
-                // Smooth scroll to the draft list if a new draft was added
-                if (result && result.id) {
-                    document.getElementById('draftList')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 1500);
         } catch (error) {
             this.showToast('❌ Upload failed: ' + error.message, 'danger');
+            if (uploadPrompt) uploadPrompt.style.opacity = '1';
+            text.textContent = 'Click to upload or drag and drop';
         }
     },
 
@@ -207,26 +233,7 @@ export const DraftController = {
     },
 
     updateDraftUI(d) {
-        // 1. Update the top-level upload zone if this is the active upload
-        if (d.id === this.currentUploadingDraftId) {
-            const topBar = document.getElementById('progressBar');
-            const topText = document.getElementById('uploadText');
-            const topContainer = document.getElementById('progressContainer');
-            
-            if (topBar) topBar.style.width = `${d.progress || 0}%`;
-            if (topText) topText.textContent = d.status_message || `${d.progress || 0}% complete`;
-            if (topContainer) topContainer.style.display = 'block';
-
-            if (d.status === 'PROCESSED' || d.status === 'FAILED') {
-                setTimeout(() => {
-                    if (this.currentUploadingDraftId === d.id) {
-                        topContainer.style.display = 'none';
-                        topText.textContent = 'Click to upload or drag and drop';
-                        this.currentUploadingDraftId = null;
-                    }
-                }, 5000);
-            }
-        }
+        // 1. (Removed top-level progress bar update as per UAC)
 
         // 2. Update the specific draft card
         const card = document.querySelector(`.draft-card[data-id="${d.id}"]`);
