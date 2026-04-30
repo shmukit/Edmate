@@ -4,6 +4,7 @@ import json
 import os
 import re
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -223,24 +224,31 @@ def run_automation_pipeline(
 
         _update_progress(15, "Starting AI-powered extraction pipeline...")
 
+        t_pipeline_start = time.time()
+        
+        t_extraction_start = time.time()
         questions_payload = []
         extracted = orchestrator.extractor.extract_content(
             file_path,
             Path(draft_dir),
             progress_callback=_update_progress,
         )
-        print(f"DEBUG: Extracted {len(extracted)} questions from PDF.")
+        t_extraction_end = time.time()
+        print(f"DEBUG: Extracted {len(extracted)} questions from PDF in {t_extraction_end - t_extraction_start:.2f}s.")
 
         _update_progress(60, "Applying Learning Science & Pedagogy Analysis...", processed_count=0, total_count=len(extracted))
 
+        t_generation_start = time.time()
         generated = orchestrator.generator.generate_for_questions(
             extracted,
             subject=subject,
             progress_callback=_update_progress,
             pedagogy_system_prompt=pedagogy_system_prompt,
         )
-        print(f"DEBUG: Generated content for {len(generated)} questions.")
+        t_generation_end = time.time()
+        print(f"DEBUG: Generated content for {len(generated)} questions in {t_generation_end - t_generation_start:.2f}s.")
 
+        t_normalization_start = time.time()
         total_questions = len(generated)
         for i, q in enumerate(generated):
             processed_count = i + 1
@@ -313,6 +321,18 @@ def run_automation_pipeline(
             }
             questions_payload.append(legacy_q)
 
+        t_normalization_end = time.time()
+        t_pipeline_end = time.time()
+        
+        telemetry = {
+            "total_time_sec": round(t_pipeline_end - t_pipeline_start, 2),
+            "nodes": {
+                "extraction_sec": round(t_extraction_end - t_extraction_start, 2),
+                "generation_sec": round(t_generation_end - t_generation_start, 2),
+                "normalization_sec": round(t_normalization_end - t_normalization_start, 2),
+            }
+        }
+
         with open(meta_path, "r") as f:
             final_meta = json.load(f)
 
@@ -330,6 +350,7 @@ def run_automation_pipeline(
                 "pedagogy_profile": pedagogy.get_profile_summary(),
                 "resolved_model_override": resolved_model_override,
                 "completed_at": datetime.now().isoformat(),
+                "telemetry": telemetry,
             }
         )
 

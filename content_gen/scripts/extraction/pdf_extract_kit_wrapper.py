@@ -151,9 +151,10 @@ class PDFExtractKitWrapper:
         if progress_callback:
             progress_callback(25, "Extracting diagrams and images via Vision AI...")
 
+        last_q_num = None
         for page_num in range(len(doc)):
             page = doc[page_num]
-            questions_on_page = self._process_page(page, page_num + 1, doc)
+            questions_on_page, last_q_num = self._process_page(page, page_num + 1, doc, last_q_num)
             all_questions.extend(questions_on_page)
 
         doc.close()
@@ -211,19 +212,27 @@ class PDFExtractKitWrapper:
 
         return self.extract(progress_callback=progress_callback)
 
-    def _process_page(self, page, page_num: int, doc) -> List[Dict]:
+    def _process_page(self, page, page_num: int, doc, last_q_num: Optional[int] = None) -> tuple[List[Dict], Optional[int]]:
         """
-        Process a single page using span-level partitioning and coordinate mapping
+        Process a single page using span-level partitioning and coordinate mapping.
+        Returns (list of question fragments, updated last_q_num).
         """
-        if page_num == 1:
-            return []
-
         # Detect question numbers with their Y positions
         question_positions = self._detect_question_numbers_with_positions(page)
+        
+        # If no questions on this page, but we have a last_q_num from previous page,
+        # treat the entire page as a continuation of that question.
         if not question_positions:
-            return []
+            if last_q_num:
+                # Use a dummy position for the whole page
+                question_positions = [(last_q_num, 0)]
+            else:
+                # Still no starting point, likely a cover page or instructions
+                return [], None
 
         questions = {}
+        new_last_q_num = last_q_num
+        
         for q_num, _ in question_positions:
             if self._is_valid_question_number(q_num):
                 questions[q_num] = {
@@ -234,6 +243,7 @@ class PDFExtractKitWrapper:
                     "stem_images": [],
                     "option_images": {}
                 }
+                new_last_q_num = q_num
 
         # 1. Collect all spans
         all_spans = []
@@ -378,7 +388,7 @@ class PDFExtractKitWrapper:
                 val = re.sub(r'\s+[\d_]$', '', val)
                 q["options"][opt] = val
 
-        return list(questions.values())
+        return list(questions.values()), new_last_q_num
 
     def _clean_noise(self, text: str) -> str:
         """Filter global noise and map symbols from reconstructed text parts"""
@@ -404,9 +414,24 @@ class PDFExtractKitWrapper:
         for code, char in symbol_map.items():
             text = text.replace(code, char)
             
+        # Paper codes and Cambridge footers
         text = re.sub(r'\d{4}/\d{2}/\w+/\d{2}', '', text)
         text = re.sub(r'© UCLES.*', '', text, flags=re.I)
         text = re.sub(r'\[Turn over', '', text, flags=re.I)
+        
+        # Robust cleanup for common Cambridge boilerplate noise
+        noise_patterns = [
+            r'Permission to reproduce items where third-party owned material.*',
+            r'reasonable effort has been made by the publisher.*',
+            r'To avoid the issue of disclosure of answer-related information.*',
+            r'Cambridge Assessment International Education is part of.*',
+            r'University of Cambridge Local Examinations Syndicate.*',
+            r'Every publisher will be pleased to make amends.*',
+            r'Assessment International Education Copyright Acknowledgements.*'
+        ]
+        for pattern in noise_patterns:
+            text = re.sub(pattern, '', text, flags=re.I | re.DOTALL)
+
         return text.strip()
 
     def _reconstruct_line_text(self, spans: List[Dict], avg_baseline: float, main_size: float) -> str:
@@ -503,10 +528,14 @@ class PDFExtractKitWrapper:
                         continue  # Skip indented lines (answer options)
 
                     # Pattern 1: Number on same line as question text (Q10+)
-                    # Use a stricter pattern: must have a dot or a space followed by a clear uppercase word
-                    marker_pattern = r'^(\d+)\s+([A-Z][a-z]+)'
-                    if self.question_detection_mode == "open":
-                        marker_pattern = r'^(\d+)[\.\s]+([A-Z\d])'
+                    # Balanced mode should be robust: allow single-character starters (e.g. '18 A')
+                    if self.question_detection_mode == "strict":
+                        marker_pattern = r'^(\d+)\s+([A-Z][a-z]+)'
+                    elif self.question_detection_mode == "open":
+                        marker_pattern = r'^(\d+)[\.\s]*([A-Z\d\(\\]|$)'
+                    else: # balanced
+                        marker_pattern = r'^(\d+)[\.\s]+([A-Z]|\\|\()'
+                        
                     match = re.match(marker_pattern, line_text)
                     if match:
                         q_num = int(match.group(1))

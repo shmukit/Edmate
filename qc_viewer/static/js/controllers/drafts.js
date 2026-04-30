@@ -136,6 +136,13 @@ export const DraftController = {
                     reviewedStr = ` | Reviewed: ${revDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                 }
             }
+            let timeStr = '';
+            if (d.telemetry && d.telemetry.total_time_sec) {
+                const mins = Math.floor(d.telemetry.total_time_sec / 60);
+                const secs = Math.round(d.telemetry.total_time_sec % 60);
+                timeStr = ` | ⏱️ ${mins}m ${secs}s`;
+            }
+
             const qCount = d.questions?.length || d.processed_count || 0;
             const statusMsg = d.status_message || (isProcessing ? 'Processing...' : '');
 
@@ -147,8 +154,8 @@ export const DraftController = {
                         ${qCount > 0 ? `<span class="question-count-badge">${qCount} Questions</span>` : ''}
                     </div>
                     <p>
-                        <span>${dateStr}${reviewedStr}</span>
-                        ${statusMsg ? `<span style="opacity:0.6; font-size:0.75rem;">• ${statusMsg}</span>` : ''}
+                        <span>${dateStr}${reviewedStr}${timeStr}</span>
+                        <span class="status-message-streaming" style="font-size:0.75rem;">${statusMsg ? ` • ${statusMsg}` : ''}</span>
                     </p>
                     ${isProcessing ? `
                         <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
