@@ -1,0 +1,74 @@
+{
+  "model_routing": {
+    "extraction": "gemini/gemini-1.5-pro",
+    "generation": "anthropic/claude-3-haiku",
+    "validation": "openai/gpt-4o"
+  },
+  "budget": {
+    "max_daily_usd": 10.0
+  },
+  "storage_settings": {
+    "image_mode": "cdn"
+  },
+  "extraction_settings": {
+    "engine": "pdf_extract_kit",
+    "min_question_number": 1,
+    "max_question_number": 40,
+    "question_detection_mode": "balanced"
+  },
+  "observability": {
+    "litellm_callbacks": [
+      "opik"
+    ]
+  },
+  "learning_science": {
+    "profile": "default",
+    "bloom_taxonomy": {
+      "enabled": true,
+      "target_levels": [
+        "Remember",
+        "Understand",
+        "Apply",
+        "Analyze",
+        "Evaluate",
+        "Create"
+      ]
+    },
+    "spaced_repetition": {
+      "enabled": true,
+      "algorithm": "sm2"
+    },
+    "elaborative_interrogation": {
+      "enabled": true
+    },
+    "cognitive_load": {
+      "enabled": true,
+      "explanation_depth": "full"
+    },
+    "retrieval_practice": {
+      "enabled": true,
+      "generate_variants": false
+    },
+    "interleaving": {
+      "enabled": true
+    },
+    "formative_summative_tagging": {
+      "enabled": true,
+      "default_role": "formative"
+    },
+    "assessment_role_tagging": {
+      "enabled": true
+    }
+  },
+  "hia_settings": {
+    "enabled": true,
+    "default_resilience_target": "High",
+    "generate_critique_exercises": true,
+    "generate_variants": true,
+    "variant_count": 3
+  },
+  "workspace": {
+    "curriculums": [],
+    "target_tables": []
+  }
+}

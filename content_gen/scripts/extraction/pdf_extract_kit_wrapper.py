@@ -38,7 +38,7 @@ class PDFExtractKitWrapper:
         output_dir: Optional[str] = None,
         use_gpu: bool = False,
         min_question_number: int = 1,
-        max_question_number: Optional[int] = 40,
+        max_question_number: Optional[int] = None,
         question_detection_mode: str = "balanced",
     ):
         """
@@ -502,18 +502,22 @@ class PDFExtractKitWrapper:
         """
         import re
 
-        # Get text with position info
-        blocks = page.get_text("dict")["blocks"]
+        text_dict = page.get_text("dict")
+        blocks = text_dict.get("blocks", [])
         question_positions = []
+
+        # 1. Identify leftmost possible position on page
+        min_x = 1000.0
+        for block in blocks:
+            if "lines" in block:
+                for line in block["lines"]:
+                    min_x = min(min_x, line["bbox"][0])
 
         for block_idx, block in enumerate(blocks):
             if "lines" in block:
                 for i, line in enumerate(block["lines"]):
                     # Get line text
-                    line_text = ""
-                    for span in line["spans"]:
-                        line_text += span["text"]
-
+                    line_text = " ".join(span["text"].strip() for span in line["spans"] if span["text"].strip())
                     line_text = line_text.strip()
 
                     # Skip paper codes/footers that look like numbers
@@ -522,19 +526,20 @@ class PDFExtractKitWrapper:
                     if "© UCLES" in line_text:
                         continue
 
-                    # Check X position first - must be left-aligned
+                    # Check position: Question numbers are typically near the leftmost edge
                     x_pos = line["bbox"][0]
-                    if x_pos >= 100:
-                        continue  # Skip indented lines (answer options)
+                    # Allow up to 50px indentation from the leftmost text element
+                    if x_pos > min_x + 50 and x_pos > 150:
+                        continue
 
-                    # Pattern 1: Number on same line as question text (Q10+)
-                    # Balanced mode should be robust: allow single-character starters (e.g. '18 A')
+                    # Pattern 1: Number + Text/Marker on same line
                     if self.question_detection_mode == "strict":
                         marker_pattern = r'^(\d+)\s+([A-Z][a-z]+)'
                     elif self.question_detection_mode == "open":
                         marker_pattern = r'^(\d+)[\.\s]*([A-Z\d\(\\]|$)'
                     else: # balanced
-                        marker_pattern = r'^(\d+)[\.\s]+([A-Z]|\\|\()'
+                        # More inclusive: allow space or dot, and any uppercase or special starter
+                        marker_pattern = r'^(\d+)[\.\s]*([A-Z]|\\|\(|\$|[a-z]{3,})'
                         
                     match = re.match(marker_pattern, line_text)
                     if match:
@@ -544,38 +549,32 @@ class PDFExtractKitWrapper:
                             question_positions.append((q_num, y_pos))
                             continue
 
-                    # Pattern 2: Number on separate line (Q1-9)
-                    if re.match(r'^\d+$', line_text):
-                        q_num = int(line_text)
+                    # Pattern 2: Number on separate line (Q1-9 often)
+                    # Allow optional trailing dot
+                    if re.match(r'^(\d+)[\.]?$', line_text):
+                        q_num_match = re.match(r'^(\d+)', line_text)
+                        q_num = int(q_num_match.group(1))
                         if self._is_valid_question_number(q_num):
-                            # Check next line/block for validation
+                            # Check next line/block for validation (should look like a question)
                             is_question = False
-
-                            # Validation: next line should start with a Capital letter
-                            # AND NOT look like a paper code
                             check_text = ""
                             if i + 1 < len(block["lines"]):
-                                for span in block["lines"][i + 1]["spans"]:
-                                    check_text += span["text"]
+                                check_text = " ".join(s["text"] for s in block["lines"][i + 1]["spans"]).strip()
                             elif block_idx + 1 < len(blocks):
                                 next_block = blocks[block_idx + 1]
                                 if "lines" in next_block and len(next_block["lines"]) > 0:
-                                    for span in next_block["lines"][0]["spans"]:
-                                        check_text += span["text"]
+                                    check_text = " ".join(s["text"] for s in next_block["lines"][0]["spans"]).strip()
 
-                            check_text = check_text.strip()
-                            if check_text and check_text[0].isupper():
+                            # Looser validation: just needs to NOT be a footer or very short
+                            if len(check_text) > 3:
                                 if not re.search(r'\d{4}/\d{2}/\w+/\d{2}', check_text):
                                     is_question = True
 
                             if is_question:
-                                # Final guard: Check if the number is within a reasonable range for a single page
-                                # and not part of a larger numeric sequence (like a constant value)
-                                if q_num > 0 and q_num < 100:
-                                    y_pos = line["bbox"][1]
-                                    question_positions.append((q_num, y_pos))
+                                y_pos = line["bbox"][1]
+                                question_positions.append((q_num, y_pos))
 
-        # Sort by Y position and de-duplicate by question number (keep first sighting).
+        # Sort by Y position and de-duplicate by question number (keep first sighting per page).
         sorted_positions = sorted(question_positions, key=lambda x: x[1])
         deduped: List[tuple] = []
         seen = set()

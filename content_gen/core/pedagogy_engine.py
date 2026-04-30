@@ -134,7 +134,8 @@ Every generated item should include a 'learning_science_applied:' section listin
 {hia}
 
 ## 5. Output Consistency
-- **Core Concept**: Provide a high-level summary of the underlying concept. Constraints: Max 4-6 lines of clear, concise text. Do not repeat the entire detailed explanation here.
+- **Core Concept**: Provide a high-level summary of the underlying concept. Constraints: Max 2-3 lines of clear, concise text. Do not repeat the entire detailed explanation here.
+- **Precision**: All explanations (Detailed and Option-wise) must be precise, concise, and focused on the core concept. Avoid verbosity.
 """
         return prompt.strip()
 

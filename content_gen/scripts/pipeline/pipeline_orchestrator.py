@@ -39,16 +39,16 @@ class PipelineOrchestrator:
             db_connection) if db_connection else None
 
         # Initialize Extractor based on config
-        engine = self.router.config.extraction_engine
+        engine = self.router.config.extraction_settings.engine
         if engine == "pymupdf":
             self.extractor = PyMuPDFAdapter()
         elif engine in ["vision", "multimodal", "pdf_extract_kit"]:
             # Default to Vision if high-fidelity is requested, or Kit if explicitly set
             if engine == "pdf_extract_kit":
                 self.extractor = KitExtractionAdapter(
-                    min_question_number=self.router.config.min_question_number,
-                    max_question_number=self.router.config.max_question_number,
-                    question_detection_mode=self.router.config.question_detection_mode,
+                    min_question_number=self.router.config.extraction_settings.min_question_number,
+                    max_question_number=self.router.config.extraction_settings.max_question_number,
+                    question_detection_mode=self.router.config.extraction_settings.question_detection_mode,
                 )
             else:
                 self.extractor = VisionExtractionAdapter(router=self.router)
@@ -91,7 +91,7 @@ class PipelineOrchestrator:
 
         # Step 1: Multimodal Extraction (The "Eyes")
         print(
-            f"👁️  Step 1: Extracting with {self.router.config.extraction_engine}...")
+            f"👁️  Step 1: Extracting with {self.router.config.extraction_settings.engine}...")
         extracted_questions = self.extractor.extract_content(
             Path(pdf_path), Path(output_dir))
         report["extraction"] = {"questions": len(extracted_questions)}
@@ -116,7 +116,7 @@ class PipelineOrchestrator:
             if not images_root.exists():
                 images_root = Path(output_dir) / "images"
             images = list(images_root.rglob("*.png")) if images_root.exists() else []
-            if self.router.config.image_mode == "base64":
+            if self.router.config.storage_settings.image_mode == "base64":
                 print("📦 Encoding images to Base64...")
                 for img_path in images:
                     b64_str = self._convert_to_base64(img_path)

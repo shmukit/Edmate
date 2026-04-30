@@ -347,7 +347,8 @@ These items are **concrete and actionable**. They are good starting points for n
 #### 🧠 Learning Science Profile System
 - [ ] **`learning_science_applied` block**: Every generated JSON output includes the pedagogy label declaring which techniques and config were applied
 - [ ] **Profile loader in `edmate_config.yaml`**: Read `learning_science.profile` and apply preset configurations (`default`, `exam_prep`, `beginner`, `flashcard_only`, `custom`)
-- [ ] **Config validation**: Validate the `learning_science` config block on startup with clear error messages for invalid combinations
+- [x] **Config validation**: Validate the `learning_science` config block on startup with clear error messages for invalid combinations (using Pydantic)
+- [x] **JSON Configuration Support**: Support both YAML and JSON for project configuration.
 - [ ] **SM-2 metadata in all flashcards**: `ease_factor`, `interval`, `next_review_date` fields populated by default
 - [ ] **Assessment role tagging**: Every output tagged with `metadata.assessment_role` based on config
 

@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from content_gen.core.model_router import ModelRoutingEngine, BudgetExceededError
-from content_gen.core.schemas import ModelConfig
+from content_gen.core.config_schema import EdmateConfig, ModelRouting, BudgetConfig
 
 
 def test_router_budget_check():
     """Verifies that the Economic Kill-Switch prevents calls when budget is exceeded."""
-    config = ModelConfig(max_budget=0.1)  # low budget
+    config = EdmateConfig(budget=BudgetConfig(max_daily_usd=0.1))  # low budget
     router = ModelRoutingEngine(config=config)
 
     # Mock metrics to show high cost
@@ -19,9 +19,11 @@ def test_router_budget_check():
 @patch("litellm.completion")
 def test_router_task_routing(mock_completion):
     """Verifies that the router selects the correct model for the task."""
-    config = ModelConfig(
-        extraction_model="test/extraction",
-        generation_model="test/generation"
+    config = EdmateConfig(
+        model_routing=ModelRouting(
+            extraction="test/extraction",
+            generation="test/generation"
+        )
     )
     router = ModelRoutingEngine(config=config)
 
@@ -55,5 +57,6 @@ def test_router_task_routing(mock_completion):
         model="test/generation",
         messages=[{"role": "user", "content": "generate this"}],
         response_format=None,
-        timeout=60
+        timeout=180
     )
+

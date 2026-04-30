@@ -63,7 +63,7 @@ cp content_gen/.env.example content_gen/.env
 
 ## 🛠️ Customizing Your Workspace
 
-Edmate is designed to be highly adaptable. Before processing your first PDF, you must define your own subjects, curriculums, and database tables in `edmate_config.yaml`.
+Edmate is designed to be highly adaptable. Before processing your first PDF, you must define your own subjects, curriculums, and database tables in `edmate_config.yaml` or `edmate_config.json`.
 
 ### 1. Connect Your Database (Agnostic)
 Edmate is **database-agnostic**. While it includes a production-ready **Postgres/Supabase** adapter by default, you can use any database (MySQL, MongoDB, Firebase, etc.).
@@ -72,7 +72,7 @@ Edmate is **database-agnostic**. While it includes a production-ready **Postgres
 - **Using a different database?** Edmate uses the **Adapter Pattern**. You can swap the persistence layer by implementing a new Storage Adapter in `content_gen/adapters/`.
 
 ### 2. Define Your Schema
-Navigate to the `workspace` section in `edmate_config.yaml` to tell Edmate which tables exist in *your* database:
+Navigate to the `workspace` section in `edmate_config.yaml` or `edmate_config.json` to tell Edmate which tables exist in *your* database:
 
 ```yaml
 workspace:
@@ -268,7 +268,7 @@ graph TD
 | `docs/` | Comprehensive documentation on system design, pedagogy, and brand. |
 | `examples/` | Client integration examples (BYOK usage, API polling). |
 | `credentials/` | Secure storage for optional cloud credentials (when needed). |
-| `edmate_config.yaml` | Global project configuration (models, budgets, engines). |
+| `edmate_config.yaml` / `.json` | Global project configuration (models, budgets, engines). |
 
 ### 🧠 Content Generation (`content_gen/`)
 | Path | Description |

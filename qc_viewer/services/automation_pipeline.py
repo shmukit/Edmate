@@ -71,9 +71,9 @@ def _apply_runtime_model_overrides(
 
     if requested_model_id:
         normalized = _normalize_model_id(requested_model_id, requested_provider)
-        router.config.extraction_model = normalized
-        router.config.generation_model = normalized
-        router.config.validation_model = normalized
+        router.config.model_routing.extraction = normalized
+        router.config.model_routing.generation = normalized
+        router.config.model_routing.validation = normalized
         return {
             "provider": requested_provider,
             "requested_model_id": requested_model_id,
@@ -83,9 +83,9 @@ def _apply_runtime_model_overrides(
     if requested_provider and has_api_key:
         defaults = _provider_default_models(requested_provider)
         if defaults:
-            router.config.extraction_model = defaults["extraction"]
-            router.config.generation_model = defaults["generation"]
-            router.config.validation_model = defaults["validation"]
+            router.config.model_routing.extraction = defaults["extraction"]
+            router.config.model_routing.generation = defaults["generation"]
+            router.config.model_routing.validation = defaults["validation"]
             return {
                 "provider": requested_provider,
                 "requested_model_id": None,
@@ -206,11 +206,11 @@ def run_automation_pipeline(
         valid_modes = {"strict", "balanced", "open"}
         requested_mode = (question_detection_mode or "").strip().lower()
         if requested_mode in valid_modes:
-            router.config.question_detection_mode = requested_mode
+            router.config.extraction_settings.question_detection_mode = requested_mode
         if min_question_number is not None:
-            router.config.min_question_number = min_question_number
+            router.config.extraction_settings.min_question_number = min_question_number
         if max_question_number is not None:
-            router.config.max_question_number = max_question_number
+            router.config.extraction_settings.max_question_number = max_question_number
 
         resolved_model_override = _apply_runtime_model_overrides(
             router, llm_provider, model_id, has_api_key=(api_key is not None)
@@ -242,6 +242,7 @@ def run_automation_pipeline(
         generated = orchestrator.generator.generate_for_questions(
             extracted,
             subject=subject,
+            curriculum=curriculum,
             progress_callback=_update_progress,
             pedagogy_system_prompt=pedagogy_system_prompt,
         )

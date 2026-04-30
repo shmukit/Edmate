@@ -59,6 +59,7 @@ class ContentGenerator:
         questions: List[ProcessedQuestion], 
         subject: str, 
         batch_size: int = 10,
+        curriculum: str = "Cambridge O/A-Level",
         progress_callback: Optional[Callable[[int, str], None]] = None,
         pedagogy_system_prompt: Optional[str] = None,
     ) -> List[ProcessedQuestion]:
@@ -89,7 +90,7 @@ class ContentGenerator:
             q_range = f"{min(batch_indices)}-{max(batch_indices)}"
             strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
                 "[Subject]", subject
-            ).replace("[Range]", q_range)
+            ).replace("[Curriculum]", curriculum).replace("[Range]", q_range)
             combined_system_prompt = (
                 f"{pedagogy_system_prompt}\n\n{strict_system_prompt}"
                 if pedagogy_system_prompt
@@ -108,20 +109,20 @@ class ContentGenerator:
                     raw_response, batch_indices)
 
                 for q in batch:
-                    self._apply_generated_content(q, parsed_content.get(q.question_number, {}), subject, pedagogy_system_prompt)
+                    self._apply_generated_content(q, parsed_content.get(q.question_number, {}), subject, curriculum, pedagogy_system_prompt)
 
             except Exception as e:
                 print(f"   ⚠️ Batch generation failed ({batch_indices}), falling back to single-question retries: {e}")
                 for q in batch:
                     # Fallback to single question generation for every question in the failed batch
-                    content = self._regenerate_single_question(q, subject, pedagogy_system_prompt)
-                    self._apply_generated_content(q, content, subject, pedagogy_system_prompt)
+                    content = self._regenerate_single_question(q, subject, curriculum, pedagogy_system_prompt)
+                    self._apply_generated_content(q, content, subject, curriculum, pedagogy_system_prompt)
             
             processed_results.extend(batch)
 
         return processed_results
 
-    def _apply_generated_content(self, q: ProcessedQuestion, content: Dict, subject: str, pedagogy_prompt: Optional[str]):
+    def _apply_generated_content(self, q: ProcessedQuestion, content: Dict, subject: str, curriculum: str, pedagogy_prompt: Optional[str]):
         """Helper to apply content and trigger single-question retry if validation fails"""
         needs_retry = not content
         quality_report = self._validate_generated_content(content)
@@ -129,7 +130,7 @@ class ContentGenerator:
             needs_retry = True
 
         if needs_retry:
-            content = self._regenerate_single_question(q, subject, pedagogy_prompt)
+            content = self._regenerate_single_question(q, subject, curriculum, pedagogy_prompt)
             quality_report = self._validate_generated_content(content)
 
         # Enrich the existing ProcessedQuestion with generated content
@@ -162,13 +163,14 @@ class ContentGenerator:
         self,
         question: ProcessedQuestion,
         subject: str,
+        curriculum: str = "Cambridge O/A-Level",
         pedagogy_system_prompt: Optional[str] = None,
     ) -> Dict:
         """Low-cost retry path for only failed questions."""
         context = self._prepare_prompt_context([question], subject)
         strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
             "[Subject]", subject
-        ).replace("[Range]", str(question.question_number))
+        ).replace("[Curriculum]", curriculum).replace("[Range]", str(question.question_number))
         combined_system_prompt = (
             f"{pedagogy_system_prompt}\n\n{strict_system_prompt}"
             if pedagogy_system_prompt

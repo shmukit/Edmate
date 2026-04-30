@@ -10,14 +10,22 @@ from qc_viewer.services.automation_pipeline import (
 )
 from content_gen.core.model_router import ModelRoutingEngine
 
-class MockModelConfig:
+class MockModelRouting:
     def __init__(self):
-        self.extraction_model = "default/extraction"
-        self.generation_model = "default/generation"
-        self.validation_model = "default/validation"
+        self.extraction = "default/extraction"
+        self.generation = "default/generation"
+        self.validation = "default/validation"
+
+class MockExtractionSettings:
+    def __init__(self):
         self.question_detection_mode = "balanced"
         self.min_question_number = 1
         self.max_question_number = 40
+
+class MockModelConfig:
+    def __init__(self):
+        self.model_routing = MockModelRouting()
+        self.extraction_settings = MockExtractionSettings()
 
 class MockRouter:
     def __init__(self):
@@ -31,13 +39,13 @@ class TestAutomationPipeline(unittest.TestCase):
         # Even if provider is sent, if has_api_key is False, it should NOT override
         res = _apply_runtime_model_overrides(self.router, "openai", None, has_api_key=False)
         self.assertIsNone(res["resolved_model"])
-        self.assertEqual(self.router.config.generation_model, "default/generation")
+        self.assertEqual(self.router.config.model_routing.generation, "default/generation")
 
     def test_apply_runtime_model_overrides_with_byok(self):
         # If has_api_key is True, it SHOULD override with provider defaults
         res = _apply_runtime_model_overrides(self.router, "openai", None, has_api_key=True)
         self.assertEqual(res["resolved_model"], "openai/gpt-4o-mini")
-        self.assertEqual(self.router.config.generation_model, "openai/gpt-4o-mini")
+        self.assertEqual(self.router.config.model_routing.generation, "openai/gpt-4o-mini")
 
     def test_apply_runtime_model_overrides_explicit_model(self):
         # Explicit model ID should always override
@@ -55,7 +63,7 @@ class TestAutomationPipeline(unittest.TestCase):
         
         # Test fallback
         explanation_no_core = "Plants use sunlight to make food.\nIt is called photosynthesis."
-        self.assertEqual(extract_core_concept(explanation_no_core), "Plants use sunlight to make food.")
+        self.assertEqual(extract_core_concept(explanation_no_core), "Plants use sunlight to make food. It is called photosynthesis.")
         
         # Test truncation
         long_line = "This is a very very long first line that should definitely be truncated because it's way too long to be a core concept title and we want to keep it clean " * 5

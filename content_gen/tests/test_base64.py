@@ -43,8 +43,8 @@ def test_pipeline_uses_base64_mode(mock_uploader, tmp_path):
 
     # Mock router with base64 config
     mock_router = MagicMock()
-    mock_router.config.image_mode = "base64"
-    mock_router.config.extraction_engine = "pymupdf"
+    mock_router.config.storage_settings.image_mode = "base64"
+    mock_router.config.extraction_settings.engine = "pymupdf"
 
     with patch.dict("sys.modules", HEAVY_MOCKS):
         with patch("content_gen.scripts.pipeline.pipeline_orchestrator.KitExtractionAdapter"), \
@@ -55,7 +55,7 @@ def test_pipeline_uses_base64_mode(mock_uploader, tmp_path):
     images = [img_dir / "q1_stem.png"]
 
     cdn_mapping = {}
-    if orchestrator.router.config.image_mode == "base64":
+    if orchestrator.router.config.storage_settings.image_mode == "base64":
         for img_path in images:
             b64_str = orchestrator._convert_to_base64(img_path)
             if b64_str:

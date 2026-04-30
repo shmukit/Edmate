@@ -16,7 +16,7 @@ class KitExtractionAdapter(BaseExtractionAdapter):
         self,
         use_gpu: bool = False,
         min_question_number: int = 1,
-        max_question_number: int | None = 40,
+        max_question_number: int | None = None,
         question_detection_mode: str = "balanced",
     ):
         try:

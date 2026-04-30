@@ -1,17 +1,17 @@
 import os
 import yaml
 from content_gen.core.config import CoreConfig
-from content_gen.core.schemas import ModelConfig
+from content_gen.core.config_schema import EdmateConfig
 
 
 def test_config_load_defaults():
     """Verifies that the config loader returns defaults when no file exists."""
     config = CoreConfig.load_from_yaml("non_existent_config.yaml")
-    assert isinstance(config, ModelConfig)
-    assert config.max_budget == 10.0  # default
-    assert config.min_question_number == 1
-    assert config.max_question_number == 40
-    assert config.question_detection_mode == "balanced"
+    assert isinstance(config, EdmateConfig)
+    assert config.budget.max_daily_usd == 10.0  # default
+    assert config.extraction_settings.min_question_number == 1
+    assert config.extraction_settings.max_question_number == 40
+    assert config.extraction_settings.question_detection_mode == "balanced"
 
 
 def test_config_load_valid_yaml(tmp_path):
@@ -35,8 +35,9 @@ def test_config_load_valid_yaml(tmp_path):
         yaml.dump(data, f)
 
     config = CoreConfig.load_from_yaml(str(config_file))
-    assert config.extraction_model == "test/model"
-    assert config.max_budget == 50.0
-    assert config.min_question_number == 2
-    assert config.max_question_number == 120
-    assert config.question_detection_mode == "open"
+    assert config.model_routing.extraction == "test/model"
+    assert config.budget.max_daily_usd == 50.0
+    assert config.extraction_settings.min_question_number == 2
+    assert config.extraction_settings.max_question_number == 120
+    assert config.extraction_settings.question_detection_mode == "open"
+

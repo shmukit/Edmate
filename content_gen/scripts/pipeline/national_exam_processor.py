@@ -27,14 +27,14 @@ for key, value in env_vars.items():
 # Set Vertex AI Location
 os.environ["VERTEXAI_LOCATION"] = "asia-south1"
 
-from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.core.segmentation import TextSegmentationUtility
-from content_gen.scripts.prompts import BD_EXAM_SYSTEM_PROMPT, BD_EXAM_EXTRACTION_PROMPT
+from content_gen.scripts.prompts import NATIONAL_EXAM_SYSTEM_PROMPT, NATIONAL_EXAM_EXTRACTION_PROMPT
 
 import time
 
-class BDExamProcessor:
-    def __init__(self, output_dir: str = "content_gen/data/outputs/bd_exams"):
+class NationalExamProcessor:
+    def __init__(self, curriculum: str = "Bangladeshi", output_dir: str = "content_gen/data/outputs/national_exams"):
+        self.curriculum = curriculum
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.router = ModelRoutingEngine()
@@ -68,7 +68,9 @@ class BDExamProcessor:
             for k, v in q['options'].items():
                 options_text += f"{k}. {v}\n"
             
-            prompt = BD_EXAM_EXTRACTION_PROMPT.format(
+            prompt = NATIONAL_EXAM_EXTRACTION_PROMPT.replace(
+                "[Curriculum]", self.curriculum
+            ).format(
                 question_text=q['question_text'],
                 options_text=options_text or "No options",
                 question_type=q['type']
@@ -81,7 +83,7 @@ class BDExamProcessor:
                     response = self.router.generate_content(
                         prompt=prompt,
                         task_type="generation",
-                        system_prompt=BD_EXAM_SYSTEM_PROMPT
+                        system_prompt=NATIONAL_EXAM_SYSTEM_PROMPT.replace("[Curriculum]", self.curriculum)
                     )
                     
                     # Parse markers
@@ -161,12 +163,17 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output-dir",
-        default="content_gen/data/outputs/bd_exams",
+        default="content_gen/data/outputs/national_exams",
         help="Directory for generated outputs.",
+    )
+    parser.add_argument(
+        "--curriculum",
+        default="Bangladeshi",
+        help="Curriculum name (e.g. Bangladeshi, Indian, etc.)",
     )
     args = parser.parse_args()
 
-    processor = BDExamProcessor(output_dir=args.output_dir)
+    processor = NationalExamProcessor(curriculum=args.curriculum, output_dir=args.output_dir)
     explicit_pdfs = [Path(p) for p in args.pdfs]
     discovered_pdfs = list(Path(args.input_dir).glob("*.pdf")) if not explicit_pdfs else []
     pdfs = explicit_pdfs or discovered_pdfs

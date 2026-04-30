@@ -1,7 +1,7 @@
 import os
 import litellm
 from typing import Optional, List, Dict, Any, cast
-from content_gen.core.schemas import ModelConfig
+from content_gen.core.config_schema import EdmateConfig
 from content_gen.core.config import CoreConfig
 from content_gen.core.metrics import MetricsTracker
 
@@ -23,8 +23,8 @@ class ModelRoutingEngine:
     Includes an automatic 'Economic Kill-Switch' based on configured budget.
     """
 
-    def __init__(self, config: Optional[ModelConfig] = None):
-        # Load config from YAML if not provided
+    def __init__(self, config: Optional[EdmateConfig] = None):
+        # Load config from YAML/JSON if not provided
         self.config = config or CoreConfig.load_from_yaml()
         self.tracker = MetricsTracker()
 
@@ -42,19 +42,19 @@ class ModelRoutingEngine:
         """
         # 1. Check Budget (The Safety Layer)
         current_cost = self.tracker.get_current_cost()
-        if current_cost >= self.config.max_budget:
+        if current_cost >= self.config.budget.max_daily_usd:
             raise BudgetExceededError(
                 f"🛑 Budget Exceeded: Current session cost (${current_cost:.4f}) "
-                f"has reached the limit (${self.config.max_budget:.2f})."
+                f"has reached the limit (${self.config.budget.max_daily_usd:.2f})."
             )
 
         # 2. Determine model
         if task_type == "extraction":
-            model = self.config.extraction_model or "gemini/gemini-1.5-pro"
+            model = self.config.model_routing.extraction or "gemini/gemini-1.5-pro"
         elif task_type == "validation":
-            model = self.config.validation_model or "openai/gpt-4o"
+            model = self.config.model_routing.validation or "openai/gpt-4o"
         else:
-            model = self.config.generation_model or "anthropic/claude-3-haiku"
+            model = self.config.model_routing.generation or "anthropic/claude-3-haiku"
 
         messages = []
         if system_prompt:
