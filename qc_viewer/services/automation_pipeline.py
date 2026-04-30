@@ -13,7 +13,7 @@ from content_gen.core.pedagogy_engine import PedagogyEngine
 from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
 
 
-CANCELLATION_EVENTS: dict[str, asyncio.Event] = {}
+CANCELLATION_EVENTS: dict[str, threading.Event] = {}
 METADATA_LOCK = threading.Lock()
 
 
@@ -153,7 +153,7 @@ def extract_core_concept(explanation: str) -> str:
     return full_text[:297] + "..."
 
 
-async def run_automation_pipeline(
+def run_automation_pipeline(
     draft_id: str,
     subject: str,
     paper_code: str,
@@ -173,7 +173,7 @@ async def run_automation_pipeline(
 
     def _update_progress(progress: int, message: str, processed_count: Optional[int] = None, total_count: Optional[int] = None):
         if draft_id in CANCELLATION_EVENTS and CANCELLATION_EVENTS[draft_id].is_set():
-            raise asyncio.CancelledError(f"Task {draft_id} was cancelled by user.")
+            raise InterruptedError(f"Task {draft_id} was cancelled by user.")
 
         try:
             with METADATA_LOCK:
@@ -336,7 +336,7 @@ async def run_automation_pipeline(
         with open(meta_path, "w") as f:
             json.dump(final_meta, f)
 
-    except asyncio.CancelledError:
+    except InterruptedError:
         print(f"Task {draft_id} cancelled.")
         _update_progress(0, "Processing stopped by user.")
         with open(meta_path, "r") as f:

@@ -2,6 +2,7 @@ import asyncio
 import json
 import shutil
 import uuid
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -88,7 +89,7 @@ async def receive_draft(
         },
     )
 
-    CANCELLATION_EVENTS[draft_id] = asyncio.Event()
+    CANCELLATION_EVENTS[draft_id] = threading.Event()
 
     background_tasks.add_task(
         run_automation_pipeline,
