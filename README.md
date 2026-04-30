@@ -84,6 +84,44 @@ If you are a developer looking to integrate Edmate directly into your own platfo
 
 ---
 
+## 🔐 Partner BYOK Integration (Platform UI)
+
+If a partner platform (like your client app) wants end-users to provide their own API key in the platform UI, use this pattern:
+
+1. User enters key in partner UI.
+2. Partner backend stores key securely (encrypted at rest / secret manager).
+3. Partner backend sends requests to Edmate with `X-API-Key`.
+4. Edmate processes the file and returns job status/results.
+
+### Supported API key headers
+
+- Preferred: `X-API-Key`
+- Backward-compatible: `X-Gemini-Key`, `X-OpenAI-Key`
+
+### Integration modes
+
+- **Direct server-to-server (recommended):** Partner backend calls Edmate and injects `X-API-Key` per request.
+- **Manual API call (no partner UI):** Integrator sends multipart form + `X-API-Key` directly from their backend/script.
+
+### Minimal request example
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/extract" \
+  -H "X-API-Key: $LITELLM_API_KEY" \
+  -F "file=@/path/to/paper.pdf" \
+  -F "curriculum=Cambridge O/Level" \
+  -F "subject=Biology"
+```
+
+### Security checklist
+
+- Keep API keys on the server side (do not expose raw keys in browser logs or frontend bundles).
+- Mask key input in UI and never return full keys in API responses.
+- Avoid persisting keys in plain text; use encryption/secret vault where possible.
+- Do not write keys to app logs, job metadata, or analytics events.
+
+---
+
 ## 🏗️ Modular Architecture
 
 Edmate is built for extreme extensibility. It uses the **Adapter Pattern** to remain decoupled across all layers of the platform, from data ingestion to database schemas.
