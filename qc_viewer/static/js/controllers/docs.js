@@ -15,7 +15,7 @@ export const DocsController = {
         pedagogy: 'Learning Science (Pedagogy)',
         extraction: 'Vision Extraction Pipeline',
         routing: 'AI Model Routing',
-        hia: 'High-Impact Accuracy (HIA)',
+        hia: 'High-Integrity Assessment (HIA)',
         pipeline_settings: 'Pipeline Settings'
     },
 

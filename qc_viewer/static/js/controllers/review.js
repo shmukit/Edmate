@@ -86,7 +86,7 @@ export const ReviewController = {
         } else if (qType === 'ai_critique') {
             typeSpecificHtml = `
                 <div class="hia-container">
-                    <div class="hia-title">🛡️ High-Integrity: AI Critique</div>
+                    <div class="hia-title">🛡️ High-Integrity Assessment: AI Critique</div>
                     <div class="critique-box">
                         <label class="field-label">AI-Generated Answer (Stimulus)</label>
                         <textarea class="editable-field" id="edit-hia-stimulus" style="height:100px;">${hia.ai_generated_answer || ''}</textarea>
@@ -106,7 +106,7 @@ export const ReviewController = {
         } else if (qType === 'viva_prompt') {
             typeSpecificHtml = `
                 <div class="hia-container">
-                    <div class="hia-title">🛡️ High-Integrity: Viva Defense Probes</div>
+                    <div class="hia-title">🛡️ High-Integrity Assessment: Viva Defense Probes</div>
                     <div class="viva-grid">
                         ${Object.entries(hia.viva_probes || {}).map(([stage, probe]) => `
                             <div class="viva-card">
