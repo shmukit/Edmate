@@ -99,7 +99,9 @@ To ensure cost portability and privacy, platforms can pass their own credentials
 ### 🧩 Modular Choice Overrides
 The generation payload allows the caller to dictate the "Rules of Engagement":
 - **Curriculum Board**: Set `curriculum` to any supported standard (e.g., `IB`, `Cambridge`, `National`).
-- **Pedagogical Profile**: Choose a `ls_profile` (e.g., `Bloom-Focused`, `Retrieval-Heavy`).
+- **Pedagogical Profile**: Choose a `ls_profile` (`default`, `exam_prep`, `beginner`, `flashcard_only`).
+- **Integrity Target**: Set `hia_mode` (`Low`, `Medium`, `High`, `Very High`).
+- **Extraction Guardrails**: Set `question_detection_mode`, `min_question_number`, and `max_question_number`.
 - **Output Preferences**: Specify the target `output_format` (e.g., `JSON-API`, `Print-Ready-PDF`).
 
 ### 🔒 Privacy & Isolation

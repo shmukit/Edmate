@@ -59,7 +59,8 @@ class ContentGenerator:
         questions: List[ProcessedQuestion], 
         subject: str, 
         batch_size: int = 3,
-        progress_callback: Optional[Callable[[int, str], None]] = None
+        progress_callback: Optional[Callable[[int, str], None]] = None,
+        pedagogy_system_prompt: Optional[str] = None,
     ) -> List[ProcessedQuestion]:
         """
         Generate detailed analysis for a list of questions using the modular router.
@@ -89,13 +90,18 @@ class ContentGenerator:
             strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
                 "[Subject]", subject
             ).replace("[Range]", q_range)
+            combined_system_prompt = (
+                f"{pedagogy_system_prompt}\n\n{strict_system_prompt}"
+                if pedagogy_system_prompt
+                else strict_system_prompt
+            )
 
             try:
                 # Use the modular router
                 raw_response = self.router.generate_content(
                     prompt=context,
                     task_type="generation",
-                    system_prompt=strict_system_prompt
+                    system_prompt=combined_system_prompt
                 )
 
                 parsed_content = self._parse_response(
@@ -110,7 +116,7 @@ class ContentGenerator:
                         needs_retry = True
 
                     if needs_retry:
-                        content = self._regenerate_single_question(q, subject)
+                        content = self._regenerate_single_question(q, subject, pedagogy_system_prompt)
                         quality_report = self._validate_generated_content(content)
 
                     # Enrich the existing ProcessedQuestion with generated content
@@ -144,12 +150,22 @@ class ContentGenerator:
 
         return data_block
 
-    def _regenerate_single_question(self, question: ProcessedQuestion, subject: str) -> Dict:
+    def _regenerate_single_question(
+        self,
+        question: ProcessedQuestion,
+        subject: str,
+        pedagogy_system_prompt: Optional[str] = None,
+    ) -> Dict:
         """Low-cost retry path for only failed questions."""
         context = self._prepare_prompt_context([question], subject)
         strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
             "[Subject]", subject
         ).replace("[Range]", str(question.question_number))
+        combined_system_prompt = (
+            f"{pedagogy_system_prompt}\n\n{strict_system_prompt}"
+            if pedagogy_system_prompt
+            else strict_system_prompt
+        )
         retry_prompt = (
             "Your prior output did not satisfy the required section markers or completeness.\n"
             "Regenerate this question using exact markers and include all required sections.\n\n"
@@ -159,7 +175,7 @@ class ContentGenerator:
             raw_response = self.router.generate_content(
                 prompt=retry_prompt,
                 task_type="generation",
-                system_prompt=strict_system_prompt
+                system_prompt=combined_system_prompt
             )
             parsed = self._parse_response(raw_response, [question.question_number])
             return parsed.get(question.question_number, {})

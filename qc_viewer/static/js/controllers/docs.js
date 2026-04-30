@@ -8,13 +8,15 @@ export const DocsController = {
         pedagogy: '/docs/pedagogy/PEDAGOGY.md',
         extraction: '/docs/technical/ARCHITECTURE.md', 
         routing: '/docs/technical/SYSTEM_DESIGN.md',
-        hia: '/docs/pedagogy/PEDAGOGY.md'
+        hia: '/docs/pedagogy/PEDAGOGY.md',
+        pipeline_settings: '/docs/technical/PIPELINE_SETTINGS.md'
     },
     sectionTitles: {
         pedagogy: 'Learning Science (Pedagogy)',
         extraction: 'Vision Extraction Pipeline',
         routing: 'AI Model Routing',
-        hia: 'High-Impact Accuracy (HIA)'
+        hia: 'High-Impact Accuracy (HIA)',
+        pipeline_settings: 'Pipeline Settings'
     },
 
     init() {

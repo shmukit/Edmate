@@ -86,7 +86,7 @@ If you are a developer looking to integrate Edmate directly into your own platfo
 
 ## 🔐 Partner BYOK Integration (Platform UI)
 
-If a partner platform (like your client app) wants end-users to provide their own API key in the platform UI, use this pattern:
+If a partner platform wants end-users to provide their own API key in the platform UI, use this pattern:
 
 1. User enters key in partner UI.
 2. Partner backend stores key securely (encrypted at rest / secret manager).
@@ -97,6 +97,24 @@ If a partner platform (like your client app) wants end-users to provide their ow
 
 - Preferred: `X-API-Key`
 - Backward-compatible: `X-Gemini-Key`, `X-OpenAI-Key`
+
+### Settings to expose in partner UI
+
+- Minimum (required for secure BYOK operation):
+  - API key input mapped to `X-API-Key`
+- Recommended (materially changes output quality/behavior):
+  - `curriculum`
+  - `ls_profile`
+  - `hia_mode`
+  - `question_detection_mode`
+  - `min_question_number`
+  - `max_question_number`
+- Optional advanced:
+  - `X-LLM-Provider` (provider-family preference)
+  - `X-Model-ID` (exact model pinning)
+- Not recommended to expose yet (currently preview-only in local UI):
+  - `target_language`
+  - `routing_profile`
 
 ### Integration modes
 
@@ -111,6 +129,24 @@ curl -X POST "http://localhost:8000/api/v1/extract" \
   -F "file=@/path/to/paper.pdf" \
   -F "curriculum=Cambridge O/Level" \
   -F "subject=Biology"
+```
+
+### Partner request with recommended settings
+
+```bash
+curl -X POST "http://localhost:8000/api/automate/draft" \
+  -H "X-API-Key: $LITELLM_API_KEY" \
+  -H "X-LLM-Provider: openai" \
+  -H "X-Model-ID: gpt-4o-mini" \
+  -F "file=@/path/to/paper.pdf" \
+  -F "subject=Biology" \
+  -F "paper_code=questions" \
+  -F "curriculum=Cambridge O/Level" \
+  -F "ls_profile=exam_prep" \
+  -F "hia_mode=High" \
+  -F "question_detection_mode=balanced" \
+  -F "min_question_number=1" \
+  -F "max_question_number=120"
 ```
 
 ### Security checklist

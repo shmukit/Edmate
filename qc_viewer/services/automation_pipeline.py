@@ -17,6 +17,86 @@ CANCELLATION_EVENTS: dict[str, asyncio.Event] = {}
 METADATA_LOCK = threading.Lock()
 
 
+def _normalize_model_id(model_id: str, provider: Optional[str]) -> str:
+    """Normalize model identifiers into litellm's provider/model format when possible."""
+    model = (model_id or "").strip()
+    if not model:
+        return model
+    if "/" in model:
+        return model
+    if provider:
+        return f"{provider.strip().lower()}/{model}"
+    return model
+
+
+def _provider_default_models(provider: str) -> dict[str, str]:
+    p = provider.strip().lower()
+    if p == "gemini":
+        # Keep defaults fast/cheap for interactive pipeline runs.
+        return {
+            "extraction": "vertex_ai/gemini-2.5-flash",
+            "generation": "vertex_ai/gemini-2.5-flash",
+            "validation": "vertex_ai/gemini-2.5-flash",
+        }
+    if p == "openai":
+        return {
+            "extraction": "openai/gpt-4o-mini",
+            "generation": "openai/gpt-4o-mini",
+            "validation": "openai/gpt-4o-mini",
+        }
+    if p == "anthropic":
+        return {
+            "extraction": "anthropic/claude-3-5-haiku-latest",
+            "generation": "anthropic/claude-3-5-haiku-latest",
+            "validation": "anthropic/claude-3-5-haiku-latest",
+        }
+    return {}
+
+
+def _apply_runtime_model_overrides(
+    router: ModelRoutingEngine,
+    llm_provider: Optional[str],
+    model_id: Optional[str],
+) -> dict[str, Optional[str]]:
+    """
+    Apply per-request model override precedence:
+      1) explicit model id
+      2) provider default model family
+      3) existing config from edmate_config.yaml
+    """
+    requested_provider = (llm_provider or "").strip().lower() or None
+    requested_model_id = (model_id or "").strip() or None
+
+    if requested_model_id:
+        normalized = _normalize_model_id(requested_model_id, requested_provider)
+        router.config.extraction_model = normalized
+        router.config.generation_model = normalized
+        router.config.validation_model = normalized
+        return {
+            "provider": requested_provider,
+            "requested_model_id": requested_model_id,
+            "resolved_model": normalized,
+        }
+
+    if requested_provider:
+        defaults = _provider_default_models(requested_provider)
+        if defaults:
+            router.config.extraction_model = defaults["extraction"]
+            router.config.generation_model = defaults["generation"]
+            router.config.validation_model = defaults["validation"]
+            return {
+                "provider": requested_provider,
+                "requested_model_id": None,
+                "resolved_model": defaults["generation"],
+            }
+
+    return {
+        "provider": requested_provider,
+        "requested_model_id": requested_model_id,
+        "resolved_model": None,
+    }
+
+
 def extract_correct_answer(explanation: str) -> str:
     match = re.search(r"Final Correct Answer\s*:\s*([A-D])", explanation or "", re.IGNORECASE)
     return match.group(1).upper() if match else "N/A"
@@ -91,7 +171,7 @@ async def run_automation_pipeline(
 
     try:
         pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
-        _ = pedagogy.compile_system_prompt()
+        pedagogy_system_prompt = pedagogy.compile_system_prompt()
 
         router = ModelRoutingEngine()
         valid_modes = {"strict", "balanced", "open"}
@@ -102,6 +182,8 @@ async def run_automation_pipeline(
             router.config.min_question_number = min_question_number
         if max_question_number is not None:
             router.config.max_question_number = max_question_number
+
+        resolved_model_override = _apply_runtime_model_overrides(router, llm_provider, model_id)
 
         if api_key:
             os.environ["LITELLM_API_KEY"] = api_key
@@ -125,6 +207,7 @@ async def run_automation_pipeline(
             extracted,
             subject=subject,
             progress_callback=_update_progress,
+            pedagogy_system_prompt=pedagogy_system_prompt,
         )
         print(f"DEBUG: Generated content for {len(generated)} questions.")
 
@@ -195,6 +278,7 @@ async def run_automation_pipeline(
                 "subject": subject,
                 "paper_code": paper_code,
                 "pedagogy_profile": pedagogy.get_profile_summary(),
+                "resolved_model_override": resolved_model_override,
                 "timestamp": datetime.now().isoformat(),
             }
         )

@@ -199,10 +199,11 @@
 
         <div class="settings-group">
             <span class="settings-label">Target Language</span>
-            <select id="languageSelect">
+            <select id="languageSelect" disabled title="Coming soon: language forcing is not wired yet">
                 <option value="English">English</option>
                 <option value="Bengali">Bengali</option>
             </select>
+            <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 0;">Preview only (coming soon).</p>
         </div>
 
         <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(255,107,0,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.2);">
@@ -222,11 +223,12 @@
             </div>
             
             <span class="settings-label" style="font-size:0.7rem;">Routing Profile</span>
-            <select id="routingProfileSelect" style="font-size:0.8rem; height:32px;">
+            <select id="routingProfileSelect" style="font-size:0.8rem; height:32px;" disabled title="Coming soon: profile bundles are not wired yet">
                 <option value="balanced">Balanced (Gemini + Claude)</option>
                 <option value="high_quality">High Quality (GPT-4o)</option>
                 <option value="turbo">Cost Effective (Haiku / Flash)</option>
             </select>
+            <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 0;">Preview only (coming soon).</p>
             </div>
         </div>
 

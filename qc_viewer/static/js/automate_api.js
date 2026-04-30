@@ -27,6 +27,7 @@ export const AutomationAPI = {
             if (maxQ) formData.append('max_question_number', maxQ);
 
             // Read BYOK settings from UI (session-only, never persisted)
+            const providerHint = document.getElementById('providerSelect')?.value;
             const byokProvider = document.getElementById('byokProviderSelect')?.value;
             const byokKey = document.getElementById('byokApiKey')?.value;
             const byokModel = document.getElementById('byokModelId')?.value;
@@ -35,7 +36,8 @@ export const AutomationAPI = {
             xhr.open('POST', '/api/automate/draft', true);
 
             // Only set BYOK headers if the user provided a key
-            if (byokProvider) xhr.setRequestHeader('X-LLM-Provider', byokProvider);
+            const resolvedProvider = byokProvider || providerHint;
+            if (resolvedProvider) xhr.setRequestHeader('X-LLM-Provider', resolvedProvider);
             if (byokKey)      xhr.setRequestHeader('X-API-Key', byokKey);
             if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
 
