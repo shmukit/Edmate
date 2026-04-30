@@ -18,6 +18,7 @@
 
     <!-- Markdown & Math Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         window.MathJax = {
             tex: {
@@ -84,8 +85,8 @@
         <div class="container" style="max-width: 900px;">
             <nav class="breadcrumb-nav">
                 <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
-                <div class="breadcrumb-item"><a href="/automate">Automation Hub</a></div>
-                <div class="breadcrumb-item active">Documentation</div>
+                <div class="breadcrumb-item"><a href="/how-it-works">How it Works</a></div>
+                <div class="breadcrumb-item active" id="activeDocBreadcrumb">Learning Science (Pedagogy)</div>
             </nav>
 
             <header class="workspace-header">
@@ -94,6 +95,14 @@
                     <p class="subtitle" style="margin-bottom: 0;">Technical and pedagogy documentation for the pipeline.</p>
                 </div>
                 <div class="header-actions-group">
+                    <button id="btnToggleSettings" class="btn btn-outline btn-sm" title="Toggle Contents Pane" style="height: 40px; padding: 0 12px; display: flex; align-items: center; gap: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                        <span>Contents</span>
+                    </button>
                     <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
