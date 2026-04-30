@@ -41,11 +41,19 @@ export const DraftController = {
                 };
                 
                 // Add to list and update UI immediately
-                const drafts = await AutomationAPI.fetchDrafts();
-                if (!drafts.find(d => d.id === result.id)) {
-                    drafts.unshift(handoverState);
+                // We use a local variable to avoid race conditions with AutomationAPI.fetchDrafts
+                let currentDrafts = [];
+                try {
+                    currentDrafts = await AutomationAPI.fetchDrafts();
+                } catch (e) {
+                    console.warn("Initial fetch failed, using local handover only.");
                 }
-                this.renderDrafts(drafts);
+
+                if (!currentDrafts.find(d => d.id === result.id)) {
+                    currentDrafts.unshift(handoverState);
+                }
+                
+                this.renderDrafts(currentDrafts);
                 this.updateDraftUI(handoverState);
 
                 // Start streaming
@@ -53,25 +61,19 @@ export const DraftController = {
             }
 
             // Reset upload zone and focus on the list
-            if (result && result.id) {
-                setTimeout(() => {
-                    container.style.display = 'none';
-                    bar.style.width = '0%';
-                    // Reset text to default state
-                    const uploadPrompt = document.querySelector('.upload-prompt');
-                    if (uploadPrompt) uploadPrompt.style.display = 'flex';
-                    text.textContent = 'Click to upload or drag and drop';
-                    
-                    // Smooth scroll to the draft list
+            setTimeout(() => {
+                container.style.display = 'none';
+                bar.style.width = '0%';
+                // Reset text to default state
+                const uploadPrompt = document.querySelector('.upload-prompt');
+                if (uploadPrompt) uploadPrompt.style.display = 'flex';
+                text.textContent = 'Click to upload or drag and drop';
+                
+                // Smooth scroll to the draft list if a new draft was added
+                if (result && result.id) {
                     document.getElementById('draftList')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1500);
-            } else {
-                setTimeout(() => {
-                    container.style.display = 'none';
-                    bar.style.width = '0%';
-                    text.textContent = 'Click to upload or drag and drop';
-                }, 3000);
-            }
+                }
+            }, 1500);
         } catch (error) {
             this.showToast('❌ Upload failed: ' + error.message, 'danger');
         }

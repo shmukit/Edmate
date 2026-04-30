@@ -165,7 +165,7 @@ async def run_automation_pipeline(
     """Heavy lifting background task. Supports BYOK and PedagogyEngine."""
     meta_path = file_path.parent / "metadata.json"
 
-    def _update_progress(progress: int, message: str):
+    def _update_progress(progress: int, message: str, processed_count: Optional[int] = None, total_count: Optional[int] = None):
         if draft_id in CANCELLATION_EVENTS and CANCELLATION_EVENTS[draft_id].is_set():
             raise asyncio.CancelledError(f"Task {draft_id} was cancelled by user.")
 
@@ -173,13 +173,19 @@ async def run_automation_pipeline(
             with METADATA_LOCK:
                 with open(meta_path, "r") as f:
                     meta = json.load(f)
-                meta.update(
-                    {
-                        "progress": progress,
-                        "status_message": message,
-                        "last_updated_at": datetime.now().isoformat(),
-                    }
-                )
+                
+                update_data = {
+                    "progress": progress,
+                    "status_message": message,
+                    "last_updated_at": datetime.now().isoformat(),
+                }
+                if processed_count is not None:
+                    update_data["processed_count"] = processed_count
+                if total_count is not None:
+                    update_data["total_count"] = total_count
+                
+                meta.update(update_data)
+                
                 with open(meta_path, "w") as f:
                     json.dump(meta, f)
         except Exception as e:
@@ -219,7 +225,7 @@ async def run_automation_pipeline(
         )
         print(f"DEBUG: Extracted {len(extracted)} questions from PDF.")
 
-        _update_progress(60, "Applying Learning Science & Pedagogy Analysis...")
+        _update_progress(60, "Applying Learning Science & Pedagogy Analysis...", processed_count=0, total_count=len(extracted))
 
         generated = orchestrator.generator.generate_for_questions(
             extracted,
@@ -312,7 +318,7 @@ async def run_automation_pipeline(
                 "paper_code": paper_code,
                 "pedagogy_profile": pedagogy.get_profile_summary(),
                 "resolved_model_override": resolved_model_override,
-                "timestamp": datetime.now().isoformat(),
+                "completed_at": datetime.now().isoformat(),
             }
         )
 
