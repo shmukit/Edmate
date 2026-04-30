@@ -16,13 +16,44 @@ export const AutomationUI = {
     isCropMode: false,
     isDraggingCrop: false,
 
-    init() {
+    async init() {
         ThemeManager.init();
         this.setupEventListeners();
+        await this.fetchPipelineConfig();
         this.fetchDrafts();
         window.addEventListener('hashchange', () => this.checkHash());
         // Initial deep link check
         setTimeout(() => this.checkHash(), 400);
+    },
+
+    async fetchPipelineConfig() {
+        try {
+            const resp = await fetch('/api/automate/config');
+            if (!resp.ok) throw new Error('Failed to fetch config');
+            const config = await resp.json();
+            
+            if (config.workspace) {
+                const curSelect = document.getElementById('curriculumSelect');
+                const tableSelect = document.getElementById('targetTableSelect');
+                
+                if (curSelect && config.workspace.curriculums) {
+                    curSelect.innerHTML = config.workspace.curriculums.map(c => 
+                        `<option value="${c}">${c}</option>`
+                    ).join('');
+                }
+                
+                if (tableSelect && config.workspace.target_tables) {
+                    tableSelect.innerHTML = config.workspace.target_tables.map(t => 
+                        `<option value="${t.id}">${t.label}</option>`
+                    ).join('');
+                }
+
+                // Re-init tooltips for dynamic content
+                this.setupTooltips();
+            }
+        } catch (e) {
+            console.error('Error loading pipeline config:', e);
+        }
     },
 
     setupEventListeners() {
@@ -94,6 +125,39 @@ export const AutomationUI = {
                 const icon = toggle.querySelector('.settings-group-toggle-icon');
                 if (icon) icon.textContent = expanded ? '−' : '+';
             };
+        });
+        
+        this.setupTooltips();
+    },
+
+    setupTooltips() {
+        // Create global tooltip if it doesn't exist
+        let tooltip = document.getElementById('globalTooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'globalTooltip';
+            tooltip.className = 'floating-tooltip';
+            document.body.appendChild(tooltip);
+        }
+
+        const icons = document.querySelectorAll('.info-icon[data-tooltip]');
+        icons.forEach(icon => {
+            icon.addEventListener('mouseenter', (e) => {
+                const text = icon.getAttribute('data-tooltip');
+                const rect = icon.getBoundingClientRect();
+                
+                tooltip.textContent = text;
+                tooltip.classList.add('active');
+                
+                // Position tooltip above the icon, growing leftward
+                const tooltipRect = tooltip.getBoundingClientRect();
+                tooltip.style.top = `${rect.top - tooltipRect.height - 10}px`;
+                tooltip.style.left = `${rect.left - tooltipRect.width + 10}px`;
+            });
+
+            icon.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('active');
+            });
         });
     },
 

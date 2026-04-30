@@ -74,3 +74,24 @@ hia_settings:
   generate_critique_exercises: true
   generate_variants: true
   variant_count: 3
+
+# ============================================================
+# Workspace & Database Configuration
+# Define your own Curriculums and Database Tables here.
+# Edmate will use these to populate the Automation Hub UI.
+# 
+# IMPORTANT: Ensure these IDs match the actual table names in 
+# your database (connected via DATABASE_URL in .env).
+# ============================================================
+workspace:
+  curriculums:
+    - "General Curriculum"
+    - "Example Curriculum (O/Level)"
+  
+  target_tables:
+    - id: "questions"
+      label: "Main Question Bank"
+    - id: "your_custom_table_1"
+      label: "Subject Specific (Example)"
+    - id: "your_custom_table_2"
+      label: "Archive/Drafts (Example)"

@@ -186,7 +186,10 @@
         <h2 style="font-family:'Outfit'; font-size:1.4rem;">Pipeline Settings</h2>
         
         <div class="settings-group">
-            <span class="settings-label">LLM Provider</span>
+            <span class="settings-label">
+                LLM Provider
+                <span class="info-icon" data-tooltip="Choose the primary AI service for your pipeline. Different providers offer various tradeoffs between cost, speed, and reasoning intelligence.">ⓘ</span>
+            </span>
             <select id="providerSelect">
                 <option value="gemini">Google Gemini (Vertex AI)</option>
                 <option value="openai">OpenAI (GPT-4o)</option>
@@ -194,7 +197,10 @@
         </div>
 
         <div class="settings-group">
-            <span class="settings-label">Target Language</span>
+            <span class="settings-label">
+                Target Language
+                <span class="info-icon" data-tooltip="Force the AI to generate explanations and flashcards in a specific language.">ⓘ</span>
+            </span>
             <select id="languageSelect" disabled title="Coming soon: language forcing is not wired yet">
                 <option value="English">English</option>
                 <option value="Bengali">Bengali</option>
@@ -204,7 +210,10 @@
 
         <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(255,107,0,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,107,0,0.2);">
             <button type="button" class="settings-group-toggle" aria-expanded="true">
-                <span class="settings-label" style="color: var(--accent); font-weight: 600; margin-bottom: 0;">🛡️ Model Routing & Budget</span>
+                <span class="settings-label" style="color: var(--accent); font-weight: 600; margin-bottom: 0;">
+                    🛡️ Model Routing & Budget
+                    <span class="info-icon" data-tooltip="Tracks the estimated cost of your current extraction session.">ⓘ</span>
+                </span>
                 <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
             </button>
             <div class="settings-group-content">
@@ -229,37 +238,40 @@
         </div>
 
         <div class="settings-group">
-            <span class="settings-label">Target Table (Injection)</span>
+            <span class="settings-label">
+                Target Table (Injection)
+                <span class="info-icon" data-tooltip="Choose the database table where approved questions will be saved.">ⓘ</span>
+            </span>
             <select id="targetTableSelect">
-                <option value="questions" selected>Unified Questions (Primary)</option>
-                <option value="chemistry_questions">Chemistry (A-Level)</option>
-                <option value="biology_questions">Biology (A-Level)</option>
-                <option value="physics_questions">Physics (A-Level)</option>
-                <option value="igcse_chemistry_questions">Chemistry (IGCSE)</option>
-                <option value="igcse_biology_questions">Biology (IGCSE)</option>
-                <option value="igcse_physics_questions">Physics (IGCSE)</option>
+                <!-- Populated dynamically from edmate_config.yaml -->
             </select>
         </div>
 
         <div class="settings-group">
-            <span class="settings-label">Curriculum</span>
+            <span class="settings-label">
+                Curriculum
+                <span class="info-icon" data-tooltip="Determines the educational context for AI explanations and learning science strategies.">ⓘ</span>
+            </span>
             <select id="curriculumSelect">
-                <option value="Cambridge O/Level">Cambridge O/Level</option>
-                <option value="Cambridge A/Level">Cambridge A/Level</option>
-                <option value="SAT/AP">SAT/AP</option>
-                <option value="National Curriculum">National Curriculum</option>
+                <!-- Populated dynamically from edmate_config.yaml -->
             </select>
         </div>
 
         <!-- Pedagogy & Integrity Settings -->
         <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(14, 165, 233, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(14, 165, 233, 0.2); margin-top: 12px;">
             <button type="button" class="settings-group-toggle" aria-expanded="true">
-                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">🧠 Pedagogy & Integrity</span>
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">
+                    🧠 Pedagogy & Integrity
+                    <span class="info-icon" data-tooltip="Controls the educational strategy (Learning Science) and AI-cheating resilience (HIA) of the generated content.">ⓘ</span>
+                </span>
                 <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
             </button>
             <div class="settings-group-content">
             
-            <span class="settings-label" style="font-size:0.7rem; margin-top: 8px;">Learning Science Profile</span>
+            <span class="settings-label" style="font-size:0.7rem; margin-top: 8px;">
+                Learning Science Profile
+                <span class="info-icon" data-tooltip="Strategies like Spaced Repetition and Active Recall tailored for specific learner goals.">ⓘ</span>
+            </span>
             <select id="lsProfileSelect" style="font-size:0.8rem; height:32px;">
                 <option value="default">Default (Balanced)</option>
                 <option value="exam_prep">Exam Prep (High Bloom's)</option>
@@ -267,7 +279,10 @@
                 <option value="flashcard_only">Flashcard Only</option>
             </select>
 
-            <span class="settings-label" style="font-size:0.7rem; margin-top: 12px;">HIA Resilience Target</span>
+            <span class="settings-label" style="font-size:0.7rem; margin-top: 12px;">
+                HIA Resilience Target
+                <span class="info-icon" data-tooltip="High-Integrity Assessment mode. Makes content harder to solve via raw AI prompts (e.g. GPT-4).">ⓘ</span>
+            </span>
             <select id="hiaResilienceSelect" style="font-size:0.8rem; height:32px;">
                 <option value="Low">Low (Standard)</option>
                 <option value="Medium">Medium (Enhanced)</option>
@@ -279,13 +294,19 @@
 
         <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(16, 185, 129, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 12px;">
             <button type="button" class="settings-group-toggle" aria-expanded="true">
-                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">Extraction Guardrails (Admin)</span>
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">
+                    Extraction Guardrails (Admin)
+                    <span class="info-icon" data-tooltip="Advanced settings to control how the AI identifies questions and segments content.">ⓘ</span>
+                </span>
                 <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
             </button>
             <div class="settings-group-content">
             <p style="font-size:0.7rem; color:var(--text-dim); margin:6px 0 10px;">Optional per-run override. Leave blank to use backend defaults from config.</p>
 
-            <span class="settings-label" style="font-size:0.7rem;">Detection Mode</span>
+            <span class="settings-label" style="font-size:0.7rem;">
+                Detection Mode
+                <span class="info-icon" data-tooltip="Strict: Exact numbering required. Open: AI attempts to infer questions from layout.">ⓘ</span>
+            </span>
             <select id="questionDetectionModeSelect" style="font-size:0.8rem; height:32px; margin-bottom:8px;">
                 <option value="">Use Backend Default</option>
                 <option value="strict">Strict</option>
@@ -306,7 +327,10 @@
         <!-- BYOK API Key Configuration -->
         <div class="settings-group settings-group-collapsible settings-group-expanded" style="background: rgba(251,191,36,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); margin-top: 12px;">
             <button type="button" class="settings-group-toggle" aria-expanded="true">
-                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">🔑 API Key (BYOK)</span>
+                <span class="settings-label" style="color: var(--primary); font-weight: 600; margin-bottom: 0;">
+                    🔑 API Key (BYOK)
+                    <span class="info-icon" data-tooltip="Bring Your Own Key. Use your personal credits for processing. Keys are never stored on our server.">ⓘ</span>
+                </span>
                 <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
             </button>
             <div class="settings-group-content">

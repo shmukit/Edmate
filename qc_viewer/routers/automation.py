@@ -255,11 +255,26 @@ async def get_metrics():
 
 @router.get("/api/automate/config")
 async def get_config():
+    import yaml
+    from qc_viewer.config import PROJECT_ROOT
+
+    config_path = PROJECT_ROOT / "edmate_config.yaml"
+    workspace_data = {}
+    
+    if config_path.exists():
+        try:
+            with open(config_path, "r") as f:
+                data = yaml.safe_load(f)
+                workspace_data = data.get("workspace", {})
+        except Exception as e:
+            print(f"Error loading edmate_config.yaml: {e}")
+
     return {
         "budget": {
             "max_daily_usd": 10.0,
             "current_usage_usd": 1.25,
         },
+        "workspace": workspace_data,
         "model": "gpt-4o",
         "vision_enabled": True,
     }

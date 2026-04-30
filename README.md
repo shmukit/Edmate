@@ -59,6 +59,45 @@ cp content_gen/.env.example content_gen/.env
 ### ⚠️ Note on PDFs and Git
 > By default, large PDF files are ignored by git (`.gitignore` excludes `*.pdf` except for `sample.pdf`) to prevent repository bloat. Please keep your heavy exam papers local to your machine!
 
+---
+
+## 🛠️ Customizing Your Workspace
+
+Edmate is designed to be highly adaptable. Before processing your first PDF, you must define your own subjects, curriculums, and database tables in `edmate_config.yaml`.
+
+### 1. Connect Your Database (Agnostic)
+Edmate is **database-agnostic**. While it includes a production-ready **Postgres/Supabase** adapter by default, you can use any database (MySQL, MongoDB, Firebase, etc.).
+
+- **Using Postgres/Supabase?** Simply set your `DATABASE_URL` in `content_gen/.env`.
+- **Using a different database?** Edmate uses the **Adapter Pattern**. You can swap the persistence layer by implementing a new Storage Adapter in `content_gen/adapters/`.
+
+### 2. Define Your Schema
+Navigate to the `workspace` section in `edmate_config.yaml` to tell Edmate which tables exist in *your* database:
+
+```yaml
+workspace:
+  curriculums:
+    - "Your Custom Curriculum"
+    - "Standard Level"
+  
+  target_tables:
+    - id: "questions"           # Must match your actual DB table name
+      label: "Main Hub"         # How it appears in the UI
+    - id: "biology_vault"       # Add as many as you need
+      label: "Biology Bank"
+```
+
+> [!CAUTION]
+> **Database Schema Consistency**: Edmate's `database_service.py` currently expects tables to have specific columns (e.g., `title`, `options`, `correct_options`). If your database uses different column names, you must update the SQL queries in `content_gen/scripts/processing/database_service.py` to match your schema.
+
+### 3. Understanding Pipeline Settings
+The **Automation Hub** provides several "Admin" settings to handle diverse document formats:
+- **Extraction Guardrails**: Adjust "Detection Mode" to **Strict** for standard papers or **Open** for noisy documents.
+- **Model Routing**: Strategies to balance cost and quality. Edmate can use cheaper models (like Gemini Flash) for extraction and switch to high-precision models (like GPT-4o) for final content generation.
+- **Pedagogy Profiles**: Choose profiles like `exam_prep` or `beginner` to change how the AI writes explanations and scaffolds content.
+
+---
+
 ### Option A: Use the Visual Automation Hub (UI)
 Start the FastAPI backend to access the drag-and-drop dashboard:
 ```bash
