@@ -398,6 +398,8 @@ class PDFExtractKitWrapper:
             "\uf03d": "=",
             "\uf02b": "+",
             "\uf02d": "–",
+            "\uf057": "Ω",
+            "\uf0b8": "÷",
         }
         for code, char in symbol_map.items():
             text = text.replace(code, char)
@@ -574,6 +576,10 @@ class PDFExtractKitWrapper:
         """
         if not question_positions:
             # No questions detected on this page, skip this element
+            return None
+
+        # Footer Guard: Ignore elements at the very bottom of the page (A4 height is 842pt)
+        if y_pos > 775:
             return None
 
         # Find the question this element belongs to

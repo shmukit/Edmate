@@ -97,7 +97,7 @@ class ContentGenerator:
             )
 
             try:
-                # Use the modular router
+                # Try batch generation first (efficient)
                 raw_response = self.router.generate_content(
                     prompt=context,
                     task_type="generation",
@@ -108,35 +108,39 @@ class ContentGenerator:
                     raw_response, batch_indices)
 
                 for q in batch:
-                    q_num = q.question_number
-                    content = parsed_content.get(q_num, {})
-                    needs_retry = not content
-                    quality_report = self._validate_generated_content(content)
-                    if quality_report["retry_required"]:
-                        needs_retry = True
+                    self._apply_generated_content(q, parsed_content.get(q.question_number, {}), subject, pedagogy_system_prompt)
 
-                    if needs_retry:
-                        content = self._regenerate_single_question(q, subject, pedagogy_system_prompt)
-                        quality_report = self._validate_generated_content(content)
-
-                    # Enrich the existing ProcessedQuestion with generated content
-                    q.explanation_body = content.get("explanation_generated")
-                    q.option_wise_explanation = content.get("options_explanation_generated")
-                    q.metadata["generation_quality"] = quality_report
-                    
-                    if content.get("flashcards_generated"):
-                        q.flashcards = self._parse_flashcards(
-                            content.get("flashcards_generated", "")
-                        )
             except Exception as e:
-                print(f"   ❌ Error generating content for batch {batch_indices}: {e}")
-                # We don't return here, we continue to ensure the batch is added to results
+                print(f"   ⚠️ Batch generation failed ({batch_indices}), falling back to single-question retries: {e}")
+                for q in batch:
+                    # Fallback to single question generation for every question in the failed batch
+                    content = self._regenerate_single_question(q, subject, pedagogy_system_prompt)
+                    self._apply_generated_content(q, content, subject, pedagogy_system_prompt)
             
-            # ALWAYS append the batch questions to processed_results, 
-            # even if the generation for this batch failed.
             processed_results.extend(batch)
 
         return processed_results
+
+    def _apply_generated_content(self, q: ProcessedQuestion, content: Dict, subject: str, pedagogy_prompt: Optional[str]):
+        """Helper to apply content and trigger single-question retry if validation fails"""
+        needs_retry = not content
+        quality_report = self._validate_generated_content(content)
+        if quality_report["retry_required"]:
+            needs_retry = True
+
+        if needs_retry:
+            content = self._regenerate_single_question(q, subject, pedagogy_prompt)
+            quality_report = self._validate_generated_content(content)
+
+        # Enrich the existing ProcessedQuestion with generated content
+        q.explanation_body = content.get("explanation_generated")
+        q.option_wise_explanation = content.get("options_explanation_generated")
+        q.metadata["generation_quality"] = quality_report
+        
+        if content.get("flashcards_generated"):
+            q.flashcards = self._parse_flashcards(
+                content.get("flashcards_generated", "")
+            )
 
     def _prepare_prompt_context(self, batch: List[ProcessedQuestion], subject: str) -> str:
         """Formats the extraction data into the prompt format defined in prompts.py"""

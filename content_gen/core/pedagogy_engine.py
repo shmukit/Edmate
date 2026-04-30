@@ -132,6 +132,9 @@ Every generated item should include a 'learning_science_applied' field listing:
 - technique: The primary learning science technique applied (e.g., "Retrieval Practice", "Interleaving").
 - resilience_profile: One of "Standard", "Enhanced", "High-Integrity".
 {hia}
+
+## 5. Output Consistency
+- **Core Concept**: Provide a high-level summary of the underlying concept. Constraints: Max 4-6 lines of clear, concise text. Do not repeat the entire detailed explanation here.
 """
         return prompt.strip()
 

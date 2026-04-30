@@ -136,15 +136,21 @@ def extract_core_concept(explanation: str) -> str:
         content = re.sub(r"\s+", " ", core_match.group(1)).strip(" -*\n\t")
         if content:
             return content
-    # Smarter fallback: first sentence or first 150 chars
+    # Smarter fallback: first few sentences or first 300 chars (approx 5-6 lines)
     lines = [ln.strip() for ln in explanation.splitlines() if ln.strip()]
     if not lines:
         return ""
-    first_line = lines[0]
-    # If the first line is very long, it's probably the explanation itself, so truncate
-    if len(first_line) > 150:
-        return first_line[:147] + "..."
-    return first_line
+    
+    # Try to get the first 2-3 sentences if possible
+    full_text = " ".join(lines)
+    sentences = re.split(r'(?<=[.!?])\s+', full_text)
+    if len(sentences) > 0:
+        concept = " ".join(sentences[:3])
+        if len(concept) > 350:
+            return concept[:347] + "..."
+        return concept
+        
+    return full_text[:297] + "..."
 
 
 async def run_automation_pipeline(
