@@ -167,6 +167,7 @@ class PDFExtractKitWrapper:
             "base_name": self.base_name,
             "questions": merged_questions,
             "raw_questions": all_questions,
+            "total_questions": len(merged_questions),
             "extraction_settings": {
                 "min_question_number": self.min_question_number,
                 "max_question_number": self.max_question_number,
@@ -500,9 +501,10 @@ class PDFExtractKitWrapper:
                         continue  # Skip indented lines (answer options)
 
                     # Pattern 1: Number on same line as question text (Q10+)
-                    marker_pattern = r'^(\d+)\s+([A-Z])'
+                    # Use a stricter pattern: must have a dot or a space followed by a clear uppercase word
+                    marker_pattern = r'^(\d+)\s+([A-Z][a-z]+)'
                     if self.question_detection_mode == "open":
-                        marker_pattern = r'^(\d+)\s+([A-Z\d])'
+                        marker_pattern = r'^(\d+)[\.\s]+([A-Z\d])'
                     match = re.match(marker_pattern, line_text)
                     if match:
                         q_num = int(match.group(1))
@@ -536,8 +538,11 @@ class PDFExtractKitWrapper:
                                     is_question = True
 
                             if is_question:
-                                y_pos = line["bbox"][1]
-                                question_positions.append((q_num, y_pos))
+                                # Final guard: Check if the number is within a reasonable range for a single page
+                                # and not part of a larger numeric sequence (like a constant value)
+                                if q_num > 0 and q_num < 100:
+                                    y_pos = line["bbox"][1]
+                                    question_positions.append((q_num, y_pos))
 
         # Sort by Y position and de-duplicate by question number (keep first sighting).
         sorted_positions = sorted(question_positions, key=lambda x: x[1])

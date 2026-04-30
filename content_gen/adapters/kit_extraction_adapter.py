@@ -62,7 +62,7 @@ class KitExtractionAdapter(BaseExtractionAdapter):
                 question_number=q_data.get("question_number", 0),
                 question_text=q_data.get("question_text", ""),
                 options=q_data.get("options", {}),
-                subject="Physics",  # Default for 9702 papers
+                subject=q_data.get("subject", "Physics"),  # Fallback to Physics for 9702 papers
                 metadata={
                     "stem_images": stem_image_paths,
                     "stem_images_b64": stem_images_b64,

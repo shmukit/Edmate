@@ -10,7 +10,7 @@ storage_settings:
   image_mode: "base64"
 
 extraction_settings:
-  engine: "pymupdf"
+  engine: "pdf_extract_kit"
 
 observability:
   litellm_callbacks: ["opik"]

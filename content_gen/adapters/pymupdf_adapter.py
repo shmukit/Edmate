@@ -25,13 +25,14 @@ class PyMuPDFAdapter(BaseExtractionAdapter):
             full_text += page.get_text() + "\n---PAGE_BREAK---\n"
 
         # Look for question markers like "1 \n Which row..." or "\n 1 \n"
-        # Cambridge papers often have question numbers as a single digit on a line
-        pattern = re.compile(r'\n(\d+)\s*\n')
+        # Stricter pattern: Digit on a line, followed by a line starting with an Uppercase letter
+        pattern = re.compile(r'\n(\d{1,2})\s*\n(?=[A-Z])')
         parts = pattern.split(full_text)
         
         # parts will be [header_text, "1", q1_text, "2", q2_text, ...]
         questions = []
         
+        questions_dict = {}
         if len(parts) > 1:
             for i in range(1, len(parts), 2):
                 q_num = int(parts[i])
@@ -53,11 +54,26 @@ class PyMuPDFAdapter(BaseExtractionAdapter):
                         options[opt_parts[j]] = opt_parts[j+1].strip().split('\n')[0] # Get first line of option
                     q_text = stem
 
+                # Store in dict for merging (basic merge: concat text)
+                if q_num not in questions_dict:
+                    questions_dict[q_num] = {
+                        "text": q_text,
+                        "options": options
+                    }
+                else:
+                    questions_dict[q_num]["text"] += " " + q_text
+                    # Simple merge for options if they were missing before
+                    if not questions_dict[q_num]["options"] and options:
+                        questions_dict[q_num]["options"] = options
+
+            # Convert dict to ProcessedQuestion objects
+            for q_num in sorted(questions_dict.keys()):
+                data = questions_dict[q_num]
                 questions.append(
                     ProcessedQuestion(
                         question_number=q_num,
-                        question_text=q_text[:2000],
-                        options=options,
+                        question_text=data["text"][:2000],
+                        options=data["options"],
                         subject="General",
                         metadata={"engine": "pymupdf_regex"}
                     )
