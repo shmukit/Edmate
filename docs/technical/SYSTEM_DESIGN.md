@@ -34,12 +34,12 @@ Edmate transforms raw Cambridge A/O-Level exam PDFs into structured, pedagogical
 │  └──────────┘   └──────┬───────┘   └──────────┬───────────┘   │
 │                         │                       │               │
 │              ┌──────────┴────┐     ┌────────────▼──────────┐   │
-│              │  CDN Upload   │     │  LLM-as-Judge QC Eval │   │
-│              │ (Cloudflare   │     └────────────┬──────────┘   │
-│              │     R2)       │                  │               │
-│              └──────┬────────┘     ┌────────────▼──────────┐   │
-│                     │              │  Database Import       │   │
-│                     └─────────────▶│  (Supabase/PostgreSQL)│   │
+│              │ Asset Storage │     │  LLM-as-Judge QC Eval │   │
+│              │ (CDN / Base64)│     └────────────┬──────────┘   │
+│              └──────┬────────┘                  │               │
+│                     │              ┌────────────▼──────────┐   │
+│                     └─────────────▶│  Database Persistence │   │
+│                                    │  (Postgres/MySQL/etc) │   │
 │                                    └───────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -63,8 +63,8 @@ graph TB
     
     C --> E[Phase 2: Content Generation - LLM Router]
     E --> F[Enriched Content JSON]
-    D --> G[Asset Persistence - Cloudflare R2]
-    F --> H[Database Import - Postgres]
+    D --> G[Asset Persistence - S3/Base64/Local]
+    F --> H[Database Import - Agnostic]
     G --> H
 ```
 
@@ -108,7 +108,7 @@ Edmate/
 [JSON: questions, options, page refs]
 [PNG: diagrams (stem + per-option)]
     │
-    ├──▶ [Cloudflare R2] ──▶ [Public CDN URLs]
+    ├──▶ [Asset Storage (CDN/Base64)] ──▶ [Public/Local URLs]
     │
     ▼ LLM Router API (prompts.py)
 [Enhanced JSON: explanation, flashcards, concept gaps]
@@ -150,7 +150,7 @@ All tables reside in the Supabase-managed PostgreSQL instance.
 |--------|------|-------|
 | `id` | UUID PK | |
 | `question_id` | UUID FK → `questions` | Cascade delete |
-| `cdn_url` | TEXT | Cloudflare R2 public URL |
+| `cdn_url` | TEXT | Asset URL (CDN, Local Path, or Base64) |
 | `diagram_type` | TEXT | `stem`, `option_A`..`option_D` |
 | `page_number` | INT | Source PDF page |
 | `alt_text` | TEXT | AI-generated description |
@@ -194,22 +194,22 @@ CREATE INDEX idx_concept_gaps_question ON concept_gaps(question_id);
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| **Database** | Supabase (PostgreSQL) | Managed, free tier |
-| **File Storage / CDN** | Cloudflare R2 | Zero egress fees, S3-compatible |
-| **AI — Generation** | Provider-configurable via LiteLLM | Explanations, flashcards |
-| **AI — Formatting** | Provider-configurable via LiteLLM | LaTeX → Unicode, Docs compatibility |
-| **PDF Extraction** | PyMuPDF + PDF-Extract-Kit | Vector diagram rendering |
-| **Language** | Python 3.8+ | Pipeline scripts |
-| **Config** | `.env` + `python-dotenv` | Credentials management |
+| **Database** | Agnostic (Postgres default) | Support for Supabase, MySQL, etc. |
+| **Asset Storage** | Agnostic (Base64 default) | Support for R2, S3, Azure, Local |
+| **AI — Generation** | LiteLLM Router | BYOK support for 100+ models |
+| **AI — Formatting** | LiteLLM Router | LaTeX → Unicode conversion |
+| **PDF Extraction** | Multi-Engine | PyMuPDF + PDF-Extract-Kit |
+| **Language** | Python 3.9+ | Modular pipeline logic |
+| **Config** | YAML + `.env` | Environment & Profile management |
 
 ### Environment Variables
 
 ```bash
-# Cloudflare R2 / AWS S3
-CLOUDFLARE_R2_ACCESS_KEY=...
-CLOUDFLARE_R2_SECRET_KEY=...
-CLOUDFLARE_R2_ENDPOINT=https://<account>.r2.cloudflarestorage.com
-R2_BUCKET_NAME=edmate-diagrams
+# Storage (S3-compatible)
+STORAGE_ACCESS_KEY=...
+STORAGE_SECRET_KEY=...
+STORAGE_ENDPOINT=...
+STORAGE_BUCKET_NAME=...
 
 # Database
 DATABASE_URL=postgresql://user:pass@host:5432/edmate
@@ -316,21 +316,19 @@ async def generate_content_batch(questions: list) -> list:
 
 Edmate relies on managed infrastructure that provides built-in availability guarantees.
 
-### Database — Supabase (PostgreSQL)
-
+### Database Persistence
 | Feature | Detail |
 |---------|--------|
-| **Replication** | Supabase runs primary + read replicas; automatic failover on primary failure |
-| **Backups** | Daily automated backups on paid tier; point-in-time recovery (PITR) available |
-| **Uptime SLA** | 99.9% (Supabase Pro) |
+| **Redundancy** | Primary + read replicas; automatic failover |
+| **Backups** | Automated daily backups; PITR support |
+| **Uptime SLA** | 99.9% (Standard Pro Tiers) |
 
-### File Storage — Cloudflare R2
-
+### Asset Storage (CDN / Cloud)
 | Feature | Detail |
 |---------|--------|
-| **Redundancy** | Objects stored across multiple availability zones by default |
-| **Durability** | 99.999999999% (11 nines) object durability |
-| **CDN Availability** | Served via Cloudflare's global edge network (300+ PoPs) |
+| **Redundancy** | Objects stored across multiple availability zones |
+| **Durability** | 99.999999999% (11 nines) durability |
+| **Availability** | Served via Global Edge network (S3-compatible) |
 
 ### Pipeline Availability
 The pipeline is a batch process, not a long-running service, so traditional load balancing is not applicable at this stage. Availability is ensured by:
@@ -534,8 +532,8 @@ python content_gen/scripts/pipeline/pipeline_orchestrator.py \
 
 ### Immediate (Phase 1)
 - [x] PDF extraction pipeline
-- [x] CDN upload (Cloudflare R2)
-- [x] Database import
+- [x] Asset Storage Integration (Base64/CDN)
+- [x] Database Import (Agnostic)
 - [x] Manual content generation (router-configured provider)
 
 ### Short-term (Phase 2)

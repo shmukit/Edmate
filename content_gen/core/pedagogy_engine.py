@@ -76,7 +76,7 @@ HIA_INSTRUCTIONS = {
     ),
     "High": (
         "\n\nHIA GUIDANCE: Generate questions that require authentic reasoning. "
-        "For each question, include a 'resilience_note' field explaining why this question "
+        "Include a 'resilience_note: [EXPLANATION]' section explaining why this question "
         "is difficult for AI to answer correctly without deep understanding."
     ),
     "Very High": (
@@ -127,7 +127,7 @@ Do NOT produce questions that only test surface memorisation unless the profile 
 {cog_load}
 
 ## 4. Learning Science Profile Active: [{self.ls_profile.upper()}]
-Every generated item should include a 'learning_science_applied' field listing:
+Every generated item should include a 'learning_science_applied:' section listing:
 - bloom_level: The target Bloom's level of this question.
 - technique: The primary learning science technique applied (e.g., "Retrieval Practice", "Interleaving").
 - resilience_profile: One of "Standard", "Enhanced", "High-Integrity".

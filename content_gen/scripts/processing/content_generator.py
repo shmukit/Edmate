@@ -58,7 +58,7 @@ class ContentGenerator:
         self, 
         questions: List[ProcessedQuestion], 
         subject: str, 
-        batch_size: int = 3,
+        batch_size: int = 10,
         progress_callback: Optional[Callable[[int, str], None]] = None,
         pedagogy_system_prompt: Optional[str] = None,
     ) -> List[ProcessedQuestion]:
@@ -138,6 +138,8 @@ class ContentGenerator:
         # We store the core concept in metadata for extraction by the pipeline later
         q.metadata["core_concept_generated"] = content.get("core_concept_generated")
         q.metadata["generation_quality"] = quality_report
+        q.metadata["resilience_note"] = content.get("resilience_note")
+        q.metadata["learning_science_applied"] = content.get("learning_science_applied")
         
         if content.get("flashcards_generated"):
             q.flashcards = self._parse_flashcards(
@@ -194,10 +196,10 @@ class ContentGenerator:
         options_exp = (content.get("options_explanation_generated") or "").strip()
         flashcards_raw = (content.get("flashcards_generated") or "").strip()
         parsed_flashcards = self._parse_flashcards(flashcards_raw) if flashcards_raw else []
-        option_letters = re.findall(r'Option\s*([A-D])\s*:', options_exp, flags=re.IGNORECASE)
+        option_letters = re.findall(r'(?:Option|Label|Choice)?[\s\*]*([A-D])[\s\*]*[:\-\)]', options_exp, flags=re.IGNORECASE)
         report = {
             "has_explanation": bool(explanation) and explanation != "[PARSING_FAILED]",
-            "has_final_answer": bool(re.search(r'Final Correct Answer\s*:\s*[A-D]', explanation, flags=re.IGNORECASE)),
+            "has_final_answer": bool(re.search(r'Final Correct Answer[\s\*]*:[\s\*]*[A-D]', explanation, flags=re.IGNORECASE)),
             "has_option_analysis": len(set([m.upper() for m in option_letters])) >= 3,
             "has_flashcards": len(parsed_flashcards) >= 2,
         }
@@ -210,7 +212,7 @@ class ContentGenerator:
         """Extract flashcards reliably from GA section."""
         flashcards: List[Flashcard] = []
         pattern = re.compile(
-            r'Flashcard\s*\d+\s*:\s*(.*?)\s*Back\s*:\s*(.*?)(?=Flashcard\s*\d+\s*:|$)',
+            r'(?:Flashcard|Card)[\s\*]*\d*[\s\*]*[:\-\)]?[\s\*]*(?:Front|Question)?[\s\*]*[:\-\)]?\s*(.*?)\s*(?:Back|Answer)[\s\*]*[:\-\)]\s*(.*?)(?=(?:Flashcard|Card)|$)',
             re.IGNORECASE | re.DOTALL
         )
         for match in pattern.finditer(gap_body):
@@ -285,6 +287,12 @@ class ContentGenerator:
             r'(?is)\[GA_START\]\s*(.*?)\s*\[GA_END\]', content)
         gap_body = ga_match.group(1).strip() if ga_match else ""
 
+        # 4. HIA/Learning Science Metadata (New)
+        rn_match = re.search(r'(?is)resilience_note\s*:\s*(.*?)(?=\n[a-z_]+\s*:|$)', content)
+        ls_match = re.search(r'(?is)learning_science_applied\s*:\s*(.*?)(?=\n[a-z_]+\s*:|$)', content)
+        resilience_note = rn_match.group(1).strip() if rn_match else ""
+        ls_applied = ls_match.group(1).strip() if ls_match else ""
+
         # Robust fallback for uncooperative LLMs or misplaced markers
         if not core_concept and explanation_body:
             # Try to extract the first part of the explanation as core concept
@@ -324,7 +332,9 @@ class ContentGenerator:
             "core_concept_generated": core_concept,
             "explanation_generated": explanation_body or "[PARSING_FAILED]",
             "options_explanation_generated": options_body,
-            "flashcards_generated": gap_body
+            "flashcards_generated": gap_body,
+            "resilience_note": resilience_note,
+            "learning_science_applied": ls_applied
         }
 
     def process_and_update_file(self, file_path: Path, subject: str):

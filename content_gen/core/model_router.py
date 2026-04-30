@@ -75,7 +75,7 @@ class ModelRoutingEngine:
             model=model,
             messages=messages,
             response_format={"type": "json_object"} if json_mode else None,
-            timeout=120 if task_type == "extraction" else 60
+            timeout=120 if task_type == "extraction" else 180
         )
 
         # 4. Log usage (The Analytics Layer)

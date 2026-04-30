@@ -18,13 +18,14 @@ For EACH question, start your response with "Question [NUMBER]" followed by thes
 2. **Sections**:
    - [CC_START] ... [CC_END]: **Core Concept**. Brief high-level summary (Max 4-6 lines).
    - [DE_START] ... [DE_END]: **Detailed Explanation**. Step-by-step logic. MUST include the line: "**Final Correct Answer: [LETTER]**" at the end.
-   - [OE_START] ... [OE_END]: Analyze each option A, B, C, and D individually. 
+   - [OE_START] ... [OE_END]: Analyze each option A, B, C, and D individually. Format each analysis as: "Option A: [Analysis]".
    - [GA_START] ... [GA_END]: Identify conceptual gaps for wrong options and provide flashcards.
 
 ### Structural Requirements:
 - For [CC_START], keep it concise and conceptual.
 - For [DE_START], use "Step 1:", "Step 2:", etc.
 - Always conclude [DE_START] with "**Final Correct Answer: [LETTER]**".
+- For [OE_START], ensure EVERY option (A, B, C, D) is addressed with the prefix "Option [LETTER]:".
 
 Provide your response for all questions in the batch.
 """

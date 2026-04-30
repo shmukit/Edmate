@@ -31,8 +31,8 @@ This plan outlines a **production-ready system** to extract questions, diagrams,
 | **PDFs to Process** | 100-500 exam papers |
 | **Images per PDF** | ~10-20 diagrams/equations |
 | **Total Images** | ~5,000-10,000 PNGs |
-| **Storage** | Cloud CDN (not Git) |
-| **Database** | PostgreSQL/Supabase |
+| **Storage** | Asset Storage (CDN / Base64) |
+| **Database** | Database Persistence (Postgres/etc) |
 
 ---
 
@@ -43,12 +43,12 @@ graph LR
     A[PDF Files] --> B[Batch Extractor]
     B --> C[Structured JSON]
     B --> D[PNG Images]
-    D --> E[CDN Upload Script]
-    E --> F[Cloud Storage]
-    F --> G[Public URLs]
+    D --> E[Storage Adapter]
+    E --> F[Asset Storage]
+    F --> G[Public/Local URLs]
     C --> H[Database Importer]
     G --> H
-    H --> I[PostgreSQL/Supabase]
+    H --> I[Database Persistence]
 ```
 
 ---
@@ -126,12 +126,10 @@ if __name__ == "__main__":
 
 ---
 
-## ☁️ Phase 2: CDN Integration (Week 2)
-
-### Recommended Providers
-1. **AWS S3** (Most scalable, $0.023/GB/month)
-2. **Cloudinary** (Free tier: 25GB, built-in image optimization)
-3. **Supabase Storage** (If you're already using Supabase for DB)
+### Recommended Storage Modes
+1. **Base64** (Modular default, no setup required, ideal for small/medium banks)
+2. **S3-Compatible** (AWS S3, Cloudflare R2, Azure Blob)
+3. **Local Storage** (Mounted volumes for local server deployments)
 
 ### Script: `upload_to_cdn.py`
 
@@ -229,8 +227,8 @@ def import_json(json_path, cdn_urls):
 | Stage | Time (100 PDFs) | Storage |
 |-------|-----------------|---------|
 | **Extraction** | ~10 minutes | 2GB (temp) |
-| **CDN Upload** | ~5 minutes | 500MB (cloud) |
-| **DB Import** | ~2 minutes | 50MB (PostgreSQL) |
+| **Asset Storage** | ~5 minutes | 500MB (cloud/base64) |
+| **DB Import** | ~2 minutes | 50MB (PostgreSQL/etc) |
 | **Total** | **~17 minutes** | **550MB** |
 
 **Cost Estimate** (AWS):
