@@ -21,6 +21,7 @@ async def extract_content(
     curriculum: str = "Cambridge O/Level",
     subject: str = "Chemistry",
     file: UploadFile = File(...),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     x_openai_key: Optional[str] = Header(None),
     x_gemini_key: Optional[str] = Header(None)
 ):
@@ -55,6 +56,7 @@ async def extract_content(
         str(file_path), 
         subject, 
         curriculum, 
+        x_api_key,
         x_openai_key, 
         x_gemini_key
     )
@@ -72,16 +74,16 @@ async def process_service_job(
     file_path: str, 
     subject: str, 
     curriculum: str,
+    api_key: Optional[str],
     openai_key: Optional[str],
     gemini_key: Optional[str]
 ):
     try:
         import os
         
-        # Determine key
-        api_key = gemini_key
-        if openai_key and not gemini_key:
-            api_key = openai_key
+        # Determine BYOK with neutral header first, then legacy provider headers.
+        if not api_key:
+            api_key = gemini_key or openai_key
 
         # Initialize engine with BYOK
         if api_key:

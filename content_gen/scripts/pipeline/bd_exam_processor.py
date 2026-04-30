@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import argparse
 from pathlib import Path
 import fitz # PyMuPDF
 from typing import List, Dict, cast
@@ -145,15 +146,37 @@ class BDExamProcessor:
         return match.group(1).strip() if match else ""
 
 if __name__ == "__main__":
-    processor = BDExamProcessor()
-    
-    pdfs = [
-        "/Users/mukit_10ms/Documents/GitHub/Edmate/content_gen/data/inputs/Final Exam of MCP 55.pdf",
-        "/Users/mukit_10ms/Documents/GitHub/Edmate/content_gen/data/inputs/Final Exam of MCP 4002.pdf"
-    ]
-    
+    parser = argparse.ArgumentParser(description="Process one or more exam PDFs.")
+    parser.add_argument(
+        "--pdf",
+        dest="pdfs",
+        nargs="*",
+        default=[],
+        help="Explicit PDF file paths to process.",
+    )
+    parser.add_argument(
+        "--input-dir",
+        default="content_gen/data/inputs",
+        help="Directory to scan for PDFs when --pdf is not provided.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="content_gen/data/outputs/bd_exams",
+        help="Directory for generated outputs.",
+    )
+    args = parser.parse_args()
+
+    processor = BDExamProcessor(output_dir=args.output_dir)
+    explicit_pdfs = [Path(p) for p in args.pdfs]
+    discovered_pdfs = list(Path(args.input_dir).glob("*.pdf")) if not explicit_pdfs else []
+    pdfs = explicit_pdfs or discovered_pdfs
+
+    if not pdfs:
+        print("⚠️ No PDFs found. Provide --pdf paths or place files in --input-dir.")
+        sys.exit(0)
+
     for pdf in pdfs:
-        if os.path.exists(pdf):
-            processor.process_pdf(pdf)
+        if pdf.exists():
+            processor.process_pdf(str(pdf))
         else:
             print(f"⚠️ File not found: {pdf}")
