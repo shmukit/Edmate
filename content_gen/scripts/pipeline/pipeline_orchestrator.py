@@ -256,9 +256,13 @@ def main():
 
     # Storage
     parser.add_argument(
-        "--storage-provider", choices=["azure"], default="azure", help="Storage provider")
+        "--storage-provider",
+        choices=["auto", "azure"],
+        default="auto",
+        help="Storage backend selector (kept for backward compatibility; currently ignored).",
+    )
     parser.add_argument("--storage-bucket",
-                        help="Azure Storage container name")
+                        help="CDN/storage bucket or container name (needed for non-base64 image mode)")
     parser.add_argument("--cleanup-images", action="store_true",
                         help="Delete local images after upload")
 
@@ -273,6 +277,9 @@ def main():
         "--single-pdf", help="Process a single PDF instead of batch")
 
     args = parser.parse_args()
+
+    if args.storage_provider != "auto":
+        print("ℹ️ --storage-provider is deprecated and currently ignored.")
 
     # Get database URL
     db_url: Optional[str] = cast(Optional[str], args.db_url or os.getenv("DATABASE_URL"))

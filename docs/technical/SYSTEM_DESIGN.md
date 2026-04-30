@@ -30,7 +30,7 @@ Edmate transforms raw Cambridge A/O-Level exam PDFs into structured, pedagogical
 │                                                                 │
 │  ┌──────────┐   ┌──────────────┐   ┌──────────────────────┐   │
 │  │  PDF     │──▶│  Extraction  │──▶│  Content Generation  │   │
-│  │  Inputs  │   │   Pipeline   │   │  (Gemini / ChatGPT)  │   │
+│  │  Inputs  │   │   Pipeline   │   │ (Any LLM via router) │   │
 │  └──────────┘   └──────┬───────┘   └──────────┬───────────┘   │
 │                         │                       │               │
 │              ┌──────────┴────┐     ┌────────────▼──────────┐   │
@@ -110,10 +110,10 @@ Edmate/
     │
     ├──▶ [Cloudflare R2] ──▶ [Public CDN URLs]
     │
-    ▼ Gemini API (prompts.py)
+    ▼ LLM Router API (prompts.py)
 [Enhanced JSON: explanation, flashcards, concept gaps]
     │
-    ▼ ChatGPT (formatting)
+    ▼ Formatting pass (provider-configurable)
 [Unicode-clean text, Google Docs compatible]
     │
     ▼ psycopg2 / supabase-py
@@ -196,8 +196,8 @@ CREATE INDEX idx_concept_gaps_question ON concept_gaps(question_id);
 |-------|-----------|-------|
 | **Database** | Supabase (PostgreSQL) | Managed, free tier |
 | **File Storage / CDN** | Cloudflare R2 | Zero egress fees, S3-compatible |
-| **AI — Generation** | Google Gemini API | Explanations, flashcards |
-| **AI — Formatting** | OpenAI ChatGPT | LaTeX → Unicode, Docs compatibility |
+| **AI — Generation** | Provider-configurable via LiteLLM | Explanations, flashcards |
+| **AI — Formatting** | Provider-configurable via LiteLLM | LaTeX → Unicode, Docs compatibility |
 | **PDF Extraction** | PyMuPDF + PDF-Extract-Kit | Vector diagram rendering |
 | **Language** | Python 3.8+ | Pipeline scripts |
 | **Config** | `.env` + `python-dotenv` | Credentials management |
@@ -215,6 +215,8 @@ R2_BUCKET_NAME=edmate-diagrams
 DATABASE_URL=postgresql://user:pass@host:5432/edmate
 
 # AI APIs
+LITELLM_API_KEY=...
+# Optional provider-specific aliases:
 GEMINI_API_KEY=...
 OPENAI_API_KEY=...
 ```
@@ -227,13 +229,13 @@ OPENAI_API_KEY=...
 
 Content generation follows a structured chain:
 
-1. **Question + Mark Scheme** → Gemini prompt
+1. **Question + Mark Scheme** → router-selected generation model
 2. **Output**: Explanation, step-by-step analysis, correct answer, option-wise analysis, flashcards
-3. **Formatting pass** → ChatGPT converts LaTeX to Unicode for Google Docs
+3. **Formatting pass** → router-selected formatting model converts LaTeX to Unicode for Google Docs
 
 ### LLM-as-Judge QC (Phase 2.5 — Planned)
 
-A second model acts as evaluator on Gemini output before database import:
+A second model acts as evaluator on generated output before database import:
 
 | Check | Criterion |
 |-------|-----------|
@@ -287,7 +289,7 @@ For large-scale ingestion (1,000+ PDFs), the pipeline can be distributed:
 | **Stateless Workers** | Each worker only reads PDFs and writes to shared DB/CDN — no shared local state |
 
 ### Async Processing
-For AI API calls (Gemini, ChatGPT), async I/O reduces idle time waiting for API responses:
+For AI API calls, async I/O reduces idle time waiting for API responses:
 
 ```python
 import asyncio
@@ -367,7 +369,7 @@ def run_with_retry(fn, args, max_retries=3, backoff=2.0):
 |-------|------------|--------|
 | PDF Extraction | Log + skip PDF | No (bad PDF is bad PDF) |
 | CDN Upload | Log + retry | Yes — 3× with backoff |
-| Gemini API | Log + retry | Yes — 3× with backoff |
+| LLM API | Log + retry | Yes — 3× with backoff |
 | DB Import | Rollback transaction + log | Yes — 2× |
 | Full Pipeline | Write failure report | No — manual intervention |
 
@@ -398,7 +400,7 @@ logs/
 | `pdfs_failed` | PDFs that errored out |
 | `questions_extracted` | Total questions written to DB |
 | `diagrams_uploaded` | Total CDN uploads |
-| `api_errors` | Gemini / ChatGPT API failures |
+| `api_errors` | LLM API failures |
 | `qc_failures` | Items flagged by LLM-as-Judge |
 
 ### Automated Tests
@@ -425,7 +427,7 @@ To avoid redundant AI API calls (which are slow and costly), responses are cache
 
 | Cache Layer | What Is Cached | Implementation |
 |-------------|---------------|----------------|
-| **File Cache** | Gemini/ChatGPT responses, keyed by `(paper_code, question_number, prompt_hash)` | JSON files in `data/cache/` |
+| **File Cache** | LLM responses, keyed by `(paper_code, question_number, prompt_hash)` | JSON files in `data/cache/` |
 | **DB Cache** | Questions already in DB are skipped on re-run (check by `paper_code + question_number`) | SQL `ON CONFLICT DO NOTHING` |
 | **CDN Cache** | Uploaded images are not re-uploaded; keyed by R2 object key existence check | R2 `head_object` check |
 
@@ -465,7 +467,7 @@ CREATE INDEX idx_questions_difficulty ON questions(difficulty);
 
 ### API Rate Limiting
 
-Gemini and OpenAI enforce per-minute token/request limits. The pipeline uses a token bucket approach:
+LLM providers enforce per-minute token/request limits. The pipeline uses a token bucket approach:
 
 ```python
 import time
@@ -482,7 +484,7 @@ class RateLimiter:
             time.sleep(self.min_interval - elapsed)
         self.last_call = time.time()
 
-gemini_limiter = RateLimiter(requests_per_minute=60)  # Gemini free tier
+provider_limiter = RateLimiter(requests_per_minute=60)  # tune per provider tier
 ```
 
 ---
@@ -534,13 +536,13 @@ python content_gen/scripts/pipeline/pipeline_orchestrator.py \
 - [x] PDF extraction pipeline
 - [x] CDN upload (Cloudflare R2)
 - [x] Database import
-- [x] Manual content generation (Gemini)
+- [x] Manual content generation (router-configured provider)
 
 ### Short-term (Phase 2)
-- [ ] Automated Gemini API integration (remove manual step)
-- [ ] Automated ChatGPT formatting API integration
+- [ ] Automated LLM API integration (remove manual step)
+- [ ] Automated formatting model integration
 - [ ] LLM-as-Judge QC pipeline (Phase 2.5)
-- [ ] Alt text generation for diagrams (Gemini Vision)
+- [ ] Alt text generation for diagrams (provider-configurable vision model)
 
 ### Long-term (Phase 3)
 - [ ] Equation extraction (LaTeX-OCR or Mathpix)

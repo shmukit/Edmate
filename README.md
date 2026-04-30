@@ -80,7 +80,7 @@ If you are a developer looking to integrate Edmate directly into your own platfo
 
 1. **Start the API Server**: `uvicorn qc_viewer.main:app --host 0.0.0.0 --port 8000`
 2. **Interactive API Docs**: Navigate to `http://localhost:8000/docs` to view the auto-generated Swagger UI which interactively documents all available endpoints.
-3. **Python Example**: Check out the fully runnable Python example at [`examples/client_request.py`](examples/client_request.py). It demonstrates how to hit the `/api/v1/extract` endpoint, pass your LLM API keys via HTTP headers, and poll the job status until completion.
+3. **Python Example**: Check out the fully runnable Python example at [`examples/client_request.py`](examples/client_request.py). It demonstrates how to hit the `/api/v1/extract` endpoint, pass a provider-agnostic BYOK key via HTTP headers, and poll the job status until completion.
 
 ---
 
@@ -140,7 +140,7 @@ graph TD
     - **Lightweight:** Regex-based extraction for fast, CPU-only processing.
 3. **Pedagogical Engine:** Applies Learning Science techniques (like our HIA engine) dynamically during the generation stage.
 4. **Curriculum Agnostic:** Plug and play your specific curriculum format (e.g., GCSE A/O level, or any National Curriculum).
-5. **Model Router (BYOK):** Bring Your Own Key. Route tasks to any LLM of your choice (OpenAI, Gemini, Anthropic, or Local models).
+5. **Model Router (BYOK):** Bring Your Own Key. Route tasks to any LLM supported by your configured provider/router.
 6. **Multi-Tier Output Generation:** Extracts simple raw content (Q/A, Diagrams, Tables as-is) alongside enriched metadata (rationales for right/wrong answers, concept gaps, and 3D flashcards).
 
 ---
@@ -154,7 +154,7 @@ graph TD
 | `qc_viewer/` | **The Heart**: FastAPI backend and Automation Hub dashboard for review. |
 | `docs/` | Comprehensive documentation on system design, pedagogy, and brand. |
 | `examples/` | Client integration examples (BYOK usage, API polling). |
-| `credentials/` | Secure storage for API keys (e.g., Gemini service accounts). |
+| `credentials/` | Secure storage for optional cloud credentials (when needed). |
 | `edmate_config.yaml` | Global project configuration (models, budgets, engines). |
 
 ### 🧠 Content Generation (`content_gen/`)

@@ -16,7 +16,7 @@ The objective is to allow an external platform to send a document and curriculum
     - [x] `POST /api/v1/extract`: Accept file + metadata (curriculum, subject).
     - [x] `GET /api/v1/jobs/{job_id}`: Poll for status and retrieve final JSON.
 - [x] **BYOK (Bring Your Own Key) Support:** 
-    - [x] Implement middleware to extract `X-OpenAI-Key` or `X-Gemini-Key` from request headers and pass them to the `LiteLLM` adapter dynamically.
+    - [x] Implement middleware to extract provider-agnostic `X-API-Key` (with legacy compatibility for provider-specific headers) and pass it to the `LiteLLM` adapter dynamically.
 
 ### B. Schema Enforcement (Pydantic Models)
 - [x] **Data Validation:** Create a robust Pydantic model for `EDMATE_JSON_SCHEMA`.

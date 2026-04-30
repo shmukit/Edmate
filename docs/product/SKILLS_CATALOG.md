@@ -116,14 +116,14 @@ print(f"Extracted {len(result['questions'])} questions")
 
 ---
 
-## Skill 2: Content Generation (Gemini)
+## Skill 2: Content Generation (LLM Router)
 
 ### Metadata
-- **Skill ID**: `gemini_content_generation`
+- **Skill ID**: `llm_content_generation`
 - **Status**: ✅ Implemented (Manual Workflow)
-- **Implementation**: Prompt-based (Gemini API)
+- **Implementation**: Prompt-based (provider-configurable)
 - **Complexity**: Medium
-- **Dependencies**: Gemini API access
+- **Dependencies**: LLM API access
 
 ### Purpose
 Generate pedagogically-rich explanations, concept gap analysis, and flashcards for exam questions.
@@ -204,27 +204,19 @@ Formatting Rules:
 ```
 
 ### Usage Example (Manual)
-1. Upload question paper + marks scheme to Gemini
+1. Upload question paper + marks scheme to your preferred LLM interface
 2. Paste prompt with subject and range
 3. Copy generated markdown output
 
-### Future: API Integration
+### Future: API Integration (provider-configurable)
 ```python
-import google.generativeai as genai
+from content_gen.core.model_router import ModelRoutingEngine
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-pro")
-
-response = model.generate_content([
-    prompt_template.format(
-        subject="Biology",
-        range="1-10"
-    ),
-    question_paper_file,
-    marks_scheme_file
-])
-
-content = response.text
+router = ModelRoutingEngine()
+content = router.generate_content(
+    prompt=prompt_template.format(subject="Biology", range="1-10"),
+    task_type="generation",
+)
 ```
 
 ---
@@ -234,9 +226,9 @@ content = response.text
 ### Metadata
 - **Skill ID**: `google_docs_formatting`
 - **Status**: ✅ Implemented (Manual Workflow)
-- **Implementation**: Prompt-based (ChatGPT)
+- **Implementation**: Prompt-based (provider-configurable)
 - **Complexity**: Low
-- **Dependencies**: ChatGPT API access
+- **Dependencies**: LLM API access
 
 ### Purpose
 Convert LaTeX and markdown to Google Docs-compatible Unicode format.
@@ -244,7 +236,7 @@ Convert LaTeX and markdown to Google Docs-compatible Unicode format.
 ### Inputs
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `raw_content` | String | Yes | Gemini output with LaTeX/markdown |
+| `raw_content` | String | Yes | LLM output with LaTeX/markdown |
 
 ### Outputs
 | Output | Type | Description |
@@ -273,27 +265,24 @@ Rewrite the following document for Google Docs compatibility:
 - Output as plain text for direct pasting into Google Docs without breaking.
 - Do not reduce text, keep it as it is.
 
-[PASTE GEMINI OUTPUT HERE]
+[PASTE LLM OUTPUT HERE]
 ```
 
 ### Usage Example (Manual)
-1. Copy Gemini output
-2. Paste into ChatGPT with prompt
+1. Copy generation output
+2. Paste into your formatting model with prompt
 3. Copy formatted output to Google Docs
 
-### Future: API Integration
+### Future: API Integration (provider-configurable)
 ```python
-import openai
+from content_gen.core.model_router import ModelRoutingEngine
 
-response = openai.ChatCompletion.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": formatting_prompt},
-        {"role": "user", "content": raw_gemini_content}
-    ]
+router = ModelRoutingEngine()
+formatted_content = router.generate_content(
+    prompt=raw_content,
+    task_type="validation",
+    system_prompt=formatting_prompt,
 )
-
-formatted_content = response.choices[0].message.content
 ```
 
 ---
@@ -507,7 +496,7 @@ json_data, images = pdf_extraction(pdf_path)
 cdn_mapping = blob_upload(images, provider="r2")
 
 # Generate (future: API)
-content = gemini_generation(json_data, marks_scheme)
+content = llm_generation(json_data, marks_scheme)
 
 # Format (future: API)
 formatted = google_docs_formatting(content)
@@ -521,8 +510,8 @@ db_import(json_data, cdn_mapping, formatted, db_conn)
 # Extract
 json_data, images = pdf_extraction(pdf_path)
 
-# Manual: User generates content via Gemini UI
-# Manual: User formats via ChatGPT UI
+# Manual: User generates content via chosen LLM UI
+# Manual: User formats via chosen LLM UI
 
 # Upload
 cdn_mapping = blob_upload(images, provider="r2")
@@ -592,5 +581,5 @@ Automate the quality control of generated educational explanations by using a se
 
 ### Skill 8: AI Alt Text Generation
 - **Purpose**: Generate accessibility descriptions for diagrams
-- **Tools**: Gemini Vision API
+- **Tools**: Provider-configurable vision-capable model
 - **Status**: Planned
