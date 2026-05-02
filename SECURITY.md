@@ -57,7 +57,8 @@ When using Edmate as an MCP Tool in an Agentic IDE (e.g., Cursor, Windsurf):
 
 Before deploying Edmate in a production environment:
 
-- [ ] Set `CORS` `allow_origins` to your specific domain (not `*`).
+- [ ] Set `CORS` `allow_origin_regex` to your specific production domain (e.g., `https?://(.*\.)?yourdomain\.com`).
+- [ ] Avoid using `.*` in production; explicitly list trusted origins or use a narrow regex.
 - [ ] Enable `slowapi` rate limiting on `/api/automate/draft`.
 - [ ] Ensure `content_gen/.env` is never committed to version control.
 - [ ] Rotate LLM API keys regularly.

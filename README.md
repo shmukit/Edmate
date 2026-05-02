@@ -194,6 +194,25 @@ curl -X POST "http://localhost:8000/api/automate/draft" \
 - Mask key input in UI and never return full keys in API responses.
 - Avoid persisting keys in plain text; use encryption/secret vault where possible.
 - Do not write keys to app logs, job metadata, or analytics events.
+- **CORS & BYOK**: When calling Edmate from a different origin (e.g., your own dashboard), ensure your backend allows the custom headers (`X-API-Key`, etc.). Edmate's default configuration is permissive for local development but must be restricted in production.
+
+---
+
+## 🛠️ Troubleshooting CORS & Preflights
+
+If you are integrating Edmate into a custom frontend (like a React or Vite app) and see **CORS errors** in your browser console:
+
+### 1. The "Wildcard + Credentials" Trap
+Browsers block `Access-Control-Allow-Origin: *` if the request includes credentials (cookies/auth) or certain custom headers. Edmate handles this by **reflecting the requesting origin** automatically.
+
+### 2. Preflight (OPTIONS) Failures
+If you send custom headers like `X-Gemini-Key`, the browser will send an `OPTIONS` request first.
+- **Problem**: In many frameworks, if the CORS middleware is registered *after* the routes, the router will return a `405 Method Not Allowed` for the `OPTIONS` request, causing a CORS error.
+- **Solution**: Edmate's `app_factory.py` ensures CORS middleware is at the top of the stack. If you modify the codebase, **never move the CORS middleware below the routers**.
+
+### 3. Required Headers
+Ensure your client-side fetch/axios configuration explicitly allows these headers if your environment is restrictive:
+`X-API-Key`, `X-LLM-Provider`, `X-Model-ID`, `X-Gemini-Key`, `X-OpenAI-Key`.
 
 ---
 
