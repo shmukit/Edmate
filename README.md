@@ -39,6 +39,7 @@ Edmate is a **Content Factory Infrastructure**. Its mission ends where the learn
 - ⚡ **MCP Ready**: Plug Edmate directly into Agentic IDEs (Cursor/Windsurf) as a native tool for instant content generation.
 - 📊 **Automation Hub**: A sleek, dark-mode dashboard for managing drafts, review workflows, and cost analytics.
 - 🛡️ **High-Integrity (HIA) First**: Specialized engine for generating AI-resilient assessments (AI Critique, Isomorphic Variants, Viva Prompts) that combat AI cheating.
+- 📤 **Output adapters (teacher exports)**: From the Automation Hub, download any processed draft as JSON, CSV, compact Markdown (`.md`), Markdown + images (`.zip` with `questions.md` + `images/`), or Word (`.docx`) — no database required.
 
 ---
 
@@ -195,6 +196,29 @@ curl -X POST "http://localhost:8000/api/automate/draft" \
 - Avoid persisting keys in plain text; use encryption/secret vault where possible.
 - Do not write keys to app logs, job metadata, or analytics events.
 - **CORS & BYOK**: When calling Edmate from a different origin (e.g., your own dashboard), ensure your backend allows the custom headers (`X-API-Key`, etc.). Edmate's default configuration is permissive for local development but must be restricted in production.
+
+---
+
+## 📤 Export formats (Automation Hub)
+
+After a draft finishes processing, you can download it without publishing to Postgres.
+
+- **Where**: Automation Hub at `/automate` (e.g. `http://localhost:8000/automate`) — each draft card has **Export** (with a menu), and the Review overlay has the same **Export** menu.
+- **Endpoint**: `GET /api/automate/draft/{draft_id}/export?format=...`
+- **Formats**:
+  - `json` — full `metadata.json` (includes diagram data URIs).
+  - `csv` — one row per question; diagrams as a `diagram_data_uri` column.
+  - `markdown` or `md` — readable Markdown; diagrams are **not** inlined as base64 (see blockquote notes); use `mdzip` or JSON/DOCX for images.
+  - `mdzip` — ZIP containing `questions.md`, `README.txt`, and `images/Q{n}.png|jpg` for PNG/JPEG diagrams.
+  - `docx` — Microsoft Word document with embedded PNG/JPEG diagrams.
+
+Example:
+
+```bash
+curl -f -o export.zip "http://localhost:8000/api/automate/draft/draft_abc12345/export?format=mdzip"
+```
+
+Implementation: [`qc_viewer/services/draft_export.py`](qc_viewer/services/draft_export.py) and route in [`qc_viewer/routers/automation.py`](qc_viewer/routers/automation.py).
 
 ---
 

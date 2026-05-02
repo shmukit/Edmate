@@ -119,5 +119,44 @@ export const AutomationAPI = {
         const result = await response.json();
         if (!response.ok) throw new Error(result.detail || 'Refinement failed');
         return result;
+    },
+
+    /**
+     * Download draft metadata (format: json | csv | markdown | md | mdzip | docx).
+     */
+    async exportDraft(id, format) {
+        const q = format === 'markdown' ? 'markdown' : format;
+        const resp = await fetch(`/api/automate/draft/${encodeURIComponent(id)}/export?format=${encodeURIComponent(q)}`);
+        if (!resp.ok) {
+            let detail = `Export failed (${resp.status})`;
+            try {
+                const err = await resp.json();
+                if (err.detail) detail = typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail);
+            } catch (_) { /* ignore */ }
+            throw new Error(detail);
+        }
+        const blob = await resp.blob();
+        const cd = resp.headers.get('Content-Disposition') || '';
+        const match = cd.match(/filename="([^"]+)"/);
+        const ext =
+            format === 'markdown' || format === 'md'
+                ? 'md'
+                : format === 'mdzip'
+                  ? 'zip'
+                  : format === 'csv'
+                    ? 'csv'
+                    : format === 'docx'
+                      ? 'docx'
+                      : 'json';
+        const filename = match ? match[1] : `draft_${id}.${ext}`;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
     }
 };

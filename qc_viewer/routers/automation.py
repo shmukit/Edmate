@@ -8,13 +8,14 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, Header, HTTPException, Request, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 
 from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.scripts.processing.database_service import DatabaseService
 from qc_viewer.config import DRAFTS_ROOT
 from qc_viewer.services.automation_pipeline import CANCELLATION_EVENTS, run_automation_pipeline
 from pydantic import BaseModel
+from qc_viewer.services import draft_export
 from qc_viewer.services.draft_store import (
     delete_draft_data,
     ensure_drafts_root,
@@ -137,6 +138,21 @@ async def list_drafts():
 @router.get("/api/automate/draft/{draft_id}")
 async def get_draft_results(draft_id: str):
     return read_json(resolve_metadata_path(draft_id))
+
+
+@router.get("/api/automate/draft/{draft_id}/export")
+async def export_draft(draft_id: str, format: str = "json"):
+    fmt = format.lower()
+    if fmt not in draft_export.SUPPORTED_FORMATS:
+        raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
+    meta = read_json(resolve_metadata_path(draft_id))
+    body = draft_export.render(meta, fmt)
+    filename = draft_export.safe_filename(meta, fmt)
+    return Response(
+        content=body,
+        media_type=draft_export.MEDIA_TYPES[fmt],
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.get("/api/automate/draft/{draft_id}/stream")
@@ -296,11 +312,11 @@ async def refine_explanation(request: RefineRequest):
 
     try:
         # For refinement, we want a more capable model
-        routing_engine.config.generation_model = "openai/gpt-4o"
+        routing_engine.config.model_routing.generation = "openai/gpt-4o"
         refined = routing_engine.generate_content(prompt, task_type="generation")
         return {
             "explanation": refined,
-            "model": routing_engine.config.generation_model,
+            "model": routing_engine.config.model_routing.generation,
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:

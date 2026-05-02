@@ -551,8 +551,8 @@ class PDFExtractKitWrapper:
 
                     # Pattern 2: Number on separate line (Q1-9 often)
                     # Allow optional trailing dot
-                    if re.match(r'^(\d+)[\.]?$', line_text):
-                        q_num_match = re.match(r'^(\d+)', line_text)
+                    q_num_match = re.match(r'^(\d+)[\.]?$', line_text)
+                    if q_num_match:
                         q_num = int(q_num_match.group(1))
                         if self._is_valid_question_number(q_num):
                             # Check next line/block for validation (should look like a question)

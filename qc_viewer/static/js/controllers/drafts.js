@@ -69,7 +69,7 @@ export const DraftController = {
                                     <span class="loader" style="width:16px; height:16px;"></span>
                                     <button class="btn btn-outline btn-sm btn-stop" data-id="${result.id}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
                                 </div>
-                                <button class="btn btn-outline btn-sm btn-delete" data-id="${result.id}" style="border:none; color:var(--danger)">×</button>
+                                <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${result.id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
                             </div>
                         </div>
                     </div>`;
@@ -168,7 +168,7 @@ export const DraftController = {
                     <span class="status-badge status-${status.toLowerCase()}">${status}</span>
                     <div class="action-buttons">
                         ${this.renderActionButton(d)}
-                        <button class="btn btn-outline btn-sm btn-delete" data-id="${d.id}" style="border:none; color:var(--danger)">×</button>
+                        <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${d.id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
                     </div>
                 </div>
             </div>
@@ -192,6 +192,12 @@ export const DraftController = {
         });
         document.querySelectorAll('.btn-stop').forEach(btn => {
             btn.onclick = (e) => { e.stopPropagation(); this.stopProcessing(btn.dataset.id); };
+        });
+        document.querySelectorAll('.btn-card-export').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                this.openDraftExportPopover(btn, btn.dataset.id);
+            };
         });
 
         if (hasProcessing && !this.pollingInterval) {
@@ -281,7 +287,10 @@ export const DraftController = {
 
     renderActionButton(d) {
         if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') {
-            return `<button class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>`;
+            return `<div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>
+                <button type="button" class="btn btn-outline btn-sm btn-card-export" data-id="${d.id}" title="Choose export format">📥 Export ▾</button>
+            </div>`;
         } else if (d.status === 'FAILED') {
             return `<span style="color:var(--danger); font-size:0.8rem;">Error</span>`;
         } else if (d.status === 'PROCESSING' || d.status === 'EXTRACTING') {
@@ -317,5 +326,65 @@ export const DraftController = {
 
     openReview(id) {
         window.AutomationUI.openReview(id);
-    }
+    },
+
+    /**
+     * Floating export format picker for a draft card (PROCESSED / REVIEW_READY).
+     */
+    openDraftExportPopover(anchorEl, draftId) {
+        document.querySelector('.draft-export-popover')?.remove();
+        const pop = document.createElement('div');
+        pop.className = 'draft-export-popover';
+        pop.style.cssText = [
+            'position:fixed',
+            'z-index:10050',
+            'background:var(--card-bg,#1e293b)',
+            'border:1px solid var(--card-border,#334155)',
+            'border-radius:8px',
+            'padding:8px',
+            'display:flex',
+            'flex-direction:column',
+            'gap:6px',
+            'min-width:220px',
+            'box-shadow:0 8px 24px rgba(0,0,0,0.35)',
+        ].join(';');
+        const r = anchorEl.getBoundingClientRect();
+        pop.style.top = `${Math.min(window.innerHeight - 120, r.bottom + 6)}px`;
+        pop.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - 150))}px`;
+
+        const addFmt = (fmt, label) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'btn btn-outline btn-sm';
+            b.textContent = label;
+            b.style.width = '100%';
+            b.style.justifyContent = 'flex-start';
+            b.onclick = async (ev) => {
+                ev.stopPropagation();
+                try {
+                    await AutomationAPI.exportDraft(draftId, fmt);
+                    this.showToast(`Exported ${label}`, 'success');
+                } catch (err) {
+                    this.showToast(err.message || 'Export failed', 'danger');
+                }
+                pop.remove();
+                document.removeEventListener('click', onDoc);
+            };
+            pop.appendChild(b);
+        };
+        addFmt('json', 'JSON');
+        addFmt('csv', 'CSV');
+        addFmt('markdown', 'Markdown (.md)');
+        addFmt('mdzip', 'Markdown + Images (.zip)');
+        addFmt('docx', 'Word (.docx)');
+        document.body.appendChild(pop);
+
+        const onDoc = (ev) => {
+            if (!pop.contains(ev.target) && ev.target !== anchorEl) {
+                pop.remove();
+                document.removeEventListener('click', onDoc);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', onDoc), 0);
+    },
 };

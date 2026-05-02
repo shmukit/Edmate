@@ -364,7 +364,8 @@ These items are **concrete and actionable**. They are good starting points for n
 
 #### 📦 Modularity (Output)
 - [ ] **Anki Export (`.apkg`)**: Direct export to Anki deck format with SM-2 scheduling
-- [ ] **Markdown Export**: Clean, portable markdown of all generated content
+- [x] **Markdown Export**: Compact `.md` plus optional **Markdown+ZIP** (`questions.md` + `images/`) for readable Markdown with separate image files
+- [x] **JSON / CSV / DOCX exports**: One-click teacher downloads from the Automation Hub (`GET /api/automate/draft/{id}/export`)
 - [ ] **JSON Schema Validation**: Enforce `v1.1.0` schema on all outputs with `pydantic` models
 
 #### 🧪 Testing
@@ -476,7 +477,7 @@ Edmate is a BYOK platform. This means the user's API keys are the highest-value 
 | **Input** | PDF | PDF, Excel, Docx, YouTube, Web |
 | **Extraction** | PyMuPDF, PDF-Extract-Kit | + LaTeX-OCR, Table Parser |
 | **Inference** | LiteLLM (100+ providers) | + Self-hosted (Ollama) |
-| **Output** | JSON, Postgres | + Anki, Markdown, QTI, SCORM, Google Classroom |
+| **Output** | JSON, Postgres, CSV, Markdown (compact + ZIP bundle), DOCX (Automation Hub) | + Anki, QTI, SCORM, Google Classroom |
 
 ---
 

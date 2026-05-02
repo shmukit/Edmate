@@ -85,6 +85,28 @@ export const AutomationUI = {
         document.getElementById('cancelRefine')?.addEventListener('click', () => this.closeModal('refineModal'));
         document.getElementById('submitRefine')?.addEventListener('click', () => this.submitRefinement());
         document.getElementById('btnSaveEdits')?.addEventListener('click', () => this.saveCurrentEdits(true));
+
+        // Draft export (review header)
+        document.getElementById('btnExportToggle')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const menu = document.getElementById('exportMenu');
+            if (!menu) return;
+            const open = menu.style.display === 'flex';
+            menu.style.display = open ? 'none' : 'flex';
+            menu.style.flexDirection = 'column';
+        });
+        document.querySelectorAll('#exportMenu [data-fmt]').forEach((btn) => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const fmt = btn.getAttribute('data-fmt');
+                if (fmt && this.triggerExport) await this.triggerExport(fmt);
+            });
+        });
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.export-menu')) return;
+            const menu = document.getElementById('exportMenu');
+            if (menu) menu.style.display = 'none';
+        });
         
         // Image Editor Actions
         document.getElementById('closeEditor')?.addEventListener('click', () => this.closeImageEditor());

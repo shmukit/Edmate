@@ -64,6 +64,16 @@
                     <button class="btn btn-primary btn-sm" id="btnAcceptAll">Accept All</button>
                     <button class="btn btn-outline btn-sm" id="btnToggleEdit">✏ Edit Mode</button>
                     <button class="btn btn-accent btn-sm" id="btnSaveEdits" style="display:none;">💾 Save</button>
+                    <div class="export-menu" style="position:relative; display:inline-block;">
+                        <button type="button" class="btn btn-outline btn-sm" id="btnExportToggle" title="Choose export format">📥 Export ▾</button>
+                        <div id="exportMenu" class="export-dropdown" style="display:none; position:absolute; right:0; top:100%; margin-top:4px; min-width:220px; z-index:50; background:var(--card-bg, #1e293b); border:1px solid var(--card-border, #334155); border-radius:8px; padding:6px; box-shadow:0 8px 24px rgba(0,0,0,0.35); flex-direction:column; gap:4px;">
+                            <button type="button" class="btn btn-outline btn-sm" data-fmt="json" style="width:100%; justify-content:flex-start;">JSON</button>
+                            <button type="button" class="btn btn-outline btn-sm" data-fmt="csv" style="width:100%; justify-content:flex-start;">CSV</button>
+                            <button type="button" class="btn btn-outline btn-sm" data-fmt="markdown" style="width:100%; justify-content:flex-start;">Markdown (.md)</button>
+                            <button type="button" class="btn btn-outline btn-sm" data-fmt="mdzip" style="width:100%; justify-content:flex-start;">Markdown + Images (.zip)</button>
+                            <button type="button" class="btn btn-outline btn-sm" data-fmt="docx" style="width:100%; justify-content:flex-start;">Word (.docx)</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="saveStatus" class="save-status-bar"></div>

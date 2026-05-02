@@ -390,5 +390,24 @@ export const ReviewController = {
         t.style.display = 'block';
         t.style.borderColor = type === 'danger' ? 'var(--danger)' : 'var(--primary)';
         setTimeout(() => t.style.display = 'none', 4000);
-    }
+    },
+
+    closeExportMenu() {
+        const menu = document.getElementById('exportMenu');
+        if (menu) menu.style.display = 'none';
+    },
+
+    async triggerExport(format) {
+        if (!this.currentDraftData?.id) {
+            this.showToast('Open a draft in Review to export', 'danger');
+            return;
+        }
+        try {
+            await AutomationAPI.exportDraft(this.currentDraftData.id, format);
+            this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
+            this.closeExportMenu();
+        } catch (err) {
+            this.showToast(err.message || 'Export failed', 'danger');
+        }
+    },
 };
