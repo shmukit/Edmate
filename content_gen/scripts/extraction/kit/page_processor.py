@@ -19,7 +19,7 @@ class KitPageProcessorMixin:
 
     # --- cross-mixin method dependencies (provided by sibling mixins) ---
     @abstractmethod
-    def _clean_noise(self, text: str) -> str: ...
+    def _clean_noise(self, text: str | None) -> str: ...
 
     @abstractmethod
     def _reconstruct_line_text(
@@ -70,8 +70,12 @@ class KitPageProcessorMixin:
             if "lines" in block:
                 for line in block["lines"]:
                     for span in line["spans"]:
-                        if not span["text"].strip():
+                        raw_t = span.get("text")
+                        text = "" if raw_t is None else str(raw_t)
+                        if not text.strip():
                             continue
+                        if span.get("text") != text:
+                            span = {**span, "text": text}
                         all_spans.append(span)
 
         spans_by_question = {q: [] for q in questions}
@@ -117,7 +121,7 @@ class KitPageProcessorMixin:
 
                 marker_indices = []
                 for i, span in enumerate(vline):
-                    txt = span["text"].strip().rstrip(".")
+                    txt = (span.get("text") or "").strip().rstrip(".")
                     font = span["font"].lower()
                     x = span["bbox"][0]
                     known_cols = [70, 81, 170, 181, 270, 281, 370, 381]
@@ -134,7 +138,7 @@ class KitPageProcessorMixin:
                             line_avg_baseline,
                             line_main_size,
                         )
-                        prefix_text = self._clean_noise(prefix_text)
+                        prefix_text = (self._clean_noise(prefix_text) or "").strip()
                         if prefix_text:
                             if current_field == "question_text":
                                 questions[q_num]["question_text"] += " " + prefix_text
@@ -153,14 +157,14 @@ class KitPageProcessorMixin:
                             line_avg_baseline,
                             line_main_size,
                         )
-                        opt_text = self._clean_noise(opt_text)
+                        opt_text = (self._clean_noise(opt_text) or "").strip()
                         questions[q_num]["options"][opt_letter] += " " + opt_text
                         current_field = opt_letter
                 else:
                     line_text = self._reconstruct_line_text(
                         vline, line_avg_baseline, line_main_size
                     )
-                    line_text = self._clean_noise(line_text)
+                    line_text = (self._clean_noise(line_text) or "").strip()
                     if line_text:
                         if current_field == "question_text":
                             if not questions[q_num]["question_text"]:
@@ -197,10 +201,10 @@ class KitPageProcessorMixin:
         temp_img_path.unlink()
 
         for q in questions.values():
-            q["question_text"] = q["question_text"].strip()
+            q["question_text"] = (q.get("question_text") or "").strip()
             q["question_text"] = re.sub(r"^(\d+[\.\s]*)+", "", q["question_text"])
             for opt in q["options"]:
-                val = q["options"][opt].strip()
+                val = (q["options"].get(opt) or "").strip()
                 val = re.sub(r"\s+[\d_]$", "", val)
                 q["options"][opt] = val
 
@@ -230,9 +234,9 @@ class KitPageProcessorMixin:
             if "lines" in block:
                 for i, line in enumerate(block["lines"]):
                     line_text = " ".join(
-                        span["text"].strip()
+                        (span.get("text") or "").strip()
                         for span in line["spans"]
-                        if span["text"].strip()
+                        if (span.get("text") or "").strip()
                     )
                     line_text = line_text.strip()
 
@@ -268,13 +272,13 @@ class KitPageProcessorMixin:
                             check_text = ""
                             if i + 1 < len(block["lines"]):
                                 check_text = " ".join(
-                                    s["text"] for s in block["lines"][i + 1]["spans"]
+                                    (s.get("text") or "") for s in block["lines"][i + 1]["spans"]
                                 ).strip()
                             elif block_idx + 1 < len(blocks):
                                 next_block = blocks[block_idx + 1]
                                 if "lines" in next_block and len(next_block["lines"]) > 0:
                                     check_text = " ".join(
-                                        s["text"] for s in next_block["lines"][0]["spans"]
+                                        (s.get("text") or "") for s in next_block["lines"][0]["spans"]
                                     ).strip()
 
                             if len(check_text) > 3:

@@ -20,9 +20,9 @@ from content_gen.scripts.extraction.kit.text_utils import KitTextUtilsMixin
 
 
 class PDFExtractKitWrapper(
-    KitPageProcessorMixin,
     KitTextUtilsMixin,
     KitImageUtilsMixin,
+    KitPageProcessorMixin,
     KitQuestionBuilderMixin,
 ):
     """

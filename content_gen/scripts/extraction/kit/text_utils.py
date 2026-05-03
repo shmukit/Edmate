@@ -11,8 +11,10 @@ class KitTextUtilsMixin:
     extraction_noise_patterns: List[str]
     outputs_dir: Optional[Path]
     base_name: Optional[str]
-    def _clean_noise(self, text: str) -> str:
-        """Filter global noise and map symbols from reconstructed text parts"""
+    def _clean_noise(self, text: str | None) -> str:
+        """Filter global noise and map symbols from reconstructed text parts."""
+        if text is None:
+            text = ""
         symbol_map = {
             "\uf070": "π",
             "\uf061": "α",
@@ -52,7 +54,8 @@ class KitTextUtilsMixin:
             return ""
         parts = []
         for span in spans:
-            text = span["text"]
+            raw = span.get("text")
+            text = "" if raw is None else str(raw)
             size = span["size"]
             top = span["bbox"][1]
 
@@ -87,10 +90,14 @@ class KitTextUtilsMixin:
                     f"Question {q['question_number']}Question and Options in Text Format\n\n"
                 )
 
-                f.write(f"{q['question_text'].strip()}\n\n")
+                q_body = (q.get("question_text") or "").strip()
+                f.write(f"{q_body}\n\n")
 
-                opts = q["options"]
-                opt_str = f"A. {opts['A']} B. {opts['B']} C. {opts['C']} D. {opts['D']}"
+                opts = q.get("options") or {}
+                opt_str = (
+                    f"A. {opts.get('A') or ''} B. {opts.get('B') or ''} "
+                    f"C. {opts.get('C') or ''} D. {opts.get('D') or ''}"
+                )
                 f.write(f"{opt_str.strip()}\n\n")
 
                 f.write("Detailed Explanation of the Question and Right Answer\n\n")

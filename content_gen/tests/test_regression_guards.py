@@ -11,6 +11,9 @@ def _wrapper_without_init() -> PDFExtractKitWrapper:
     wrapper.min_question_number = 1
     wrapper.max_question_number = 40
     wrapper.question_detection_mode = "balanced"
+    wrapper.extraction_noise_patterns = []
+    wrapper.outputs_dir = None
+    wrapper.base_name = None
     return wrapper
 
 
@@ -104,6 +107,65 @@ def test_parse_response_returns_empty_for_multi_without_headers():
         [1, 2, 3]
     )
     assert parsed == {}
+
+
+def test_reconstruct_line_text_handles_none_span_text():
+    wrapper = _wrapper_without_init()
+    spans = [
+        {"text": None, "size": 12.0, "bbox": [0.0, 10.0, 10.0, 20.0]},
+        {"text": "stem", "size": 12.0, "bbox": [12.0, 10.0, 40.0, 20.0]},
+    ]
+    assert wrapper._reconstruct_line_text(spans, 15.0, 12.0) == "stem"
+
+
+def test_clean_noise_accepts_none():
+    wrapper = _wrapper_without_init()
+    assert wrapper._clean_noise(None) == ""
+
+
+def test_generate_processed_text_tolerates_null_question_and_options(tmp_path: Path):
+    wrapper = _wrapper_without_init()
+    wrapper.outputs_dir = tmp_path
+    wrapper.base_name = "nullsafe"
+    wrapper._generate_processed_text(
+        {
+            "questions": [
+                {
+                    "question_number": 1,
+                    "question_text": None,
+                    "options": {"A": None, "B": "", "C": "", "D": ""},
+                }
+            ]
+        }
+    )
+    out = tmp_path / "nullsafe_processed.txt"
+    assert out.exists()
+    body = out.read_text(encoding="utf-8")
+    assert "Question 1" in body
+    assert "A." in body
+
+
+def test_kit_adapter_coerces_null_question_text_and_options(tmp_path: Path):
+    adapter = KitExtractionAdapter.__new__(KitExtractionAdapter)
+    adapter.default_subject = "General"
+    adapter.wrapper = MagicMock()
+    adapter.wrapper.extract_questions.return_value = {
+        "questions": [
+            {
+                "question_number": 1,
+                "question_text": None,
+                "options": {"A": None, "B": "beta"},
+                "stem_images": [],
+                "option_images": {},
+            }
+        ]
+    }
+
+    result = adapter.extract_content(tmp_path / "source.pdf", tmp_path)
+    assert result[0].question_text == ""
+    assert result[0].options["A"] == ""
+    assert result[0].options["B"] == "beta"
+    assert result[0].options.get("C") == ""
 
 
 def test_validate_generated_content_flags_missing_sections():

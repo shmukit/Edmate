@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-from typing import List, Optional, Callable
+from typing import Dict, List, Optional, Callable
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
 from content_gen.scripts.extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
@@ -65,10 +65,18 @@ class KitExtractionAdapter(BaseExtractionAdapter):
             subj = (q_data.get("subject") or "").strip()
             if not subj:
                 subj = self.default_subject
+            raw_opts = q_data.get("options") or {}
+            if not isinstance(raw_opts, dict):
+                raw_opts = {}
+            opts = {str(k): ("" if v is None else str(v)) for k, v in raw_opts.items()}
+            for k in ("A", "B", "C", "D"):
+                opts.setdefault(k, "")
+            q_text = q_data.get("question_text")
+            question_text = "" if q_text is None else str(q_text)
             questions.append(ProcessedQuestion(
                 question_number=q_data.get("question_number", 0),
-                question_text=q_data.get("question_text", ""),
-                options=q_data.get("options", {}),
+                question_text=question_text,
+                options=opts,
                 subject=subj,
                 metadata={
                     "stem_images": stem_image_paths,
