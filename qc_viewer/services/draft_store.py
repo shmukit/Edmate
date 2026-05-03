@@ -1,8 +1,9 @@
 import json
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 import threading
 
 from fastapi import HTTPException
@@ -48,6 +49,24 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     with METADATA_LOCK:
         with open(path, "w") as f:
             json.dump(payload, f)
+
+
+def read_modify_write_json(path: Path, mutator: Callable[[dict[str, Any]], None]) -> None:
+    """
+    Read JSON, apply mutator in-place, then atomically replace the file.
+    Holds METADATA_LOCK for the whole operation so callers never read a torn write.
+    """
+    with METADATA_LOCK:
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                data: dict[str, Any] = json.load(f)
+        else:
+            data = {}
+        mutator(data)
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        os.replace(tmp, path)
 
 
 def list_draft_metadata() -> list[dict[str, Any]]:

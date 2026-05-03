@@ -30,6 +30,7 @@ class KitQuestionBuilderMixin:
                     },
                     "stem_images": list(dict.fromkeys(q.get("stem_images", []) or [])),
                     "option_images": q.get("option_images", {}) or {},
+                    "extraction_warnings": list(q.get("extraction_warnings") or []),
                 }
                 continue
 
@@ -45,6 +46,13 @@ class KitQuestionBuilderMixin:
                     continue
                 existing = merged[num]["options"].get(opt, "")
                 merged[num]["options"][opt] = f"{existing} {opt_text}".strip()
+
+            new_warn = q.get("extraction_warnings") or []
+            if new_warn:
+                prev = merged[num].get("extraction_warnings") or []
+                merged[num]["extraction_warnings"] = list(
+                    dict.fromkeys([*prev, *new_warn])
+                )
 
             merged[num]["stem_images"] = list(
                 dict.fromkeys(

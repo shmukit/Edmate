@@ -48,8 +48,6 @@ export const AutomationUI = {
                     ).join('');
                 }
 
-                // Re-init tooltips for dynamic content
-                this.setupTooltips();
             }
 
             const engine = (config.extraction_settings && config.extraction_settings.engine) || 'unknown';
@@ -60,14 +58,23 @@ export const AutomationUI = {
             const banner = document.getElementById('extractionContextBanner');
             if (banner) {
                 const safeEngine = String(engine).replace(/</g, '&lt;');
-                const parts = [
-                    `<strong>Active extraction engine:</strong> ${safeEngine}`,
-                    mode ? `<span> · detection: ${String(mode)}</span>` : '',
-                    `<span> · PDF-Extract-Kit: ${kit}</span>`,
-                    hint ? `<br>${hint}` : '',
-                    warn ? `<br><strong style="color:#f97316;">${warn}</strong>` : '',
-                ];
-                banner.innerHTML = parts.join('');
+                const engKey = String(engine).toLowerCase();
+                let mainLine = '';
+                if (engKey === 'pdf_extract_kit') {
+                    mainLine = `<strong>Active extraction engine:</strong> PDF-Extract-Kit <span style="opacity:0.72;font-size:0.82em;">(pdf_extract_kit)</span> · kit: ${kit}`;
+                } else {
+                    mainLine = `<strong>Active extraction engine:</strong> ${safeEngine}`;
+                }
+                const det = mode ? ` <span>· detection: ${String(mode).replace(/</g, '&lt;')}</span>` : '';
+                const hintHtml = hint ? `<br>${String(hint).replace(/</g, '&lt;')}` : '';
+                const warnHtml = warn ? `<br><strong style="color:#f97316;">${String(warn).replace(/</g, '&lt;')}</strong>` : '';
+                const bannerTip =
+                    'Backend from edmate_config.yaml. For PDF-Extract-Kit, kit means the local checkout under content_gen/tools/PDF-Extract-Kit (layout/diagram support). Other engines do not use that directory.';
+                banner.innerHTML = `
+                    <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:0;">${mainLine}${det}${hintHtml}${warnHtml}</div>
+                        <span class="info-icon" data-tooltip="${bannerTip.replace(/"/g, '&quot;')}">ⓘ</span>
+                    </div>`;
             }
             const footer = document.getElementById('settingsEngineFooter');
             if (footer) {
@@ -95,13 +102,23 @@ export const AutomationUI = {
             setTxt('cfgDetection', mode || '—');
             setTxt('cfgKit', kit);
             setTxt('cfgQuestionRange', qRange);
-            setTxt('cfgSegmentation', es.segmentation_preset);
             setTxt('cfgSubject', ws.default_subject);
             setTxt('cfgCurriculum', ws.default_curriculum);
             setTxt('cfgBudget', bud.max_daily_usd != null ? String(bud.max_daily_usd) : '—');
             setTxt('cfgModelExt', mr.extraction);
             setTxt('cfgModelGen', mr.generation);
             setTxt('cfgModelVal', mr.validation);
+
+            const segRaw = (es.segmentation_preset || '').toString().trim().toLowerCase();
+            const segLabel =
+                segRaw === 'bangladeshi'
+                    ? 'Sections + numbered (legacy id: bangladeshi)'
+                    : segRaw === 'numbered_only'
+                      ? 'Numbered questions only'
+                      : segRaw || '—';
+            setTxt('cfgSegmentation', segLabel);
+
+            this.setupTooltips();
         } catch (e) {
             console.error('Error loading pipeline config:', e);
         }
@@ -217,8 +234,9 @@ export const AutomationUI = {
             document.body.appendChild(tooltip);
         }
 
-        const icons = document.querySelectorAll('.info-icon[data-tooltip]');
+        const icons = document.querySelectorAll('.info-icon[data-tooltip]:not([data-tooltip-bound])');
         icons.forEach(icon => {
+            icon.setAttribute('data-tooltip-bound', '1');
             icon.addEventListener('mouseenter', (e) => {
                 const text = icon.getAttribute('data-tooltip');
                 const rect = icon.getBoundingClientRect();
