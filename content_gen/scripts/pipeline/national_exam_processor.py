@@ -28,6 +28,7 @@ for key, value in env_vars.items():
 os.environ["VERTEXAI_LOCATION"] = "asia-south1"
 
 from content_gen.core.segmentation import TextSegmentationUtility
+from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.scripts.prompts import NATIONAL_EXAM_SYSTEM_PROMPT, NATIONAL_EXAM_EXTRACTION_PROMPT
 
 import time
