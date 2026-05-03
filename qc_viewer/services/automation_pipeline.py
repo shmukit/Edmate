@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.core.config_schema import DetectionMode
 from content_gen.core.pedagogy_engine import PedagogyEngine
 from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
 
@@ -159,7 +160,7 @@ def run_automation_pipeline(
     subject: str,
     paper_code: str,
     file_path: Path,
-    curriculum: str = "Cambridge O/Level",
+    curriculum: Optional[str] = None,
     ls_profile: str = "default",
     hia_mode: str = "Low",
     llm_provider: Optional[str] = None,
@@ -199,14 +200,21 @@ def run_automation_pipeline(
             print(f"Error updating progress: {e}")
 
     try:
+        router = ModelRoutingEngine()
+        if curriculum is None or not str(curriculum).strip():
+            curriculum = (
+                (router.config.workspace.default_curriculum or "").strip() or "General"
+            )
+
         pedagogy = PedagogyEngine(ls_profile=ls_profile, hia_mode=hia_mode, curriculum=curriculum)
         pedagogy_system_prompt = pedagogy.compile_system_prompt()
 
-        router = ModelRoutingEngine()
         valid_modes = {"strict", "balanced", "open"}
         requested_mode = (question_detection_mode or "").strip().lower()
         if requested_mode in valid_modes:
-            router.config.extraction_settings.question_detection_mode = requested_mode
+            router.config.extraction_settings.question_detection_mode = DetectionMode(
+                requested_mode
+            )
         if min_question_number is not None:
             router.config.extraction_settings.min_question_number = min_question_number
         if max_question_number is not None:

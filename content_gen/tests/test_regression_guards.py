@@ -69,6 +69,7 @@ def test_kit_adapter_preserves_image_paths_and_base64(tmp_path: Path):
     img_path.write_bytes(b"image-bytes")
 
     adapter = KitExtractionAdapter.__new__(KitExtractionAdapter)
+    adapter.default_subject = "General"
     adapter.wrapper = MagicMock()
     adapter.wrapper.extract_questions.return_value = {
         "questions": [

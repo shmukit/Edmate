@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional, Any, Union
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 
 class ImageMode(str, Enum):
@@ -9,6 +9,8 @@ class ImageMode(str, Enum):
 class ExtractionEngine(str, Enum):
     PDF_EXTRACT_KIT = "pdf_extract_kit"
     PYMUPDF = "pymupdf"
+    VISION = "vision"
+    MULTIMODAL = "multimodal"
 
 class DetectionMode(str, Enum):
     STRICT = "strict"
@@ -50,11 +52,39 @@ class BudgetConfig(BaseModel):
 class StorageSettings(BaseModel):
     image_mode: ImageMode = ImageMode.CDN
 
+# Optional extra regex patterns applied in pdf_extract_kit_wrapper._clean_noise (after structural cleanup).
+# Override in edmate_config.yaml; set to [] to disable boilerplate-only stripping.
+DEFAULT_EXTRACTION_NOISE_PATTERNS: List[str] = [
+    r"Permission to reproduce items where third-party owned material.*",
+    r"reasonable effort has been made by the publisher.*",
+    r"To avoid the issue of disclosure of answer-related information.*",
+    r"Cambridge Assessment International Education is part of.*",
+    r"University of Cambridge Local Examinations Syndicate.*",
+    r"Every publisher will be pleased to make amends.*",
+    r"Assessment International Education Copyright Acknowledgements.*",
+]
+
+
 class ExtractionSettings(BaseModel):
     engine: ExtractionEngine = ExtractionEngine.PDF_EXTRACT_KIT
     min_question_number: int = 1
     max_question_number: Optional[int] = None
     question_detection_mode: DetectionMode = DetectionMode.BALANCED
+    extraction_noise_patterns: List[str] = Field(
+        default_factory=lambda: list(DEFAULT_EXTRACTION_NOISE_PATTERNS)
+    )
+    # Layout preset for TextSegmentationUtility when used (e.g. national_exam_processor legacy path).
+    segmentation_preset: str = Field(
+        default="bangladeshi",
+        description="bangladeshi | numbered_only — controls regex segmentation heuristics",
+    )
+
+    @field_validator("engine", mode="before")
+    @classmethod
+    def _coerce_engine(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 class ObservabilityConfig(BaseModel):
     litellm_callbacks: List[str] = Field(default_factory=lambda: ["opik"])
@@ -96,6 +126,14 @@ class TargetTable(BaseModel):
 class WorkspaceConfig(BaseModel):
     curriculums: List[str] = Field(default_factory=list)
     target_tables: List[TargetTable] = Field(default_factory=list)
+    default_subject: str = Field(
+        default="General",
+        description="Fallback subject label when CLI/UI does not specify one",
+    )
+    default_curriculum: str = Field(
+        default="General",
+        description="Fallback curriculum string injected into prompts when none is provided",
+    )
 
 class EdmateConfig(BaseModel):
     """Root configuration for Edmate."""

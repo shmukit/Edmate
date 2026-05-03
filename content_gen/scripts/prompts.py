@@ -50,7 +50,7 @@ Rewrite the following document for Google Docs compatibility:
 
 # JSON generation prompt for high-reliability experiments
 JSON_GENERATION_PROMPT = """
-You are an expert Cambridge O/A-Level teacher. Provide a detailed educational analysis for the following question.
+You are an expert teacher for the learner's curriculum. Provide a detailed educational analysis for the following question.
 
 Return your response in STRICT JSON format with the following keys:
 {

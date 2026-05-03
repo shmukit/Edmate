@@ -1,6 +1,6 @@
 import fitz  # PyMuPDF
 from pathlib import Path
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, cast
 from content_gen.adapters.base_extraction import BaseExtractionAdapter
 from content_gen.core.schemas import ProcessedQuestion
 
@@ -22,7 +22,8 @@ class PyMuPDFAdapter(BaseExtractionAdapter):
         doc = fitz.open(str(source_path))
         full_text = ""
         for page in doc:
-            full_text += page.get_text() + "\n---PAGE_BREAK---\n"
+            # get_text() is overloaded in stubs; "text" always returns a plain string.
+            full_text += cast(str, page.get_text("text")) + "\n---PAGE_BREAK---\n"
 
         # Look for question markers like "1 \n Which row..." or "\n 1 \n"
         # Stricter pattern: Digit on a line, followed by a line starting with an Uppercase letter
@@ -41,7 +42,8 @@ class PyMuPDFAdapter(BaseExtractionAdapter):
                 # Basic cleaning: remove page breaks and codes
                 q_text = q_text.replace("---PAGE_BREAK---", "")
                 q_text = re.sub(r'© UCLES.*', '', q_text)
-                q_text = re.sub(r'9702/.*', '', q_text)
+                # Strip common syllabus / session codes embedded in footer lines
+                q_text = re.sub(r'\b\d{4}/\d{2}/[A-Za-z0-9_/]+\b', '', q_text)
                 
                 # Split options if they exist (A, B, C, D)
                 options = {}

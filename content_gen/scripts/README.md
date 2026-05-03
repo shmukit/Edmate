@@ -1,244 +1,44 @@
-# Content Generation Scripts
+# Content generation scripts
 
-## Overview
-Organized scripts for A/O-level content generation using **PDF-Extract-Kit** as the core extraction engine.
+This directory contains the **PDF → structured questions → explanations** pipeline used by Edmate.
 
----
+## Layout (actual tree)
 
-## Folder Structure
+| Path | Role |
+|------|------|
+| `extraction/` | `pdf_extract_kit_wrapper.py` — adapter around [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) (must be cloned to `content_gen/tools/PDF-Extract-Kit`; see repo `scripts/setup_pdf_extract_kit.sh`). |
+| `adapters/` (package root `content_gen/adapters/`) | `PyMuPDFAdapter`, `KitExtractionAdapter`, `VisionExtractionAdapter` — selected by `extraction_settings.engine` in `edmate_config.yaml`. |
+| `pipeline/` | `pipeline_orchestrator.py` — main CLI orchestrator; `national_exam_processor.py` — optional standalone path with `--extraction-engine`. |
+| `processing/` | `content_generator.py`, import/upload helpers. |
+| `prompts.py` | Shared prompt templates (use `[Curriculum]` / `[Subject]` placeholders). |
 
-```
-scripts/
-├── extraction/          # PDF extraction using PDF-Extract-Kit
-│   ├── pdf_extract_kit_wrapper.py
-│   └── __init__.py
-├── processing/          # Data processing (upload, import)
-│   ├── upload_to_storage.py
-│   ├── import_to_db.py
-│   └── __init__.py
-├── pipeline/            # End-to-end orchestration
-│   ├── pipeline_orchestrator.py
-│   └── __init__.py
-├── docx/                # DOCX text extraction
-│   ├── extract_text.py
-│   └── process_batch.py
-├── debug/               # Debugging and testing tools
-│   ├── ai_extract_test.py
-│   ├── analyze_pdf.py
-│   ├── check_spatial.py
-│   ├── debug_anchors.py
-│   └── debug_drawings.py
-└── archive/             # Deprecated scripts (do not use)
-    ├── smart_extract.py
-    ├── extract_pdf_content.py
-    ├── extract_diagram.py
-    └── README.md
-```
+## Quick start
 
----
+1. Install deps: `pip install -r content_gen/requirements.txt`
+2. Configure keys: `content_gen/.env` from `.env.example`
+3. Configure routing: `edmate_config.yaml` (see `edmate_config.yaml.example` in repo root — **plain YAML**, no `!!python/object` tags)
+4. If using **`pdf_extract_kit`**: run `./scripts/setup_pdf_extract_kit.sh` from the repo root, then install kit deps per upstream docs.
 
-## Core Scripts
+## CLI orchestrator
 
-### 1. PDF Extraction (extraction/)
-
-#### `pdf_extract_kit_wrapper.py`
-**Purpose**: Extract questions and diagrams from PDFs using PDF-Extract-Kit AI models
-
-**Features**:
-- ✅ AI-powered layout detection (figures, tables, formulas)
-- ✅ High-resolution image extraction
-- ✅ Question number detection
-- ✅ Compatible output format with legacy scripts
-
-**Usage**:
 ```bash
-python extraction/pdf_extract_kit_wrapper.py \
-  path/to/exam.pdf \
-  --output-dir data/extracted
+python3 content_gen/scripts/pipeline/pipeline_orchestrator.py \
+  --input-dir content_gen/data/inputs \
+  --output-dir content_gen/data/extracted \
+  --single-pdf path/to/file.pdf
 ```
 
-**Output**:
-- JSON file: `{pdf_name}_extracted.json`
-- PNG images: `images/q{num}_{type}.png`
+`--subject` is optional (defaults to `workspace.default_subject` in `edmate_config.yaml`).  
+`--storage-provider` is **deprecated** and ignored (kept only for backward-compatible argument parsing).
 
----
+## National exam processor (optional)
 
-### 2. Processing (processing/)
-
-#### `upload_to_storage.py`
-**Purpose**: Upload images to Cloudflare R2 or AWS S3
-
-**Usage**:
 ```bash
-python processing/upload_to_storage.py \
-  data/extracted/images \
-  --provider r2 \
-  --bucket edmate-diagrams \
-  --base-path "diagrams/9701_s25_qp_13"
+python3 content_gen/scripts/pipeline/national_exam_processor.py --pdf path/to/file.pdf --curriculum "General"
 ```
 
-#### `import_to_db.py`
-**Purpose**: Import questions and diagrams to PostgreSQL/Supabase
+Use `--extraction-engine legacy` for text + regex only; omit the flag to follow `edmate_config.yaml` (`vision`, `pdf_extract_kit`, `pymupdf`, etc.).
 
-**Usage**:
-```bash
-python processing/import_to_db.py \
-  data/extracted/9701_s25_qp_13_extracted.json \
-  --cdn-mapping cdn_mapping.json \
-  --paper-code 9701_s25_qp_13 \
-  --subject Biology \
-  --db-url "postgresql://user:pass@host:5432/edmate"
-```
+## Import to Postgres
 
----
-
-### 3. Pipeline (pipeline/)
-
-#### `pipeline_orchestrator.py`
-**Purpose**: End-to-end pipeline (extract → upload → import)
-
-**Usage**:
-```bash
-# Single PDF
-python pipeline/pipeline_orchestrator.py \
-  --single-pdf path/to/exam.pdf \
-  --output-dir data/extracted \
-  --subject Biology \
-  --storage-provider r2 \
-  --storage-bucket edmate-diagrams \
-  --db-url "postgresql://user:pass@host:5432/edmate"
-
-# Batch processing
-python pipeline/pipeline_orchestrator.py \
-  --input-dir data/inputs \
-  --output-dir data/extracted \
-  --subject Chemistry \
-  --storage-provider r2 \
-  --storage-bucket edmate-diagrams \
-  --db-url "postgresql://user:pass@host:5432/edmate" \
-  --cleanup-images
-```
-
----
-
-### 4. DOCX Processing (docx/)
-
-#### `extract_text.py`
-**Purpose**: Extract text from DOCX files
-
-**Usage**:
-```bash
-python docx/extract_text.py path/to/document.docx
-```
-
-#### `process_batch.py`
-**Purpose**: Batch process DOCX files
-
-**Usage**:
-```bash
-python docx/process_batch.py
-```
-
----
-
-### 5. Debug Tools (debug/)
-
-#### `ai_extract_test.py`
-**Purpose**: Test PDF-Extract-Kit on specific pages
-
-#### `analyze_pdf.py`
-**Purpose**: Analyze PDF structure (images, text, tables)
-
-**Usage**:
-```bash
-python debug/analyze_pdf.py path/to/exam.pdf
-```
-
-#### `check_spatial.py`, `debug_anchors.py`, `debug_drawings.py`
-**Purpose**: Debug spatial layout, anchors, and drawings
-
----
-
-## Key Changes from Previous Version
-
-### ✅ What Changed
-
-1. **Core Extraction**: Now uses **PDF-Extract-Kit** (AI-powered) instead of custom heuristics
-2. **Organized Structure**: Scripts grouped by purpose (extraction/, processing/, pipeline/, etc.)
-3. **Archived Old Code**: Redundant scripts moved to `archive/` folder
-4. **Updated Pipeline**: `pipeline_orchestrator.py` now uses PDF-Extract-Kit wrapper
-
-### ❌ What Was Removed
-
-- `smart_extract.py` → Replaced by `extraction/pdf_extract_kit_wrapper.py`
-- `extract_pdf_content.py` → Replaced by `extraction/pdf_extract_kit_wrapper.py`
-- `extract_diagram.py` → Replaced by `extraction/pdf_extract_kit_wrapper.py`
-
-### 📦 Module Structure
-
-All folders are now Python modules with `__init__.py` files, allowing clean imports:
-
-```python
-from extraction import PDFExtractKitWrapper
-from processing import StorageUploader, DatabaseImporter
-from pipeline import PipelineOrchestrator
-```
-
----
-
-## Migration Guide
-
-### If you were using `smart_extract.py`:
-
-**Old**:
-```python
-from smart_extract import SmartQuestionExtractor
-
-extractor = SmartQuestionExtractor(pdf_path, output_dir)
-result = extractor.extract()
-```
-
-**New**:
-```python
-from extraction.pdf_extract_kit_wrapper import PDFExtractKitWrapper
-
-extractor = PDFExtractKitWrapper(pdf_path, output_dir)
-result = extractor.extract()
-```
-
-**Output format remains the same** - no changes needed to downstream code!
-
----
-
-## Requirements
-
-See `../requirements.txt` for dependencies. Key additions:
-- PDF-Extract-Kit (already installed in `../tools/PDF-Extract-Kit`)
-- PyMuPDF (fitz)
-- boto3 (for cloud storage)
-- psycopg2 (for database)
-
----
-
-## Next Steps
-
-1. **Test the new extraction**:
-   ```bash
-   python extraction/pdf_extract_kit_wrapper.py path/to/test.pdf
-   ```
-
-2. **Run the full pipeline**:
-   ```bash
-   python pipeline/pipeline_orchestrator.py --single-pdf path/to/test.pdf --subject Biology
-   ```
-
-3. **Review archived scripts** in `archive/` folder (for reference only)
-
----
-
-## Support
-
-For issues or questions:
-- Check `archive/README.md` for migration details
-- Review `../docs/AGENTIC_WORKFLOW.md` for system architecture
-- See `../docs/SKILLS_CATALOG.md` for skill definitions
+See `content_gen/scripts/processing/import_to_db.py`. Use `--target-table` to force a table id, or define `workspace.target_tables` in `edmate_config.yaml` so the importer picks the first configured table.

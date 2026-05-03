@@ -49,13 +49,16 @@ class BatchProcessingReport(BaseModel):
 
 
 class ModelConfig(BaseModel):
-    """Configuration for routing models to specific tasks."""
+    """
+    Legacy sketch for routing-related fields.
+    Prefer :class:`content_gen.core.config_schema.EdmateConfig` for authoritative settings.
+    """
     extraction_model: str = "gemini/gemini-1.5-pro"
     generation_model: str = "anthropic/claude-3-haiku"
     validation_model: str = "openai/gpt-4o"
     max_budget: float = 10.0  # USD daily cap placeholder
     image_mode: str = "cdn"    # "cdn" or "base64"
-    extraction_engine: str = "pdf_extract_kit"  # "pdf_extract_kit" or "pymupdf"
+    extraction_engine: str = "pdf_extract_kit"  # "pdf_extract_kit" | "pymupdf" | "vision" | "multimodal"
     min_question_number: int = 1
-    max_question_number: Optional[int] = 40
+    max_question_number: Optional[int] = None
     question_detection_mode: str = "balanced"  # "strict" | "balanced" | "open"

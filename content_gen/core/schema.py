@@ -28,7 +28,7 @@ class ExamContext(BaseModel):
     variant: Optional[str] = None
 
 class Metadata(BaseModel):
-    curriculum: str = Field(..., description="e.g., 'Cambridge O-Level'")
+    curriculum: str = Field(..., description="Curriculum label for your deployment (any string)")
     subject: str
     topic: str
     subtopic: Optional[str] = None

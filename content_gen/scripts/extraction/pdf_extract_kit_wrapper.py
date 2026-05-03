@@ -40,6 +40,7 @@ class PDFExtractKitWrapper:
         min_question_number: int = 1,
         max_question_number: Optional[int] = None,
         question_detection_mode: str = "balanced",
+        extraction_noise_patterns: Optional[List[str]] = None,
     ):
         """
         Initialize PDF extractor
@@ -55,6 +56,13 @@ class PDFExtractKitWrapper:
         self.min_question_number = min_question_number
         self.max_question_number = max_question_number
         self.question_detection_mode = question_detection_mode
+        # Configurable boilerplate regexes (see edmate_config extraction_noise_patterns)
+        if extraction_noise_patterns is None:
+            from content_gen.core.config_schema import DEFAULT_EXTRACTION_NOISE_PATTERNS
+
+            self.extraction_noise_patterns = list(DEFAULT_EXTRACTION_NOISE_PATTERNS)
+        else:
+            self.extraction_noise_patterns = list(extraction_noise_patterns)
 
         # Determine working directory or use provided output_dir
         if output_dir:
@@ -392,7 +400,7 @@ class PDFExtractKitWrapper:
 
     def _clean_noise(self, text: str) -> str:
         """Filter global noise and map symbols from reconstructed text parts"""
-        # Symbol mapping for common Greek/Math characters found in Cambridge papers
+        # Symbol mapping for Wingdings-style private-use glyphs often emitted by PDF text layers
         symbol_map = {
             "\uf070": "π",
             "\uf061": "α",
@@ -418,19 +426,10 @@ class PDFExtractKitWrapper:
         text = re.sub(r'\d{4}/\d{2}/\w+/\d{2}', '', text)
         text = re.sub(r'© UCLES.*', '', text, flags=re.I)
         text = re.sub(r'\[Turn over', '', text, flags=re.I)
-        
-        # Robust cleanup for common Cambridge boilerplate noise
-        noise_patterns = [
-            r'Permission to reproduce items where third-party owned material.*',
-            r'reasonable effort has been made by the publisher.*',
-            r'To avoid the issue of disclosure of answer-related information.*',
-            r'Cambridge Assessment International Education is part of.*',
-            r'University of Cambridge Local Examinations Syndicate.*',
-            r'Every publisher will be pleased to make amends.*',
-            r'Assessment International Education Copyright Acknowledgements.*'
-        ]
-        for pattern in noise_patterns:
-            text = re.sub(pattern, '', text, flags=re.I | re.DOTALL)
+
+        for pattern in self.extraction_noise_patterns:
+            if pattern:
+                text = re.sub(pattern, '', text, flags=re.I | re.DOTALL)
 
         return text.strip()
 

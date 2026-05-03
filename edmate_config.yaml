@@ -11,6 +11,9 @@ storage_settings:
 
 extraction_settings:
   engine: "pdf_extract_kit"
+  # Optional: override boilerplate regexes for PDF text cleanup (empty list = skip these only)
+  # extraction_noise_patterns: []
+  segmentation_preset: "bangladeshi"
 
 observability:
   litellm_callbacks: ["opik"]
@@ -84,6 +87,8 @@ hia_settings:
 # your database (connected via DATABASE_URL in .env).
 # ============================================================
 workspace:
+  default_subject: "General"
+  default_curriculum: "General"
   curriculums:
     - "General Curriculum"
     - "Example Curriculum (O/Level)"

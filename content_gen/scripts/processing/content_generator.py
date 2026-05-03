@@ -48,6 +48,13 @@ class ContentGenerator:
         """
         self.router = router or ModelRoutingEngine()
 
+    def _default_curriculum(self) -> str:
+        raw = getattr(self.router.config.workspace, "default_curriculum", None)
+        if raw is None:
+            return "General"
+        label = str(raw).strip()
+        return label or "General"
+
     def _encode_image(self, image_path: str) -> str:
         """Helper to convert local image to base64 string"""
         import base64
@@ -59,7 +66,7 @@ class ContentGenerator:
         questions: List[ProcessedQuestion], 
         subject: str, 
         batch_size: int = 10,
-        curriculum: str = "Cambridge O/A-Level",
+        curriculum: Optional[str] = None,
         progress_callback: Optional[Callable[[int, str], None]] = None,
         pedagogy_system_prompt: Optional[str] = None,
     ) -> List[ProcessedQuestion]:
@@ -68,6 +75,9 @@ class ContentGenerator:
         """
         if not questions:
             return []
+
+        if curriculum is None or not str(curriculum).strip():
+            curriculum = self._default_curriculum()
 
         print(
             f"🧠 Generating content for {len(questions)} questions using Modular Router...")
@@ -163,10 +173,12 @@ class ContentGenerator:
         self,
         question: ProcessedQuestion,
         subject: str,
-        curriculum: str = "Cambridge O/A-Level",
+        curriculum: Optional[str] = None,
         pedagogy_system_prompt: Optional[str] = None,
     ) -> Dict:
         """Low-cost retry path for only failed questions."""
+        if curriculum is None or not str(curriculum).strip():
+            curriculum = self._default_curriculum()
         context = self._prepare_prompt_context([question], subject)
         strict_system_prompt = CONTENT_GENERATION_PROMPT.replace(
             "[Subject]", subject

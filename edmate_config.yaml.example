@@ -1,65 +1,69 @@
+# Portable example — copy to edmate_config.yaml and customize.
+# Do not use YAML tags like !!python/object; values are plain strings.
+
+model_routing:
+  extraction: "vertex_ai/gemini-2.5-flash"
+  generation: "vertex_ai/gemini-2.5-flash"
+  validation: "vertex_ai/gemini-2.5-flash"
+
 budget:
-  max_daily_usd: 10.0
+  max_daily_usd: 20.0
+
+storage_settings:
+  image_mode: "base64"
+
 extraction_settings:
-  engine: !!python/object/apply:content_gen.core.config_schema.ExtractionEngine
-  - pdf_extract_kit
-  max_question_number: 40
+  engine: "pdf_extract_kit"
   min_question_number: 1
-  question_detection_mode: !!python/object/apply:content_gen.core.config_schema.DetectionMode
-  - balanced
-hia_settings:
-  default_resilience_target: High
-  enabled: true
-  generate_critique_exercises: true
-  generate_variants: true
-  variant_count: 3
+  max_question_number: null
+  question_detection_mode: "balanced"
+  segmentation_preset: "bangladeshi"
+
+observability:
+  litellm_callbacks: ["opik"]
+
 learning_science:
-  assessment_role_tagging:
-    enabled: true
+  profile: "default"
   bloom_taxonomy:
     enabled: true
     target_levels:
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Remember
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Understand
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Apply
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Analyze
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Evaluate
-    - !!python/object/apply:content_gen.core.config_schema.BloomLevel
-      - Create
-  cognitive_load:
+      - "Remember"
+      - "Understand"
+      - "Apply"
+      - "Analyze"
+      - "Evaluate"
+      - "Create"
+  spaced_repetition:
     enabled: true
-    explanation_depth: !!python/object/apply:content_gen.core.config_schema.ExplanationDepth
-    - full
+    algorithm: "sm2"
   elaborative_interrogation:
     enabled: true
-  formative_summative_tagging:
-    default_role: formative
+  cognitive_load:
     enabled: true
-  interleaving:
-    enabled: true
-  profile: default
+    explanation_depth: "full"
   retrieval_practice:
     enabled: true
     generate_variants: false
-  spaced_repetition:
-    algorithm: !!python/object/apply:content_gen.core.config_schema.SRAlogrithm
-    - sm2
+  interleaving:
     enabled: true
-model_routing:
-  extraction: gemini/gemini-1.5-pro
-  generation: anthropic/claude-3-haiku
-  validation: openai/gpt-4o
-observability:
-  litellm_callbacks:
-  - opik
-storage_settings:
-  image_mode: !!python/object/apply:content_gen.core.config_schema.ImageMode
-  - cdn
+  formative_summative_tagging:
+    enabled: true
+    default_role: "formative"
+  assessment_role_tagging:
+    enabled: true
+
+hia_settings:
+  enabled: true
+  default_resilience_target: "High"
+  generate_critique_exercises: true
+  generate_variants: true
+  variant_count: 3
+
 workspace:
-  curriculums: []
-  target_tables: []
+  default_subject: "General"
+  default_curriculum: "General"
+  curriculums:
+    - "General Curriculum"
+  target_tables:
+    - id: "questions"
+      label: "Main Question Bank"

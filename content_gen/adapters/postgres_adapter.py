@@ -1,9 +1,13 @@
+import re
 import psycopg2
 import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
+
 from .base import BaseStorageAdapter
 from ..core.schemas import ProcessedQuestion, Flashcard
+from ..core.config_loader import ConfigLoader
+from ..core.config_schema import EdmateConfig
 
 
 class PostgresStorageAdapter(BaseStorageAdapter):
@@ -12,15 +16,20 @@ class PostgresStorageAdapter(BaseStorageAdapter):
     PostgreSQL schema used in the Edmate ecosystem.
     """
 
-    def __init__(self, connection_string: str):
+    _IDENTIFIER_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
+
+    def __init__(self, connection_string: str, edmate_config: Optional[EdmateConfig] = None):
         self.conn_str = connection_string
         self.conn = psycopg2.connect(connection_string)
         self.cur = self.conn.cursor()
+        self._workspace = (edmate_config or ConfigLoader.load_config()).workspace
 
     @staticmethod
-    def initialize_schema(connection_string: str):
+    def initialize_schema(connection_string: str, edmate_config: Optional[EdmateConfig] = None):
         """
         Creates the necessary database tables for Edmate if they do not exist.
+        Table names come from edmate_config workspace.target_tables when set;
+        otherwise a legacy Cambridge-style multi-table set is created for backward compatibility.
         """
         conn = psycopg2.connect(connection_string)
         cur = conn.cursor()
@@ -39,11 +48,16 @@ class PostgresStorageAdapter(BaseStorageAdapter):
                 );
             """)
 
-            # Subject tables (example with chemistry, others would follow same pattern)
+            cfg = edmate_config or ConfigLoader.load_config()
             tables = [
-                "chemistry_questions", "biology_questions", "physics_questions",
-                "igcse_biology_questions", "igcse_chemistry_questions", "igcse_physics_questions"
+                t.id for t in cfg.workspace.target_tables
+                if PostgresStorageAdapter._IDENTIFIER_RE.match(t.id)
             ]
+            if not tables:
+                tables = [
+                    "chemistry_questions", "biology_questions", "physics_questions",
+                    "igcse_biology_questions", "igcse_chemistry_questions", "igcse_physics_questions",
+                ]
             for table in tables:
                 cur.execute(f"""
                     CREATE TABLE IF NOT EXISTS {table} (
@@ -73,23 +87,34 @@ class PostgresStorageAdapter(BaseStorageAdapter):
             cur.close()
             conn.close()
 
-    def _get_table_name(self, subject: str, grade: str) -> str:
-        # Based on the original TABLE_MAP in import_to_db.py
+    def _allowed_table_ids(self) -> List[str]:
+        return [
+            t.id for t in self._workspace.target_tables
+            if self._IDENTIFIER_RE.match(t.id)
+        ]
+
+    def _get_table_name(self, question: ProcessedQuestion) -> str:
+        allowed = self._allowed_table_ids()
+        tid = question.metadata.get("target_table_id")
+        if isinstance(tid, str) and tid in allowed:
+            return tid
+        if allowed:
+            return allowed[0]
+        # Legacy routing when workspace.target_tables is empty
+        subject = question.subject
+        grade = question.metadata.get("grade", "A-Level")
         mapping = {
-            ("Biology",   "A-Level"): "biology_questions",
+            ("Biology", "A-Level"): "biology_questions",
             ("Chemistry", "A-Level"): "chemistry_questions",
-            ("Physics",   "A-Level"): "physics_questions",
-            ("Biology",   "IGCSE"):   "igcse_biology_questions",
-            ("Chemistry", "IGCSE"):   "igcse_chemistry_questions",
-            ("Physics",   "IGCSE"):   "igcse_physics_questions",
+            ("Physics", "A-Level"): "physics_questions",
+            ("Biology", "IGCSE"): "igcse_biology_questions",
+            ("Chemistry", "IGCSE"): "igcse_chemistry_questions",
+            ("Physics", "IGCSE"): "igcse_physics_questions",
         }
-        return mapping.get((subject, grade), "biology_questions")
+        return mapping.get((subject, grade), "questions")
 
     def save_question(self, question: ProcessedQuestion) -> str:
-        table = self._get_table_name(
-            question.subject,
-            question.metadata.get("grade", "A-Level")
-        )
+        table = self._get_table_name(question)
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         q_id = str(uuid.uuid4())

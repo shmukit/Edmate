@@ -10,7 +10,13 @@ Generate and Sync Script
 
 from content_gen.scripts.processing.text_normalizer import normalize, normalize_options
 from content_gen.scripts.processing.content_generator import ContentGenerator
-from content_gen.scripts.processing.import_to_db import DatabaseImporter, TABLE_MAP, SUBJECT_IDS, FALLBACK_TOPIC_ID, FALLBACK_SUBTOPIC_ID
+from content_gen.scripts.processing.import_to_db import (
+    DatabaseImporter,
+    SUBJECT_IDS,
+    FALLBACK_TOPIC_ID,
+    FALLBACK_SUBTOPIC_ID,
+    _resolve_import_table,
+)
 import os
 import re
 import sys
@@ -80,8 +86,16 @@ def main():
         description="Generate AI content and sync to production DB")
     parser.add_argument("--paper-code", required=True,
                         help="Paper code, e.g. 9701_w25_qp_11")
-    parser.add_argument("--subject", required=True,
-                        choices=["Biology", "Chemistry", "Physics"], help="Subject")
+    parser.add_argument(
+        "--subject",
+        required=True,
+        help="Subject label (used with grade for legacy TABLE_MAP unless --target-table is set)",
+    )
+    parser.add_argument(
+        "--target-table",
+        default=None,
+        help="Override destination table (see workspace.target_tables in edmate_config.yaml)",
+    )
     parser.add_argument("--grade", default="A-Level",
                         choices=["A-Level", "IGCSE"], help="Grade")
     parser.add_argument("--provider", default="gemini",
@@ -101,7 +115,11 @@ def main():
         print("❌ Error: Set DATABASE_URL env var or use --db-url")
         sys.exit(1)
 
-    table = TABLE_MAP.get((args.subject, args.grade))
+    try:
+        table = _resolve_import_table(args.subject, args.grade, target_table=args.target_table)
+    except ValueError as e:
+        print(f"❌ {e}")
+        sys.exit(1)
     if not table:
         print(f"❌ Error: No table mapping for {args.subject} {args.grade}")
         sys.exit(1)

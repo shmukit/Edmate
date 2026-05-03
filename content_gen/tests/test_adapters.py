@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 import uuid
 from content_gen.adapters.postgres_adapter import PostgresStorageAdapter
+from content_gen.core.config_schema import EdmateConfig, WorkspaceConfig
 from content_gen.core.schemas import ProcessedQuestion, Flashcard
 
 
@@ -13,8 +14,11 @@ def test_storage_adapter_save_question():
     mock_conn.cursor.return_value = mock_cur
 
     # Initialize adapter with mocked connection
+    empty_ws = EdmateConfig(workspace=WorkspaceConfig())
     with patch("psycopg2.connect", return_value=mock_conn):
-        adapter = PostgresStorageAdapter("postgres://user:pass@host:5432/db")
+        adapter = PostgresStorageAdapter(
+            "postgres://user:pass@host:5432/db", edmate_config=empty_ws
+        )
         # Overwrite the cur manually to be sure
         adapter.cur = mock_cur
         adapter.conn = mock_conn
@@ -49,8 +53,11 @@ def test_storage_adapter_save_flashcards():
     mock_conn = MagicMock()
     mock_cur = MagicMock()
 
+    empty_ws = EdmateConfig(workspace=WorkspaceConfig())
     with patch("psycopg2.connect", return_value=mock_conn):
-        adapter = PostgresStorageAdapter("postgres://user:pass@host:5432/db")
+        adapter = PostgresStorageAdapter(
+            "postgres://user:pass@host:5432/db", edmate_config=empty_ws
+        )
         adapter.cur = mock_cur
         adapter.conn = mock_conn
 

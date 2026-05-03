@@ -51,6 +51,29 @@ export const AutomationUI = {
                 // Re-init tooltips for dynamic content
                 this.setupTooltips();
             }
+
+            const engine = (config.extraction_settings && config.extraction_settings.engine) || 'unknown';
+            const mode = (config.extraction_settings && config.extraction_settings.question_detection_mode) || '';
+            const kit = config.kit_present ? 'present' : 'missing';
+            const hint = (config.extraction_hints && config.extraction_hints.summary) || '';
+            const warn = (config.extraction_hints && config.extraction_hints.warning) || '';
+            const banner = document.getElementById('extractionContextBanner');
+            if (banner) {
+                const safeEngine = String(engine).replace(/</g, '&lt;');
+                const parts = [
+                    `<strong>Active extraction engine:</strong> ${safeEngine}`,
+                    mode ? `<span> · detection: ${String(mode)}</span>` : '',
+                    `<span> · PDF-Extract-Kit: ${kit}</span>`,
+                    hint ? `<br>${hint}` : '',
+                    warn ? `<br><strong style="color:#f97316;">${warn}</strong>` : '',
+                ];
+                banner.innerHTML = parts.join('');
+            }
+            const footer = document.getElementById('settingsEngineFooter');
+            if (footer) {
+                const gen = (config.model_routing && config.model_routing.generation) || '—';
+                footer.textContent = `Pipeline engine: ${engine} · kit: ${kit} · generation model: ${gen}`;
+            }
         } catch (e) {
             console.error('Error loading pipeline config:', e);
         }

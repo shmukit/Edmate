@@ -4,18 +4,27 @@ from typing import List, Dict
 class TextSegmentationUtility:
     """
     Utility to segment exam text into sections and individual questions.
-    Specifically tuned for Bangladeshi exam formats.
+    Presets: ``bangladeshi`` (section headers + numbered items) or ``numbered_only``
+    (line-numbered questions without requiring Section A/B blocks).
     """
-    
+
     SECTION_PATTERN = r'(?i)Section\s+([A-Z]):\s*(.*?)(?=\nSection\s+[A-Z]:|\nTHE END| \.\.\.|$)'
     QUESTION_PATTERN = r'(?m)^(\d+)\.\s*(.*?)(?=\n\d+\.\s*|\nSection|\nTHE END|$)'
     OPTION_PATTERN = r'([A-D])\.\s*(.*?)(?=\s+[A-D]\.|$)'
 
     @classmethod
-    def segment_exam(cls, full_text: str) -> List[Dict]:
+    def segment_exam(cls, full_text: str, preset: str = "bangladeshi") -> List[Dict]:
         """
         Segments the full text into a list of questions with metadata.
+
+        Args:
+            full_text: Raw text extracted from the PDF.
+            preset: ``bangladeshi`` | ``numbered_only`` — controls segmentation heuristics.
         """
+        preset = (preset or "bangladeshi").strip().lower()
+        if preset == "numbered_only":
+            return cls._segment_numbered_only(full_text)
+
         sections = re.findall(cls.SECTION_PATTERN, full_text, re.DOTALL)
         all_questions = []
         
@@ -59,6 +68,29 @@ class TextSegmentationUtility:
                 })
 
         return all_questions
+
+    @classmethod
+    def _segment_numbered_only(cls, full_text: str) -> List[Dict]:
+        """Numbered questions only (no Section A/B requirement)."""
+        questions = re.findall(cls.QUESTION_PATTERN, full_text, re.DOTALL)
+        out: List[Dict] = []
+        for q_num, q_body in questions:
+            options: Dict[str, str] = {}
+            if "A." in q_body or "A)" in q_body:
+                opt_matches = re.findall(cls.OPTION_PATTERN, q_body)
+                for letter, text in opt_matches:
+                    options[letter] = text.strip()
+                q_text = re.split(cls.OPTION_PATTERN, q_body)[0].strip() if opt_matches else q_body.strip()
+            else:
+                q_text = q_body.strip()
+            out.append({
+                "section": "Unknown",
+                "question_number": int(q_num),
+                "question_text": q_text,
+                "options": options,
+                "type": "MCQ" if options else "General",
+            })
+        return out
 
     @staticmethod
     def _infer_section_type(content: str) -> str:

@@ -12,7 +12,7 @@ export const AutomationAPI = {
             formData.append('paper_code', paperCode);
 
             // Read pedagogy settings from UI
-            const curriculum = document.getElementById('curriculumSelect')?.value || 'Cambridge O/Level';
+            const curriculum = document.getElementById('curriculumSelect')?.value || '';
             const lsProfile = document.getElementById('lsProfileSelect')?.value || 'default';
             const hiaMode = document.getElementById('hiaResilienceSelect')?.value || 'Low';
             formData.append('curriculum', curriculum);

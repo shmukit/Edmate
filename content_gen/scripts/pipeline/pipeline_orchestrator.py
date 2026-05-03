@@ -8,6 +8,7 @@ import base64
 
 # Import modular core
 from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.core.config_schema import ExtractionEngine
 from content_gen.adapters.postgres_adapter import PostgresStorageAdapter
 
 # Import local modules
@@ -35,25 +36,38 @@ class PipelineOrchestrator:
         # Initialize components
         self.router = router or ModelRoutingEngine()
         self.generator = ContentGenerator(router=self.router)
-        self.storage = PostgresStorageAdapter(
-            db_connection) if db_connection else None
+        self.storage = (
+            PostgresStorageAdapter(db_connection, edmate_config=self.router.config)
+            if db_connection
+            else None
+        )
 
         # Initialize Extractor based on config
         engine = self.router.config.extraction_settings.engine
-        if engine == "pymupdf":
+        engine_key = engine.value if isinstance(engine, ExtractionEngine) else str(engine).lower()
+        es = self.router.config.extraction_settings
+        ws = self.router.config.workspace
+        default_subject = (ws.default_subject or "General").strip() or "General"
+        if engine_key == ExtractionEngine.PYMUPDF.value:
             self.extractor = PyMuPDFAdapter()
-        elif engine in ["vision", "multimodal", "pdf_extract_kit"]:
-            # Default to Vision if high-fidelity is requested, or Kit if explicitly set
-            if engine == "pdf_extract_kit":
+        elif engine_key in (
+            ExtractionEngine.VISION.value,
+            ExtractionEngine.MULTIMODAL.value,
+            ExtractionEngine.PDF_EXTRACT_KIT.value,
+        ):
+            if engine_key == ExtractionEngine.PDF_EXTRACT_KIT.value:
                 self.extractor = KitExtractionAdapter(
-                    min_question_number=self.router.config.extraction_settings.min_question_number,
-                    max_question_number=self.router.config.extraction_settings.max_question_number,
-                    question_detection_mode=self.router.config.extraction_settings.question_detection_mode,
+                    min_question_number=es.min_question_number,
+                    max_question_number=es.max_question_number,
+                    question_detection_mode=str(es.question_detection_mode.value)
+                    if hasattr(es.question_detection_mode, "value")
+                    else str(es.question_detection_mode),
+                    extraction_noise_patterns=list(es.extraction_noise_patterns),
+                    default_subject=default_subject,
                 )
             else:
                 self.extractor = VisionExtractionAdapter(router=self.router)
         else:
-            # Fallback to Vision as the 'Golden' standard for Edmate
             self.extractor = VisionExtractionAdapter(router=self.router)
 
     def _convert_to_base64(self, image_path: Path) -> str:
@@ -73,7 +87,8 @@ class PipelineOrchestrator:
         subject: str,
         difficulty: Optional[str] = "Medium",
         topics: Optional[List[str]] = None,
-        cleanup_images: bool = False
+        cleanup_images: bool = False,
+        curriculum: Optional[str] = None,
     ) -> Dict:
         """
         Process a single PDF through the modular Edmate pipeline.
@@ -90,8 +105,9 @@ class PipelineOrchestrator:
         }
 
         # Step 1: Multimodal Extraction (The "Eyes")
-        print(
-            f"👁️  Step 1: Extracting with {self.router.config.extraction_settings.engine}...")
+        _eng = self.router.config.extraction_settings.engine
+        _eng_disp = _eng.value if hasattr(_eng, "value") else str(_eng)
+        print(f"👁️  Step 1: Extracting with {_eng_disp}...")
         extracted_questions = self.extractor.extract_content(
             Path(pdf_path), Path(output_dir))
         report["extraction"] = {"questions": len(extracted_questions)}
@@ -102,7 +118,8 @@ class PipelineOrchestrator:
             print("🤖 Step 2: Generating educational content via ModelRouter...")
             generated_questions = self.generator.generate_for_questions(
                 extracted_questions,
-                subject=subject
+                subject=subject,
+                curriculum=curriculum,
             )
             report["processing"] = {"count": len(generated_questions)}
         except Exception as e:
@@ -249,8 +266,11 @@ def main():
         "--output-dir", default="content_gen/data/extracted", help="Output directory")
 
     # Metadata
-    parser.add_argument("--subject", required=True,
-                        choices=["Biology", "Chemistry", "Physics"])
+    parser.add_argument(
+        "--subject",
+        default=None,
+        help="Subject label for generation metadata (default: workspace.default_subject in edmate_config.yaml, else General).",
+    )
     parser.add_argument("--difficulty", choices=["Easy", "Medium", "Hard"])
     parser.add_argument("--topics", nargs="+", help="Topic tags")
 
@@ -284,16 +304,21 @@ def main():
     # Get database URL
     db_url: Optional[str] = cast(Optional[str], args.db_url or os.getenv("DATABASE_URL"))
 
-    # Create schema if requested
-    if args.create_schema and db_url:
-        print("🏗️  Creating database schema...")
-        PostgresStorageAdapter.initialize_schema(db_url)
-
     # Initialize orchestrator
     orchestrator = PipelineOrchestrator(
         storage_bucket=args.storage_bucket,
         db_connection=db_url
     )
+    subject_resolved = (args.subject or "").strip() or (
+        orchestrator.router.config.workspace.default_subject or "General"
+    )
+
+    # Create schema if requested
+    if args.create_schema and db_url:
+        print("🏗️  Creating database schema...")
+        PostgresStorageAdapter.initialize_schema(
+            db_url, edmate_config=orchestrator.router.config
+        )
 
     # Process
     if args.single_pdf:
@@ -301,7 +326,7 @@ def main():
         report = orchestrator.process_pdf(
             pdf_path=args.single_pdf,
             output_dir=args.output_dir,
-            subject=args.subject,
+            subject=subject_resolved,
             difficulty=args.difficulty,
             topics=args.topics,
             cleanup_images=args.cleanup_images
@@ -320,7 +345,7 @@ def main():
         batch_report = orchestrator.process_batch(
             input_dir=args.input_dir,
             output_dir=args.output_dir,
-            subject=args.subject,
+            subject=subject_resolved,
             difficulty=args.difficulty,
             topics=args.topics,
             cleanup_images=args.cleanup_images

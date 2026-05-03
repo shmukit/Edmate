@@ -18,7 +18,7 @@ JOBS = {}
 @router.post("/extract")
 async def extract_content(
     background_tasks: BackgroundTasks,
-    curriculum: str = "Cambridge O/Level",
+    curriculum: str = "General",
     subject: str = "Chemistry",
     file: UploadFile = File(...),
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),

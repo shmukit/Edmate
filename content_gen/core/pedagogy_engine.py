@@ -95,7 +95,7 @@ class PedagogyEngine:
     The output prompt is injected as the system message to every LLM generation call.
     """
 
-    def __init__(self, ls_profile: str = "default", hia_mode: str = "Low", curriculum: str = "Cambridge O/Level"):
+    def __init__(self, ls_profile: str = "default", hia_mode: str = "Low", curriculum: str = "General"):
         self.ls_profile = ls_profile if ls_profile in PROFILE_BLOOM_MAP else "default"
         self.hia_mode = hia_mode if hia_mode in HIA_INSTRUCTIONS else "Low"
         self.curriculum = curriculum

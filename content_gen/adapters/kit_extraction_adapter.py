@@ -18,13 +18,17 @@ class KitExtractionAdapter(BaseExtractionAdapter):
         min_question_number: int = 1,
         max_question_number: int | None = None,
         question_detection_mode: str = "balanced",
+        extraction_noise_patterns: Optional[List[str]] = None,
+        default_subject: str = "General",
     ):
         try:
+            self.default_subject = (default_subject or "General").strip() or "General"
             self.wrapper = PDFExtractKitWrapper(
                 use_gpu=use_gpu,
                 min_question_number=min_question_number,
                 max_question_number=max_question_number,
                 question_detection_mode=question_detection_mode,
+                extraction_noise_patterns=extraction_noise_patterns,
             )
         except Exception as e:
             raise RuntimeError(
@@ -58,11 +62,14 @@ class KitExtractionAdapter(BaseExtractionAdapter):
                 except Exception:
                     continue
 
+            subj = (q_data.get("subject") or "").strip()
+            if not subj:
+                subj = self.default_subject
             questions.append(ProcessedQuestion(
                 question_number=q_data.get("question_number", 0),
                 question_text=q_data.get("question_text", ""),
                 options=q_data.get("options", {}),
-                subject=q_data.get("subject", "Physics"),  # Fallback to Physics for 9702 papers
+                subject=subj,
                 metadata={
                     "stem_images": stem_image_paths,
                     "stem_images_b64": stem_images_b64,

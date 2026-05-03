@@ -48,7 +48,7 @@ async def receive_draft(
     subject: str = Form(...),
     paper_code: str = Form(...),
     file: UploadFile = File(...),
-    curriculum: str = Form("Cambridge O/Level"),
+    curriculum: Optional[str] = Form(None),
     ls_profile: str = Form("default"),
     hia_mode: str = Form("Low"),
     min_question_number: Optional[int] = Form(None),
@@ -58,6 +58,11 @@ async def receive_draft(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     x_model_id: Optional[str] = Header(None, alias="X-Model-ID"),
 ):
+    from qc_viewer.config import get_workspace_defaults
+
+    default_curriculum, _default_subject = get_workspace_defaults()
+    curriculum_resolved = (curriculum or "").strip() or default_curriculum
+
     draft_id = f"draft_{uuid.uuid4().hex[:8]}"
     ensure_drafts_root()
 
@@ -75,7 +80,7 @@ async def receive_draft(
             "subject": subject,
             "paper_code": paper_code,
             "filename": file.filename,
-            "curriculum": curriculum,
+            "curriculum": curriculum_resolved,
             "ls_profile": ls_profile,
             "hia_mode": hia_mode,
             "extraction_overrides": {
@@ -98,7 +103,7 @@ async def receive_draft(
         subject,
         paper_code,
         file_path,
-        curriculum,
+        curriculum_resolved,
         ls_profile,
         hia_mode,
         x_llm_provider,
@@ -272,27 +277,61 @@ async def get_metrics():
 @router.get("/api/automate/config")
 async def get_config():
     import yaml
+    from pathlib import Path
+
     from qc_viewer.config import PROJECT_ROOT
 
     config_path = PROJECT_ROOT / "edmate_config.yaml"
-    workspace_data = {}
-    
+    workspace_data: dict = {}
+    budget_data: dict = {}
+    extraction_settings: dict = {}
+    model_routing: dict = {}
+    kit_present = False
+
     if config_path.exists():
         try:
             with open(config_path, "r") as f:
-                data = yaml.safe_load(f)
-                workspace_data = data.get("workspace", {})
+                data = yaml.safe_load(f) or {}
+                workspace_data = data.get("workspace", {}) or {}
+                budget_data = data.get("budget", {}) or {}
+                extraction_settings = data.get("extraction_settings", {}) or {}
+                model_routing = data.get("model_routing", {}) or {}
         except Exception as e:
             print(f"Error loading edmate_config.yaml: {e}")
 
+    kit_path = Path(PROJECT_ROOT) / "content_gen" / "tools" / "PDF-Extract-Kit"
+    kit_present = kit_path.is_dir() and (kit_path / "pdf_extract_kit").is_dir()
+
+    engine = (extraction_settings.get("engine") or "pdf_extract_kit").lower()
+    extraction_hints: dict[str, str] = {}
+    if engine == "pdf_extract_kit":
+        extraction_hints["summary"] = (
+            "Layout-aware extraction (diagrams supported when the kit is installed)."
+        )
+        if not kit_present:
+            extraction_hints["warning"] = (
+                "PDF-Extract-Kit directory not found under content_gen/tools/. "
+                "Run scripts/setup_pdf_extract_kit.sh or set extraction_settings.engine to vision or pymupdf."
+            )
+    elif engine in ("vision", "multimodal"):
+        extraction_hints["summary"] = (
+            "Vision-based extraction (diagrams via LLM vision; uses API credits per page)."
+        )
+    elif engine == "pymupdf":
+        extraction_hints["summary"] = (
+            "Text-only extraction. Diagrams and raster figures are not captured."
+        )
+
     return {
         "budget": {
-            "max_daily_usd": 10.0,
-            "current_usage_usd": 1.25,
+            "max_daily_usd": float(budget_data.get("max_daily_usd", 10.0)),
+            "current_usage_usd": 0.0,
         },
         "workspace": workspace_data,
-        "model": "gpt-4o",
-        "vision_enabled": True,
+        "model_routing": model_routing,
+        "extraction_settings": extraction_settings,
+        "kit_present": kit_present,
+        "extraction_hints": extraction_hints,
     }
 
 

@@ -20,6 +20,9 @@ import psycopg2
 import re
 from psycopg2.extras import execute_values
 from .text_normalizer import normalize, normalize_options
+from content_gen.core.config_loader import ConfigLoader
+
+_TABLE_ID_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
 
 # ──────────────────────────────────────────────
 # Subject/grade → table mapping
@@ -44,6 +47,26 @@ SUBJECT_IDS = {
 # Fallback topic/subtopic IDs used when they cannot be resolved
 FALLBACK_TOPIC_ID = "unknown-topic"
 FALLBACK_SUBTOPIC_ID = "unknown-subtopics"
+
+
+def _resolve_import_table(subject: str, grade: str, target_table: Optional[str] = None) -> str:
+    """Prefer explicit --target-table, then first id from edmate_config workspace.target_tables, else legacy TABLE_MAP."""
+    if target_table and _TABLE_ID_RE.match(target_table):
+        return target_table
+    try:
+        cfg = ConfigLoader.load_config()
+        ids = [t.id for t in cfg.workspace.target_tables if _TABLE_ID_RE.match(t.id)]
+        if ids:
+            return ids[0]
+    except Exception:
+        pass
+    t = TABLE_MAP.get((subject, grade))
+    if not t:
+        raise ValueError(
+            f"No table mapping for subject={subject!r}, grade={grade!r}. "
+            "Define workspace.target_tables in edmate_config.yaml or pass --target-table."
+        )
+    return t
 
 
 def _parse_paper_code(paper_code: str) -> Dict[str, str]:
@@ -135,6 +158,7 @@ class DatabaseImporter:
         topic_id: Optional[str] = None,
         subtopic_id: Optional[str] = None,
         cdn_mapping: Optional[Dict[str, str]] = None,
+        target_table: Optional[str] = None,
     ) -> Dict:
         """
         Import questions from an extracted JSON file into the production DB.
@@ -155,26 +179,23 @@ class DatabaseImporter:
         with open(json_path) as f:
             data = json.load(f)
 
-        # Resolve target table
-        table = TABLE_MAP.get((subject, grade))
-        if not table:
-            raise ValueError(
-                f"No table mapping for subject='{subject}', grade='{grade}'. "
-                f"Valid combinations: {list(TABLE_MAP.keys())}"
-            )
-
         # Parse paper metadata from code
         meta = _parse_paper_code(paper_code)
         effective_grade = meta.get("grade") or grade
 
-        # Re-resolve table in case grade was inferred from paper code
-        table = TABLE_MAP.get((subject, effective_grade), table)
+        # Resolve target table (config-driven when workspace.target_tables is set)
+        table = _resolve_import_table(subject, effective_grade, target_table=target_table)
 
-        # Resolve subject ID
+        # Resolve subject ID (legacy UUID map; unknown subjects use env or NULL placeholder)
         subject_id = SUBJECT_IDS.get(subject)
         if not subject_id:
-            raise ValueError(
-                f"Unknown subject '{subject}'. Valid: {list(SUBJECT_IDS.keys())}")
+            subject_id = os.getenv("EDMATE_DEFAULT_SUBJECT_ID")
+        if not subject_id:
+            print(
+                f"⚠️  Subject '{subject}' has no SUBJECT_IDS entry. "
+                "Set EDMATE_DEFAULT_SUBJECT_ID or add the subject to SUBJECT_IDS in import_to_db.py."
+            )
+            subject_id = "00000000-0000-0000-0000-000000000001"
 
         # Resolve topic
         resolved_topic_id = topic_id or FALLBACK_TOPIC_ID
@@ -456,8 +477,12 @@ def main():
                         help="Paper code, e.g. 9701_w25_qp_11")
     parser.add_argument(
         "--subject", required=True,
-        choices=["Biology", "Chemistry", "Physics", "Mathematics"],
-        help="Subject name"
+        help="Subject label (used for topic resolution when SUBJECT_IDS has a match)",
+    )
+    parser.add_argument(
+        "--target-table",
+        default=None,
+        help="Override DB table name (must match workspace.target_tables id or legacy table name)",
     )
     parser.add_argument(
         "--grade", default="A-Level",
@@ -497,6 +522,7 @@ def main():
             topic_id=args.topic_id,
             subtopic_id=args.subtopic_id,
             cdn_mapping=cdn_mapping,
+            target_table=args.target_table,
         )
 
     sys.exit(0 if len(report["errors"]) == 0 else 1)

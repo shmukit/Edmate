@@ -17,7 +17,7 @@ Your goal is to identify each question and its options with 100% accuracy.
 1. **Identification**: Every question typically starts with a number. Capture the full text of the question (the "stem").
 2. **Options**: MCQs always have options (usually A, B, C, D). If you see options, extract them into the "options" object.
 3. **Spatial Intelligence**: If a diagram, graph, or table is placed near a question, it belongs to that question. Provide its coordinates.
-4. **No Refusals**: Even if the text is blurry, use your domain knowledge (O/A-Level) to reconstruct the most likely intended text.
+4. **No Refusals**: Even if the text is blurry, use your domain knowledge of standard exam-style assessments to reconstruct the most likely intended text.
 
 For each question found, return a JSON object with:
 - question_number: (int)
@@ -56,11 +56,13 @@ class VisionExtractionAdapter(BaseExtractionAdapter):
         images_dir = output_dir / "images" / source_path.stem
         images_dir.mkdir(parents=True, exist_ok=True)
 
-        for i, page in enumerate(doc):
-            print(f"  Processing page {i+1}/{len(doc)}...")
+        page_count = len(doc)
+        for i in range(page_count):
+            page = doc[i]
+            print(f"  Processing page {i+1}/{page_count}...")
             
             if progress_callback:
-                prog = 20 + int(((i + 1) / len(doc)) * 30)
+                prog = 20 + int(((i + 1) / page_count) * 30)
                 progress_callback(prog, f"Extracting content from page {i+1} via Vision AI...")
             
             # 1. Convert page to high-res image for LLM
@@ -104,7 +106,11 @@ class VisionExtractionAdapter(BaseExtractionAdapter):
                         question_number=q_num,
                         question_text=q_data.get("question_text", ""),
                         options=q_data.get("options", {}),
-                        correct_options=[q_data.get("correct_answer")] if q_data.get("correct_answer") else [],
+                        correct_options=(
+                            [str(q_data.get("correct_answer"))]
+                            if q_data.get("correct_answer") is not None
+                            else []
+                        ),
                         subject="General", # Default, generator will refine
                         metadata={
                             "page": i + 1,

@@ -55,6 +55,13 @@ pip install -r content_gen/requirements.txt
 
 # 2. Configure (Set your keys)
 cp content_gen/.env.example content_gen/.env
+
+# 3. Workspace + routing (copy template, then edit)
+cp edmate_config.yaml.example edmate_config.yaml
+
+# 4. (Optional) PDF-Extract-Kit — only if extraction_settings.engine is pdf_extract_kit
+./scripts/setup_pdf_extract_kit.sh
+# Otherwise set extraction_settings.engine to vision or pymupdf in edmate_config.yaml
 ```
 
 ### ⚠️ Note on PDFs and Git
@@ -64,7 +71,7 @@ cp content_gen/.env.example content_gen/.env
 
 ## 🛠️ Customizing Your Workspace
 
-Edmate is designed to be highly adaptable. Before processing your first PDF, you must define your own subjects, curriculums, and database tables in `edmate_config.yaml` or `edmate_config.json`.
+Edmate is designed to be highly adaptable. Before processing your first PDF, define **curriculums**, **target database tables**, and optional defaults (`workspace.default_subject`, `workspace.default_curriculum`) in `edmate_config.yaml` or `edmate_config.json`.
 
 ### 1. Connect Your Database (Agnostic)
 Edmate is **database-agnostic**. While it includes a production-ready **Postgres/Supabase** adapter by default, you can use any database (MySQL, MongoDB, Firebase, etc.).
@@ -77,6 +84,8 @@ Navigate to the `workspace` section in `edmate_config.yaml` or `edmate_config.js
 
 ```yaml
 workspace:
+  default_subject: "General"
+  default_curriculum: "General"
   curriculums:
     - "Your Custom Curriculum"
     - "Standard Level"
@@ -107,9 +116,19 @@ uvicorn qc_viewer.main:app --host 0.0.0.0 --port 8000
 Navigate to `http://localhost:8000/automate` in your browser.
 
 ### Option B: Use the CLI Orchestrator (Headless)
-Process a PDF headlessly via terminal:
+Process a PDF headlessly via terminal. **`--subject` is optional** — it defaults to `workspace.default_subject` in `edmate_config.yaml` (falls back to `General`). Batch mode still requires `--input-dir`.
 ```bash
-python3 content_gen/scripts/pipeline/pipeline_orchestrator.py --single-pdf path/to/your_paper.pdf
+python3 content_gen/scripts/pipeline/pipeline_orchestrator.py \
+  --input-dir content_gen/data/inputs \
+  --output-dir content_gen/data/extracted \
+  --single-pdf path/to/your_paper.pdf
+
+# Optional explicit subject label:
+python3 content_gen/scripts/pipeline/pipeline_orchestrator.py \
+  --input-dir content_gen/data/inputs \
+  --output-dir content_gen/data/extracted \
+  --single-pdf path/to/your_paper.pdf \
+  --subject "Chemistry"
 ```
 
 ---

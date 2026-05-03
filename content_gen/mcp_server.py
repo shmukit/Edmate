@@ -68,7 +68,7 @@ class EdmateMCPServer:
                     "tools": [
                         {
                             "name": "generate_edmate_content",
-                            "description": "Generate O/A-level content using the modular Edmate router.",
+                            "description": "Generate curriculum-aligned educational content using the modular Edmate router.",
                             "inputSchema": {
                                 "type": "object",
                                 "properties": {

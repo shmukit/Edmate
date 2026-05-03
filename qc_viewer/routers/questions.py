@@ -2,7 +2,7 @@ from typing import Any, Optional, cast
 
 from fastapi import APIRouter, HTTPException
 
-from qc_viewer.config import TABLES
+from qc_viewer.config import get_allowed_table_ids
 from qc_viewer.services.db_service import get_db
 
 
@@ -17,7 +17,7 @@ async def get_papers():
     papers = []
     try:
         with conn.cursor() as cur:
-            for table in TABLES:
+            for table in get_allowed_table_ids():
                 cur.execute(
                     f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table}')"
                 )
@@ -39,7 +39,7 @@ async def get_papers():
 
 @router.get("/api/questions")
 async def get_questions(table: str, paper_code: str):
-    if table not in TABLES:
+    if table not in get_allowed_table_ids():
         raise HTTPException(status_code=400, detail="Invalid table name")
     conn = get_db()
     if not conn:
@@ -70,7 +70,7 @@ async def get_questions(table: str, paper_code: str):
 
 @router.post("/api/verify")
 async def verify_question(table: str, question_id: str, is_verified: bool):
-    if table not in TABLES:
+    if table not in get_allowed_table_ids():
         raise HTTPException(status_code=400, detail="Invalid table name")
     conn = get_db()
     if not conn:
@@ -121,7 +121,7 @@ async def get_flashcards(
 
 @router.get("/api/question/details")
 async def get_question_details(table: str, question_identifier: str):
-    if table not in TABLES:
+    if table not in get_allowed_table_ids():
         raise HTTPException(status_code=400, detail="Invalid table name")
     conn = get_db()
     if not conn:
