@@ -10,7 +10,8 @@ def test_config_load_defaults():
     assert isinstance(config, EdmateConfig)
     assert config.budget.max_daily_usd == 10.0  # default
     assert config.extraction_settings.min_question_number == 1
-    assert config.extraction_settings.max_question_number == 40
+    # No YAML → no ceiling; runtime/API may still set a cap when provided.
+    assert config.extraction_settings.max_question_number is None
     assert config.extraction_settings.question_detection_mode == "balanced"
 
 

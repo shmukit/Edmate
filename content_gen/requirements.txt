@@ -1,5 +1,11 @@
 # Content Generation System Dependencies
 
+# QC Viewer (FastAPI) — used by qc_viewer and CI pytest for qc_viewer/services/tests
+fastapi>=0.100.0
+uvicorn>=0.23.0
+httpx>=0.24.0  # Starlette TestClient
+python-multipart>=0.0.6  # File/Form routes (FastAPI)
+
 # PDF Processing
 PyMuPDF>=1.23.0  # fitz - PDF rendering and extraction
 pdfplumber>=0.10.0  # Table detection (future)
