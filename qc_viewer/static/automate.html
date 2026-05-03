@@ -64,9 +64,9 @@
                     <button class="btn btn-primary btn-sm" id="btnAcceptAll">Accept All</button>
                     <button class="btn btn-outline btn-sm" id="btnToggleEdit">✏ Edit Mode</button>
                     <button class="btn btn-accent btn-sm" id="btnSaveEdits" style="display:none;">💾 Save</button>
-                    <div class="export-menu" style="position:relative; display:inline-block;">
+                    <div class="export-menu">
                         <button type="button" class="btn btn-outline btn-sm" id="btnExportToggle" title="Choose export format">📥 Export ▾</button>
-                        <div id="exportMenu" class="export-dropdown" style="display:none; position:absolute; right:0; top:100%; margin-top:4px; min-width:220px; z-index:50; background:var(--card-bg, #1e293b); border:1px solid var(--card-border, #334155); border-radius:8px; padding:6px; box-shadow:0 8px 24px rgba(0,0,0,0.35); flex-direction:column; gap:4px;">
+                        <div id="exportMenu" class="export-dropdown">
                             <button type="button" class="btn btn-outline btn-sm" data-fmt="json" style="width:100%; justify-content:flex-start;">JSON</button>
                             <button type="button" class="btn btn-outline btn-sm" data-fmt="csv" style="width:100%; justify-content:flex-start;">CSV</button>
                             <button type="button" class="btn btn-outline btn-sm" data-fmt="markdown" style="width:100%; justify-content:flex-start;">Markdown (.md)</button>
@@ -212,17 +212,17 @@
                     <button type="button" id="btnRefreshPipelineConfig" class="btn btn-outline btn-sm" title="Reload edmate_config.yaml from disk">Refresh config</button>
                 </div>
                 <dl id="configSnapshotDl" style="margin:0; font-size:0.78rem; line-height:1.5; color:var(--text-dim); display:grid; grid-template-columns:auto 1fr; gap:4px 12px;">
-                    <dt style="margin:0; color:var(--text-muted);">Engine</dt><dd style="margin:0;" id="cfgEngine">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Detection</dt><dd style="margin:0;" id="cfgDetection">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Kit</dt><dd style="margin:0;" id="cfgKit">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Question range</dt><dd style="margin:0;" id="cfgQuestionRange">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Segmentation</dt><dd style="margin:0;" id="cfgSegmentation">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Default subject</dt><dd style="margin:0;" id="cfgSubject">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Default curriculum</dt><dd style="margin:0;" id="cfgCurriculum">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Budget cap (USD/day)</dt><dd style="margin:0;" id="cfgBudget">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Model · extraction</dt><dd style="margin:0; word-break:break-all;" id="cfgModelExt">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Model · generation</dt><dd style="margin:0; word-break:break-all;" id="cfgModelGen">—</dd>
-                    <dt style="margin:0; color:var(--text-muted);">Model · validation</dt><dd style="margin:0; word-break:break-all;" id="cfgModelVal">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Engine <span class="info-icon" data-tooltip="extraction_settings.engine from edmate_config.yaml (e.g. pdf_extract_kit, vision, pymupdf).">ⓘ</span></dt><dd style="margin:0;" id="cfgEngine">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Detection <span class="info-icon" data-tooltip="question_detection_mode: how strictly question numbers are matched in the PDF. strict = exact patterns; balanced = default; open = more inference.">ⓘ</span></dt><dd style="margin:0;" id="cfgDetection">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Kit <span class="info-icon" data-tooltip="Whether the PDF-Extract-Kit repo is present under content_gen/tools/PDF-Extract-Kit (layout/diagram pipeline). Not used by vision-only engines.">ⓘ</span></dt><dd style="margin:0;" id="cfgKit">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Question range <span class="info-icon" data-tooltip="min_question_number / max_question_number: optional filter so only questions in that inclusive range are extracted.">ⓘ</span></dt><dd style="margin:0;" id="cfgQuestionRange">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Segmentation preset <span class="info-icon" data-tooltip="Heuristic preset for splitting text into questions—not a country. bangladeshi = section headers + numbered items; numbered_only = numbered lines without section blocks.">ⓘ</span></dt><dd style="margin:0;" id="cfgSegmentation">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Default subject <span class="info-icon" data-tooltip="workspace.default_subject fallback when the upload does not specify a subject label.">ⓘ</span></dt><dd style="margin:0;" id="cfgSubject">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Default curriculum <span class="info-icon" data-tooltip="workspace.default_curriculum used as prompt context when none is selected.">ⓘ</span></dt><dd style="margin:0;" id="cfgCurriculum">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Budget cap (USD/day) <span class="info-icon" data-tooltip="budget.max_daily_usd from config (tracking hooks may extend later).">ⓘ</span></dt><dd style="margin:0;" id="cfgBudget">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Model · extraction <span class="info-icon" data-tooltip="model_routing.extraction: provider/model id for extraction-related LLM steps.">ⓘ</span></dt><dd style="margin:0; word-break:break-all;" id="cfgModelExt">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Model · generation <span class="info-icon" data-tooltip="model_routing.generation: provider/model for explanations and generated teaching content.">ⓘ</span></dt><dd style="margin:0; word-break:break-all;" id="cfgModelGen">—</dd>
+                    <dt style="margin:0; color:var(--text-dim);">Model · validation <span class="info-icon" data-tooltip="model_routing.validation: provider/model for validation or QA-style checks when enabled.">ⓘ</span></dt><dd style="margin:0; word-break:break-all;" id="cfgModelVal">—</dd>
                 </dl>
             </div>
         </div>

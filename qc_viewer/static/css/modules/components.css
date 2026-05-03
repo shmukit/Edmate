@@ -450,3 +450,57 @@ select {
     opacity: 1;
     visibility: visible;
 }
+
+/* Export format menus: solid background so dark theme stays readable */
+.export-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.export-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    min-width: 220px;
+    z-index: 1200;
+    background: var(--popover-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    flex-direction: column;
+    gap: 4px;
+}
+
+.export-dropdown .btn-outline {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .export-dropdown .btn-outline {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+.export-dropdown .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .export-dropdown .btn-outline:hover {
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.draft-export-popover {
+    background: var(--popover-bg) !important;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.draft-export-popover .btn-outline {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .draft-export-popover .btn-outline {
+    background: rgba(15, 23, 42, 0.04);
+}

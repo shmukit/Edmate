@@ -60,7 +60,7 @@ export const DraftController = {
                             <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
                                 <div style="width: 10%; height: 100%; background: var(--primary-light); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
                             </div>
-                            <span style="font-size: 0.7rem; color: var(--primary-light);">10% complete</span>
+                            <span class="draft-progress-pct" style="font-size: 0.7rem; color: var(--primary-light);">10% complete</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <span class="status-badge status-processing">PROCESSING</span>
@@ -111,6 +111,9 @@ export const DraftController = {
             this.renderDrafts(drafts);
         } catch (error) {
             console.error('Fetch failed:', error);
+            if (typeof this.showToast === 'function') {
+                this.showToast('Could not refresh drafts', 'danger');
+            }
         }
     },
 
@@ -161,7 +164,7 @@ export const DraftController = {
                         <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
                             <div style="width: ${d.progress || 0}%; height: 100%; background: var(--primary-light); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
                         </div>
-                        <span style="font-size: 0.7rem; color: var(--primary-light);">${d.progress || 0}% complete</span>
+                        <span class="draft-progress-pct" style="font-size: 0.7rem; color: var(--primary-light);">${d.progress || 0}% complete</span>
                     ` : ''}
                 </div>
                 <div style="display: flex; align-items: center; gap: 16px;">
@@ -180,7 +183,7 @@ export const DraftController = {
                 if (e.target.closest('.action-buttons')) return;
                 const id = card.dataset.id;
                 const d = drafts.find(x => x.id === id);
-                if (d.status === 'PROCESSED') this.openReview(id);
+                if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') this.openReview(id);
             };
         });
 
@@ -226,12 +229,12 @@ export const DraftController = {
                 const data = JSON.parse(event.data);
                 this.updateDraftUI(data);
                 
-                if (data.status === 'PROCESSED' || data.status === 'FAILED') {
+                if (data.status === 'PROCESSED' || data.status === 'FAILED' || data.status === 'PUBLISHED') {
                     console.log(`✅ Stream complete for ${draftId}`);
                     eventSource.close();
                     delete this.activeStreams[draftId];
-                    // Final fetch to sync everything
-                    setTimeout(() => this.fetchDrafts(), 1000);
+                    this.fetchDrafts();
+                    setTimeout(() => this.fetchDrafts(), 900);
                 }
             } catch (e) {
                 console.error('SSE Parse Error:', e);
@@ -246,32 +249,31 @@ export const DraftController = {
     },
 
     updateDraftUI(d) {
-        // 1. (Removed top-level progress bar update as per UAC)
-
-        // 2. Update the specific draft card
         const card = document.querySelector(`.draft-card[data-id="${d.id}"]`);
         if (!card) return;
 
-        // Update progress bar
+        const status = d.status || '';
+        const isProcessing = status === 'PROCESSING' || status === 'EXTRACTING';
+
         const bar = card.querySelector('.mini-progress-container div');
         if (bar) bar.style.width = `${d.progress || 0}%`;
 
-        // Update percentage text
-        const pctText = card.querySelector('.draft-info span[style*="color: var(--primary-light)"]');
+        const pctText = card.querySelector('.draft-progress-pct')
+            || card.querySelector('.draft-info span[style*="color: var(--primary-light)"]');
         if (pctText) pctText.textContent = `${d.progress || 0}% complete`;
 
-        // Update status message
         const statusMsgContainer = card.querySelector('.draft-info p');
-        let statusMsgSpan = statusMsgContainer.querySelector('.status-message-streaming');
-        if (!statusMsgSpan) {
-            statusMsgSpan = document.createElement('span');
-            statusMsgSpan.className = 'status-message-streaming';
-            statusMsgSpan.style.fontSize = '0.75rem';
-            statusMsgContainer.appendChild(statusMsgSpan);
+        if (statusMsgContainer) {
+            let statusMsgSpan = statusMsgContainer.querySelector('.status-message-streaming');
+            if (!statusMsgSpan) {
+                statusMsgSpan = document.createElement('span');
+                statusMsgSpan.className = 'status-message-streaming';
+                statusMsgSpan.style.fontSize = '0.75rem';
+                statusMsgContainer.appendChild(statusMsgSpan);
+            }
+            statusMsgSpan.textContent = ` • ${d.status_message || 'Processing...'}`;
         }
-        statusMsgSpan.textContent = ` • ${d.status_message || 'Processing...'}`;
-        
-        // Update question count if available
+
         const qCount = d.questions?.length || d.processed_count || 0;
         if (qCount > 0) {
             let badge = card.querySelector('.question-count-badge');
@@ -282,6 +284,50 @@ export const DraftController = {
                 if (titleBlock) titleBlock.appendChild(badge);
             }
             badge.textContent = `${qCount} Questions`;
+        }
+
+        if (status === 'PROCESSED' || status === 'FAILED' || status === 'PUBLISHED') {
+            card.classList.remove('processing-active');
+            const badgeEl = card.querySelector('.status-badge');
+            if (badgeEl) {
+                badgeEl.textContent = status;
+                badgeEl.className = `status-badge status-${String(status).toLowerCase()}`;
+            }
+            const mini = card.querySelector('.mini-progress-container');
+            const pctEl = card.querySelector('.draft-progress-pct')
+                || card.querySelector('.draft-info span[style*="color: var(--primary-light)"]');
+            if (mini) mini.style.display = 'none';
+            if (pctEl) pctEl.style.display = 'none';
+
+            const actions = card.querySelector('.action-buttons');
+            if (actions && typeof this.renderActionButton === 'function') {
+                const id = d.id;
+                actions.innerHTML = `${this.renderActionButton(d)}<button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>`;
+                actions.querySelector('.btn-delete')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.deleteDraft(id);
+                });
+                actions.querySelector('.btn-review')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openReview(id);
+                });
+                actions.querySelector('.btn-stop')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.stopProcessing(id);
+                });
+                const exportBtn = actions.querySelector('.btn-card-export');
+                exportBtn?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openDraftExportPopover(exportBtn, id);
+                });
+            }
+        } else if (isProcessing) {
+            card.classList.add('processing-active');
+            const mini = card.querySelector('.mini-progress-container');
+            const pctEl = card.querySelector('.draft-progress-pct')
+                || card.querySelector('.draft-info span[style*="color: var(--primary-light)"]');
+            if (mini) mini.style.display = '';
+            if (pctEl) pctEl.style.display = '';
         }
     },
 
@@ -338,15 +384,11 @@ export const DraftController = {
         pop.style.cssText = [
             'position:fixed',
             'z-index:10050',
-            'background:var(--card-bg,#1e293b)',
-            'border:1px solid var(--card-border,#334155)',
-            'border-radius:8px',
             'padding:8px',
             'display:flex',
             'flex-direction:column',
             'gap:6px',
             'min-width:220px',
-            'box-shadow:0 8px 24px rgba(0,0,0,0.35)',
         ].join(';');
         const r = anchorEl.getBoundingClientRect();
         pop.style.top = `${Math.min(window.innerHeight - 120, r.bottom + 6)}px`;

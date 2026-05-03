@@ -276,9 +276,9 @@ async def get_metrics():
 
 @router.get("/api/automate/config")
 async def get_config():
-    import yaml
     from pathlib import Path
 
+    from content_gen.core.config_loader import ConfigLoader
     from qc_viewer.config import PROJECT_ROOT
 
     config_path = PROJECT_ROOT / "edmate_config.yaml"
@@ -288,16 +288,18 @@ async def get_config():
     model_routing: dict = {}
     kit_present = False
 
-    if config_path.exists():
-        try:
-            with open(config_path, "r") as f:
-                data = yaml.safe_load(f) or {}
-                workspace_data = data.get("workspace", {}) or {}
-                budget_data = data.get("budget", {}) or {}
-                extraction_settings = data.get("extraction_settings", {}) or {}
-                model_routing = data.get("model_routing", {}) or {}
-        except Exception as e:
-            print(f"Error loading edmate_config.yaml: {e}")
+    try:
+        ec = ConfigLoader.load_config(config_path if config_path.exists() else None)
+        if hasattr(ec, "model_dump"):
+            merged = ec.model_dump(mode="json")
+        else:
+            merged = json.loads(ec.json())  # type: ignore[attr-defined]
+        workspace_data = merged.get("workspace") or {}
+        budget_data = merged.get("budget") or {}
+        extraction_settings = merged.get("extraction_settings") or {}
+        model_routing = merged.get("model_routing") or {}
+    except Exception as e:
+        print(f"Error loading validated edmate_config: {e}")
 
     kit_path = Path(PROJECT_ROOT) / "content_gen" / "tools" / "PDF-Extract-Kit"
     kit_present = kit_path.is_dir() and (kit_path / "pdf_extract_kit").is_dir()

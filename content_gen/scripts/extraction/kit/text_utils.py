@@ -49,26 +49,37 @@ class KitTextUtilsMixin:
     def _reconstruct_line_text(
         self, spans: List[Dict], avg_baseline: float, main_size: float
     ) -> str:
-        """Helper to reconstruct text with markup from a list of spans on one line"""
+        """Reconstruct one visual line from spans; insert spaces from PDF x-gaps between words."""
         if not spans:
             return ""
-        parts = []
+        pieces: List[tuple[str, float, float]] = []
         for span in spans:
             raw = span.get("text")
             text = "" if raw is None else str(raw)
             size = span["size"]
             top = span["bbox"][1]
+            x0, x1 = float(span["bbox"][0]), float(span["bbox"][2])
 
             if size < main_size * 0.9:
                 if top < avg_baseline - 1:
-                    parts.append(f"^{text}")
+                    piece = f"^{text}"
                 elif top > avg_baseline + 1:
-                    parts.append(f"_{text}")
+                    piece = f"_{text}"
                 else:
-                    parts.append(text)
+                    piece = text
             else:
-                parts.append(text)
-        return "".join(parts).strip()
+                piece = text
+            pieces.append((piece, x0, x1))
+
+        out: List[str] = []
+        gap_space_px = 1.25
+        for i, (piece, x0, _x1) in enumerate(pieces):
+            if i > 0:
+                prev_x1 = pieces[i - 1][2]
+                if x0 - prev_x1 > gap_space_px:
+                    out.append(" ")
+            out.append(piece)
+        return "".join(out).strip()
 
     def _generate_processed_text(self, output_data: Dict) -> None:
         """Generate the standard processed text file in data/outputs following prompts.py"""

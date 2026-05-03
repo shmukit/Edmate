@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import json
 import os
 import re
 import threading
@@ -13,10 +12,10 @@ from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.core.config_schema import DetectionMode
 from content_gen.core.pedagogy_engine import PedagogyEngine
 from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
+from qc_viewer.services.draft_store import read_modify_write_json
 
 
 CANCELLATION_EVENTS: dict[str, threading.Event] = {}
-METADATA_LOCK = threading.Lock()
 
 
 def _normalize_model_id(model_id: str, provider: Optional[str]) -> str:
@@ -178,10 +177,7 @@ def run_automation_pipeline(
             raise InterruptedError(f"Task {draft_id} was cancelled by user.")
 
         try:
-            with METADATA_LOCK:
-                with open(meta_path, "r") as f:
-                    meta = json.load(f)
-                
+            def _mut(meta: dict) -> None:
                 update_data = {
                     "progress": progress,
                     "status_message": message,
@@ -191,11 +187,9 @@ def run_automation_pipeline(
                     update_data["processed_count"] = processed_count
                 if total_count is not None:
                     update_data["total_count"] = total_count
-                
                 meta.update(update_data)
-                
-                with open(meta_path, "w") as f:
-                    json.dump(meta, f)
+
+            read_modify_write_json(meta_path, _mut)
         except Exception as e:
             print(f"Error updating progress: {e}")
 
@@ -312,6 +306,13 @@ def run_automation_pipeline(
             if clean_core_concept.lower() in explanation_text.lower() and len(clean_core_concept) > len(explanation_text) * 0.8:
                 clean_core_concept = "Concept extracted from explanation."
 
+            opts_map = q.options if isinstance(q.options, dict) else {}
+            opt_vals = [str(opts_map.get(k, "") or "").strip() for k in ("A", "B", "C", "D")]
+            non_empty_opts = sum(1 for v in opt_vals if v)
+            extraction_warnings = (
+                ["mcq_options_missing"] if non_empty_opts < 2 else []
+            )
+
             legacy_q = {
                 "question_number": q.question_number,
                 "text": q.question_text,
@@ -328,6 +329,8 @@ def run_automation_pipeline(
                 "quality_report": quality_report,
                 "contract_warnings": [k for k, v in quality_report.items() if v is False],
             }
+            if extraction_warnings:
+                legacy_q["extraction_warnings"] = extraction_warnings
             questions_payload.append(legacy_q)
 
         t_normalization_end = time.time()
@@ -342,53 +345,56 @@ def run_automation_pipeline(
             }
         }
 
-        with open(meta_path, "r") as f:
-            final_meta = json.load(f)
+        def _finalize(meta: dict) -> None:
+            meta.update(
+                {
+                    "questions": questions_payload,
+                    "status": "PROCESSED",
+                    "progress": 100,
+                    "processed_count": total_questions,
+                    "total_count": total_questions,
+                    "status_message": "Generation complete!",
+                    "id": draft_id,
+                    "subject": subject,
+                    "paper_code": paper_code,
+                    "pedagogy_profile": pedagogy.get_profile_summary(),
+                    "resolved_model_override": resolved_model_override,
+                    "completed_at": datetime.now().isoformat(),
+                    "telemetry": telemetry,
+                }
+            )
 
-        final_meta.update(
-            {
-                "questions": questions_payload,
-                "status": "PROCESSED",
-                "progress": 100,
-                "processed_count": total_questions,
-                "total_count": total_questions,
-                "status_message": "Generation complete!",
-                "id": draft_id,
-                "subject": subject,
-                "paper_code": paper_code,
-                "pedagogy_profile": pedagogy.get_profile_summary(),
-                "resolved_model_override": resolved_model_override,
-                "completed_at": datetime.now().isoformat(),
-                "telemetry": telemetry,
-            }
-        )
-
-        with open(meta_path, "w") as f:
-            json.dump(final_meta, f)
+        read_modify_write_json(meta_path, _finalize)
 
     except InterruptedError:
         print(f"Task {draft_id} cancelled.")
-        _update_progress(0, "Processing stopped by user.")
-        with open(meta_path, "r") as f:
-            meta = json.load(f)
-        meta["status"] = "FAILED"
-        meta["status_message"] = "Stopped by user"
-        with open(meta_path, "w") as f:
-            json.dump(meta, f)
+        try:
+            read_modify_write_json(
+                meta_path,
+                lambda m: m.update(
+                    {
+                        "progress": 0,
+                        "status_message": "Processing stopped by user.",
+                        "status": "FAILED",
+                    }
+                ),
+            )
+        except Exception as inner_e:
+            print(f"Failed to update metadata after cancel: {inner_e}")
     except Exception as e:
         print(f"Background Processing Error: {e}")
         try:
-            with open(meta_path, "r") as f:
-                fail_meta = json.load(f)
-            fail_meta.update(
-                {
-                    "status": "FAILED",
-                    "error": str(e),
-                    "progress": 0,
-                    "status_message": f"Error: {str(e)}",
-                }
-            )
-            with open(meta_path, "w") as f:
-                json.dump(fail_meta, f)
+
+            def _fail(meta: dict) -> None:
+                meta.update(
+                    {
+                        "status": "FAILED",
+                        "error": str(e),
+                        "progress": 0,
+                        "status_message": f"Error: {str(e)}",
+                    }
+                )
+
+            read_modify_write_json(meta_path, _fail)
         except Exception as inner_e:
             print(f"Failed to update metadata with error: {inner_e}")

@@ -25,7 +25,7 @@ export const ReviewController = {
         list.innerHTML = questions.map((q, i) => `
             <div class="draft-card question-item ${q.status === 'REJECTED' ? 'rejected' : ''}" data-index="${i}" style="margin-bottom:10px; ${this.currentQuestionIndex === i ? 'border-color:var(--primary)' : ''}">
                 <div style="flex:1">
-                    <b style="color:${q.status === 'REJECTED' ? 'var(--danger)' : 'var(--primary-light)'}">Q${q.question_number}</b>: 
+                    <b style="color:${q.status === 'REJECTED' ? 'var(--danger)' : 'var(--primary-light)'}">Q${q.question_number}</b>${(q.extraction_warnings && q.extraction_warnings.length) ? '<span class="extraction-warn-inline" title="Extraction may be incomplete (e.g. options)">⚠</span>' : ''}: 
                     ${q.text.substring(0, 50)}...
                 </div>
                 ${q.status !== 'INJECTED' ? `
@@ -65,13 +65,18 @@ export const ReviewController = {
         
         let typeSpecificHtml = '';
         const qType = q.type || 'mcq';
+        const extWarn = Array.isArray(q.extraction_warnings) && q.extraction_warnings.length > 0;
+        const warnBanner = extWarn
+            ? `<div class="extraction-warn-banner" role="status">Extraction note: some PDF fields (often MCQ options) could not be split reliably. Compare with the source PDF or use edit mode to fix.</div>`
+            : '';
 
         if (qType === 'mcq') {
             const opts = q.options || { A: '', B: '', C: '', D: '' };
             typeSpecificHtml = `
+                ${warnBanner}
                 <div style="margin-top:20px; border-top: 1px solid #e2e8f0; padding-top:12px;">
                     <b style="color:var(--primary); font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Options</b>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <div class="mcq-options-grid">
                         ${['A', 'B', 'C', 'D'].map(opt => `
                             <div class="edit-group opt-field" id="group-opt-${opt}">
                                 <label class="field-label" style="font-weight:700; text-transform:uppercase; font-size:0.7rem;">Option ${opt}</label>
@@ -120,6 +125,7 @@ export const ReviewController = {
         }
 
         preview.innerHTML = `
+            ${qType !== 'mcq' ? warnBanner : ''}
             <div class="edit-group" id="group-text">
                 <label class="field-label">Question Text</label>
                 <textarea class="editable-field" id="edit-text" style="height:80px;">${q.text}</textarea>

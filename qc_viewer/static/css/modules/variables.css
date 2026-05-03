@@ -26,6 +26,8 @@
     --glass: rgba(17, 24, 39, 0.6);
     --glass-border: rgba(251, 191, 36, 0.2);
     --grid-color: rgba(251, 191, 36, 0.05); /* Increased opacity */
+    /* Opaque menus/popovers (--card-bg is translucent in dark theme) */
+    --popover-bg: #1e293b;
 }
 
 [data-theme="light"] {
@@ -42,6 +44,7 @@
     --glass: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(17, 24, 39, 0.15);
     --grid-color: rgba(251, 191, 36, 0.12); /* Increased opacity */
+    --popover-bg: #ffffff;
 }
 
 * {

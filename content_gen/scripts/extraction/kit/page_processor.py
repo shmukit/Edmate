@@ -166,6 +166,16 @@ class KitPageProcessorMixin:
                     )
                     line_text = (self._clean_noise(line_text) or "").strip()
                     if line_text:
+                        m_opt = re.match(
+                            r"(?i)^\s*([A-D])[\.\):]\s*(.*)$", line_text
+                        )
+                        if m_opt:
+                            letter = m_opt.group(1).upper()
+                            rest = (m_opt.group(2) or "").strip()
+                            if letter in questions[q_num]["options"]:
+                                questions[q_num]["options"][letter] += " " + rest
+                                current_field = letter
+                                continue
                         if current_field == "question_text":
                             if not questions[q_num]["question_text"]:
                                 line_text = re.sub(r"^\d+[\.\s]*", "", line_text)
