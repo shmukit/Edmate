@@ -8,8 +8,19 @@ import os
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
+
+from azure.core.credentials import AzureNamedKeyCredential
 from azure.storage.blob import BlobServiceClient, ContentSettings
+
+
+def _account_name_from_conn_str(conn: str) -> Optional[str]:
+    """Parse AccountName from an Azure storage connection string."""
+    for seg in conn.split(";"):
+        seg = seg.strip()
+        if seg.lower().startswith("accountname="):
+            return seg.split("=", 1)[1].strip()
+    return None
 
 
 class StorageUploader:
@@ -17,20 +28,37 @@ class StorageUploader:
         """
         Initialize storage uploader with Azure Blob Storage
         """
-        self.client = self._init_client()
+        self.client, self._blob_account_name = self._init_client()
 
-    def _init_client(self):
-        """Initialize Azure Blob Storage client"""
-        # Azure Blob Storage configuration
+    def _init_client(self) -> Tuple[BlobServiceClient, str]:
+        """Initialize client; return (client, storage account name for public URLs)."""
         account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
         account_key = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
+        conn = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "").strip()
 
-        if not all([account_name, account_key]):
+        if conn:
+            client = BlobServiceClient.from_connection_string(conn)
+            resolved = (account_name or "").strip() or _account_name_from_conn_str(conn) or ""
+            if not resolved:
+                raise ValueError(
+                    "Set AZURE_STORAGE_ACCOUNT_NAME, or include AccountName= in "
+                    "AZURE_STORAGE_CONNECTION_STRING, so public blob URLs can be built."
+                )
+            return client, resolved
+
+        if not account_name or not account_key:
             raise ValueError(
-                "Missing Azure credentials. Set AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY")
+                "Missing Azure credentials. Set AZURE_STORAGE_CONNECTION_STRING, or "
+                "both AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY."
+            )
 
-        connection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
-        return BlobServiceClient.from_connection_string(connection_string)
+        name = account_name.strip()
+        key = account_key.strip()
+        # Named key credential — avoids a connection-string literal in source
+        # (scanners flag AccountKey= substrings in repository code).
+        credential = AzureNamedKeyCredential(name, key)
+        account_url = f"https://{name}.blob.core.windows.net"
+        return BlobServiceClient(account_url=account_url, credential=credential), name
 
     def upload_file(self, local_path: str, container: str, key: str, retries: int = 3) -> str:
         """
@@ -71,14 +99,13 @@ class StorageUploader:
 
     def _generate_cdn_url(self, container: str, key: str) -> str:
         """Generate public CDN URL for uploaded file"""
-        # Use custom CDN domain if configured, otherwise default blob endpoint
-        account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
         custom_cdn = os.getenv("AZURE_STORAGE_CDN_URL")
 
         if custom_cdn:
             return f"{custom_cdn}/{container}/{key}"
-        else:
-            return f"https://{account_name}.blob.core.windows.net/{container}/{key}"
+        return (
+            f"https://{self._blob_account_name}.blob.core.windows.net/{container}/{key}"
+        )
 
     def upload_directory(
         self,

@@ -74,6 +74,34 @@ export const AutomationUI = {
                 const gen = (config.model_routing && config.model_routing.generation) || '—';
                 footer.textContent = `Pipeline engine: ${engine} · kit: ${kit} · generation model: ${gen}`;
             }
+
+            const es = config.extraction_settings || {};
+            const mr = config.model_routing || {};
+            const ws = config.workspace || {};
+            const bud = config.budget || {};
+            const minQ = es.min_question_number;
+            const maxQ = es.max_question_number;
+            const qRange = (minQ != null && maxQ != null)
+                ? `${minQ}–${maxQ}`
+                : (minQ != null && (maxQ === null || maxQ === undefined))
+                    ? `${minQ}–∞ (no max)`
+                    : '—';
+
+            const setTxt = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val == null || val === '' ? '—' : String(val);
+            };
+            setTxt('cfgEngine', engine);
+            setTxt('cfgDetection', mode || '—');
+            setTxt('cfgKit', kit);
+            setTxt('cfgQuestionRange', qRange);
+            setTxt('cfgSegmentation', es.segmentation_preset);
+            setTxt('cfgSubject', ws.default_subject);
+            setTxt('cfgCurriculum', ws.default_curriculum);
+            setTxt('cfgBudget', bud.max_daily_usd != null ? String(bud.max_daily_usd) : '—');
+            setTxt('cfgModelExt', mr.extraction);
+            setTxt('cfgModelGen', mr.generation);
+            setTxt('cfgModelVal', mr.validation);
         } catch (e) {
             console.error('Error loading pipeline config:', e);
         }
@@ -170,6 +198,10 @@ export const AutomationUI = {
                 const icon = toggle.querySelector('.settings-group-toggle-icon');
                 if (icon) icon.textContent = expanded ? '−' : '+';
             };
+        });
+
+        document.getElementById('btnRefreshPipelineConfig')?.addEventListener('click', () => {
+            this.fetchPipelineConfig();
         });
         
         this.setupTooltips();
