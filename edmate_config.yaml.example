@@ -1,6 +1,12 @@
 # Portable example — copy to edmate_config.yaml and customize.
 # Do not use YAML tags like !!python/object; values are plain strings.
 
+# Model routing uses LiteLLM provider/model strings (passed through to LiteLLM).
+# Swap to any LiteLLM-compatible route without code changes, for example:
+#   openai/gpt-4o
+#   anthropic/claude-3-5-sonnet-20240620
+#   azure/gpt-4o
+#   vertex_ai/gemini-2.5-flash
 model_routing:
   extraction: "vertex_ai/gemini-2.5-flash"
   generation: "vertex_ai/gemini-2.5-flash"

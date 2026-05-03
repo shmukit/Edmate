@@ -198,6 +198,34 @@
     <!-- Pipeline Configuration Sidebar -->
     <div class="settings-panel">
         <h2 style="font-family:'Outfit'; font-size:1.4rem;">Pipeline Settings</h2>
+
+        <div class="settings-group settings-group-collapsible settings-group-expanded" id="configSnapshotPanel" style="background: rgba(14, 165, 233, 0.06); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 14px;">
+            <button type="button" class="settings-group-toggle" aria-expanded="true">
+                <span class="settings-label" style="font-weight: 600; margin-bottom: 0;">
+                    Active Config Snapshot
+                    <span class="info-icon" data-tooltip="Read-only view of edmate_config.yaml as loaded by the server. Edit the file and click Refresh to update this panel.">ⓘ</span>
+                </span>
+                <span class="settings-group-toggle-icon" aria-hidden="true">−</span>
+            </button>
+            <div class="settings-group-content">
+                <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                    <button type="button" id="btnRefreshPipelineConfig" class="btn btn-outline btn-sm" title="Reload edmate_config.yaml from disk">Refresh config</button>
+                </div>
+                <dl id="configSnapshotDl" style="margin:0; font-size:0.78rem; line-height:1.5; color:var(--text-dim); display:grid; grid-template-columns:auto 1fr; gap:4px 12px;">
+                    <dt style="margin:0; color:var(--text-muted);">Engine</dt><dd style="margin:0;" id="cfgEngine">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Detection</dt><dd style="margin:0;" id="cfgDetection">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Kit</dt><dd style="margin:0;" id="cfgKit">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Question range</dt><dd style="margin:0;" id="cfgQuestionRange">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Segmentation</dt><dd style="margin:0;" id="cfgSegmentation">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Default subject</dt><dd style="margin:0;" id="cfgSubject">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Default curriculum</dt><dd style="margin:0;" id="cfgCurriculum">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Budget cap (USD/day)</dt><dd style="margin:0;" id="cfgBudget">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Model · extraction</dt><dd style="margin:0; word-break:break-all;" id="cfgModelExt">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Model · generation</dt><dd style="margin:0; word-break:break-all;" id="cfgModelGen">—</dd>
+                    <dt style="margin:0; color:var(--text-muted);">Model · validation</dt><dd style="margin:0; word-break:break-all;" id="cfgModelVal">—</dd>
+                </dl>
+            </div>
+        </div>
         
         <div class="settings-group">
             <span class="settings-label">

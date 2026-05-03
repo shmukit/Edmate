@@ -79,6 +79,20 @@ class ExtractionSettings(BaseModel):
         description="bangladeshi | numbered_only — controls regex segmentation heuristics",
     )
 
+    @field_validator("segmentation_preset", mode="before")
+    @classmethod
+    def _validate_segmentation_preset(cls, v: Any) -> str:
+        allowed = frozenset({"bangladeshi", "numbered_only"})
+        s = (v if v is not None else "bangladeshi")
+        if not isinstance(s, str):
+            s = str(s)
+        s = s.strip().lower()
+        if s not in allowed:
+            raise ValueError(
+                f"segmentation_preset must be one of {sorted(allowed)}, got {v!r}"
+            )
+        return s
+
     @field_validator("engine", mode="before")
     @classmethod
     def _coerce_engine(cls, v: Any) -> Any:

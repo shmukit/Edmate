@@ -6,7 +6,7 @@ This directory contains the **PDF → structured questions → explanations** pi
 
 | Path | Role |
 |------|------|
-| `extraction/` | `pdf_extract_kit_wrapper.py` — adapter around [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) (must be cloned to `content_gen/tools/PDF-Extract-Kit`; see repo `scripts/setup_pdf_extract_kit.sh`). |
+| `extraction/` | `pdf_extract_kit_wrapper.py` (shim) → `extraction/kit/` — modular adapter around [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) (clone to `content_gen/tools/PDF-Extract-Kit`; see `scripts/setup_pdf_extract_kit.sh`). |
 | `adapters/` (package root `content_gen/adapters/`) | `PyMuPDFAdapter`, `KitExtractionAdapter`, `VisionExtractionAdapter` — selected by `extraction_settings.engine` in `edmate_config.yaml`. |
 | `pipeline/` | `pipeline_orchestrator.py` — main CLI orchestrator; `national_exam_processor.py` — optional standalone path with `--extraction-engine`. |
 | `processing/` | `content_generator.py`, import/upload helpers. |
