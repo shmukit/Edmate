@@ -382,16 +382,17 @@ def run_automation_pipeline(
         except Exception as inner_e:
             print(f"Failed to update metadata after cancel: {inner_e}")
     except Exception as e:
-        print(f"Background Processing Error: {e}")
+        error_str = str(e)
+        print(f"Background Processing Error: {error_str}")
         try:
 
             def _fail(meta: dict) -> None:
                 meta.update(
                     {
                         "status": "FAILED",
-                        "error": str(e),
+                        "error": error_str,
                         "progress": 0,
-                        "status_message": f"Error: {str(e)}",
+                        "status_message": f"Error: {error_str}",
                     }
                 )
 
