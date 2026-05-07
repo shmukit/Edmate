@@ -17,6 +17,7 @@ from qc_viewer.services.automation_pipeline import CANCELLATION_EVENTS, run_auto
 from pydantic import BaseModel
 from qc_viewer.services import draft_export
 from qc_viewer.services.draft_store import (
+    DraftNotFound,
     delete_draft_data,
     ensure_drafts_root,
     get_draft_dir,
@@ -26,6 +27,13 @@ from qc_viewer.services.draft_store import (
     sort_key_from_timestamp,
     write_json,
 )
+
+
+def _require_draft_path(draft_id: str) -> Path:
+    try:
+        return resolve_metadata_path(draft_id)
+    except DraftNotFound:
+        raise HTTPException(status_code=404, detail="Draft not found")
 
 
 class PublishRequest(BaseModel):
@@ -142,7 +150,7 @@ async def list_drafts():
 
 @router.get("/api/automate/draft/{draft_id}")
 async def get_draft_results(draft_id: str):
-    return read_json(resolve_metadata_path(draft_id))
+    return read_json(_require_draft_path(draft_id))
 
 
 @router.get("/api/automate/draft/{draft_id}/export")
@@ -150,7 +158,7 @@ async def export_draft(draft_id: str, format: str = "json"):
     fmt = format.lower()
     if fmt not in draft_export.SUPPORTED_FORMATS:
         raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
-    meta = read_json(resolve_metadata_path(draft_id))
+    meta = read_json(_require_draft_path(draft_id))
     body = draft_export.render(meta, fmt)
     filename = draft_export.safe_filename(meta, fmt)
     return Response(
@@ -164,7 +172,7 @@ async def export_draft(draft_id: str, format: str = "json"):
 async def stream_draft_progress(draft_id: str, request: Request):
     try:
         meta_path = resolve_metadata_path(draft_id)
-    except HTTPException:
+    except DraftNotFound:
         meta_path = DRAFTS_ROOT / draft_id / "metadata.json"
         if not meta_path.exists():
             meta_path = DRAFTS_ROOT / f"{draft_id}.json"
@@ -211,7 +219,7 @@ async def stop_draft_processing(draft_id: str):
     if meta and meta.get("status") == "PROCESSING":
         meta["status"] = "FAILED"
         meta["status_message"] = "Stopped by user"
-        write_json(resolve_metadata_path(draft_id), meta)
+        write_json(_require_draft_path(draft_id), meta)
         return {"status": "stopped"}
 
     return {"status": "not_running"}
@@ -219,7 +227,7 @@ async def stop_draft_processing(draft_id: str):
 
 @router.patch("/api/automate/draft/{draft_id}")
 async def update_draft(draft_id: str, updates: dict):
-    meta_path = resolve_metadata_path(draft_id)
+    meta_path = _require_draft_path(draft_id)
     try:
         data = read_json(meta_path)
         data.update(updates)

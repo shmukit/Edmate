@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 from typing import List, Dict, Optional, cast
 import argparse
-import base64
 
 # Import modular core
+from content_gen.core.media_encoding import png_file_to_data_uri
 from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.core.config_schema import ExtractionEngine
 from content_gen.adapters.postgres_adapter import PostgresStorageAdapter
@@ -31,9 +31,6 @@ class PipelineOrchestrator:
         """
         self.storage_bucket = storage_bucket
         self.db_connection = db_connection
-        self.router = router or ModelRoutingEngine()
-
-        # Initialize components
         self.router = router or ModelRoutingEngine()
         self.generator = ContentGenerator(router=self.router)
         self.storage = (
@@ -73,9 +70,7 @@ class PipelineOrchestrator:
     def _convert_to_base64(self, image_path: Path) -> str:
         """Converts an image file to a base64 Data URI."""
         try:
-            with open(image_path, "rb") as f:
-                encoded = base64.b64encode(f.read()).decode("utf-8")
-                return f"data:image/png;base64,{encoded}"
+            return png_file_to_data_uri(image_path)
         except Exception as e:
             print(f"⚠️ Failed to base64 encode {image_path}: {e}")
             return ""

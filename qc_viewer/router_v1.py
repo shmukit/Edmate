@@ -9,11 +9,9 @@ from datetime import datetime
 from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
 from content_gen.core.model_router import ModelRoutingEngine
 from content_gen.core.schemas import ProcessedQuestion
+from qc_viewer.services.job_repository import get_job_repository
 
 router = APIRouter(prefix="/api/v1", tags=["Service API v1"])
-
-# In-memory job store for the experimental run (use DB/Cache for production)
-JOBS = {}
 
 @router.post("/extract")
 async def extract_content(
@@ -41,13 +39,16 @@ async def extract_content(
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
         
-    JOBS[job_id] = {
-        "status": "PROCESSING",
-        "id": job_id,
-        "subject": subject,
-        "curriculum": curriculum,
-        "created_at": datetime.now().isoformat()
-    }
+    get_job_repository().put(
+        job_id,
+        {
+            "status": "PROCESSING",
+            "id": job_id,
+            "subject": subject,
+            "curriculum": curriculum,
+            "created_at": datetime.now().isoformat(),
+        },
+    )
     
     # Run the processing in background
     background_tasks.add_task(
@@ -65,9 +66,10 @@ async def extract_content(
 
 @router.get("/jobs/{job_id}")
 async def get_job_status(job_id: str):
-    if job_id not in JOBS:
+    row = get_job_repository().get(job_id)
+    if not row:
         raise HTTPException(status_code=404, detail="Job not found")
-    return JOBS[job_id]
+    return row
 
 async def process_service_job(
     job_id: str, 
@@ -79,17 +81,11 @@ async def process_service_job(
     gemini_key: Optional[str]
 ):
     try:
-        import os
-        
         # Determine BYOK with neutral header first, then legacy provider headers.
         if not api_key:
             api_key = gemini_key or openai_key
 
-        # Initialize engine with BYOK
-        if api_key:
-            os.environ["LITELLM_API_KEY"] = api_key
-            
-        router = ModelRoutingEngine()
+        router = ModelRoutingEngine(api_key=api_key)
         orchestrator = PipelineOrchestrator(router=router)
 
         # Execute processing
@@ -114,15 +110,21 @@ async def process_service_job(
             }
             validated_questions.append(legacy_q)
 
-        JOBS[job_id].update({
-            "status": "COMPLETED",
-            "questions": validated_questions,
-            "completed_at": datetime.now().isoformat()
-        })
-        
+        get_job_repository().merge(
+            job_id,
+            {
+                "status": "COMPLETED",
+                "questions": validated_questions,
+                "completed_at": datetime.now().isoformat(),
+            },
+        )
+
     except Exception as e:
         print(f"Job {job_id} failed: {e}")
-        JOBS[job_id].update({
-            "status": "FAILED",
-            "error": str(e)
-        })
+        get_job_repository().merge(
+            job_id,
+            {
+                "status": "FAILED",
+                "error": str(e),
+            },
+        )

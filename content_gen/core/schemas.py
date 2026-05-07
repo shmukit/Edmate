@@ -1,3 +1,11 @@
+"""
+Pipeline DTOs (extraction + generation).
+
+Canonical in-process model for PDF → LLM → DB flows is :class:`ProcessedQuestion`.
+For versioned export JSON see :mod:`content_gen.core.schema` and
+:func:`content_gen.core.question_mapping.processed_question_to_edmate_question`.
+"""
+
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 from datetime import datetime

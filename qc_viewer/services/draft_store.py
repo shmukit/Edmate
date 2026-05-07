@@ -6,11 +6,17 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 import threading
 
-from fastapi import HTTPException
-
 from qc_viewer.config import DRAFTS_ROOT
 
 METADATA_LOCK = threading.Lock()
+
+
+class DraftNotFound(Exception):
+    """No metadata file exists for this draft_id (neither dir/metadata.json nor legacy flat .json)."""
+
+    def __init__(self, draft_id: str):
+        self.draft_id = draft_id
+        super().__init__(f"Draft not found: {draft_id}")
 
 
 def ensure_drafts_root() -> None:
@@ -36,7 +42,7 @@ def resolve_metadata_path(draft_id: str) -> Path:
     legacy_path = get_legacy_metadata_path(draft_id)
     if legacy_path.exists():
         return legacy_path
-    raise HTTPException(status_code=404, detail="Draft not found")
+    raise DraftNotFound(draft_id)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -122,5 +128,5 @@ def delete_draft_data(draft_id: str) -> bool:
 def load_metadata_if_exists(draft_id: str) -> Optional[dict[str, Any]]:
     try:
         return read_json(resolve_metadata_path(draft_id))
-    except HTTPException:
+    except DraftNotFound:
         return None

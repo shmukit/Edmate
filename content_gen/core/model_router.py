@@ -23,10 +23,18 @@ class ModelRoutingEngine:
     Includes an automatic 'Economic Kill-Switch' based on configured budget.
     """
 
-    def __init__(self, config: Optional[EdmateConfig] = None):
+    def __init__(
+        self,
+        config: Optional[EdmateConfig] = None,
+        *,
+        api_key: Optional[str] = None,
+    ):
         # Load config from YAML/JSON if not provided
         self.config = config or CoreConfig.load_from_yaml()
         self.tracker = MetricsTracker()
+        # Per-request / BYOK key passed to litellm (never mutate os.environ).
+        _k = (api_key or "").strip()
+        self._api_key: Optional[str] = _k or None
 
     def generate_content(
         self,
@@ -34,7 +42,8 @@ class ModelRoutingEngine:
         task_type: str = "generation",
         system_prompt: Optional[str] = None,
         images: Optional[List[str]] = None,
-        json_mode: bool = False
+        json_mode: bool = False,
+        api_key: Optional[str] = None,
     ) -> str:
         """
         Routes the task to the appropriate model based on task_type.
@@ -70,13 +79,18 @@ class ModelRoutingEngine:
         else:
             messages.append({"role": "user", "content": prompt})
 
-        # 3. Execute call
-        response = litellm.completion(
-            model=model,
-            messages=messages,
-            response_format={"type": "json_object"} if json_mode else None,
-            timeout=120 if task_type == "extraction" else 180
-        )
+        # 3. Execute call (optional api_key: per-call override, else instance BYOK)
+        _key = (api_key or "").strip() or self._api_key
+        _kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "timeout": 120 if task_type == "extraction" else 180,
+        }
+        if json_mode:
+            _kwargs["response_format"] = {"type": "json_object"}
+        if _key:
+            _kwargs["api_key"] = _key
+        response = litellm.completion(**_kwargs)
 
         # 4. Log usage (The Analytics Layer)
         self.tracker.log_usage(response)

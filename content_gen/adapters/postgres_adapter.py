@@ -1,10 +1,10 @@
 import re
-import psycopg2
 import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
 
 from .base import BaseStorageAdapter
+from ..db.session import connect_real_dict
 from ..core.schemas import ProcessedQuestion, Flashcard
 from ..core.config_loader import ConfigLoader
 from ..core.config_schema import EdmateConfig
@@ -20,7 +20,7 @@ class PostgresStorageAdapter(BaseStorageAdapter):
 
     def __init__(self, connection_string: str, edmate_config: Optional[EdmateConfig] = None):
         self.conn_str = connection_string
-        self.conn = psycopg2.connect(connection_string)
+        self.conn = connect_real_dict(connection_string, connect_timeout=30)
         self.cur = self.conn.cursor()
         self._workspace = (edmate_config or ConfigLoader.load_config()).workspace
 
@@ -31,7 +31,7 @@ class PostgresStorageAdapter(BaseStorageAdapter):
         Table names come from edmate_config workspace.target_tables when set;
         otherwise a legacy Cambridge-style multi-table set is created for backward compatibility.
         """
-        conn = psycopg2.connect(connection_string)
+        conn = connect_real_dict(connection_string, connect_timeout=30)
         cur = conn.cursor()
         try:
             # Shared tables
