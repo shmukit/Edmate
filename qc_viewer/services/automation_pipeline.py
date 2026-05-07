@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import threading
 import time
 from datetime import datetime
@@ -14,14 +15,19 @@ class _MutableModelRouting(Protocol):
     extraction: str
     generation: str
     validation: str
+
+
 from content_gen.core.config_schema import DetectionMode
 from content_gen.core.pedagogy_engine import PedagogyEngine
 from content_gen.scripts.pipeline.pipeline_orchestrator import PipelineOrchestrator
+from content_gen.scripts.prompts import CONTENT_GENERATION_PROMPT_VERSION
 from qc_viewer.services.draft_store import read_modify_write_json
 from qc_viewer.services.legacy_question_payload import build_legacy_question_dict
 
 
 CANCELLATION_EVENTS: dict[str, threading.Event] = {}
+
+_logger = logging.getLogger(__name__)
 
 
 def _normalize_model_id(model_id: str, provider: Optional[str]) -> str:
@@ -142,9 +148,14 @@ def run_automation_pipeline(
 
             read_modify_write_json(meta_path, _mut)
         except Exception as e:
-            print(f"Error updating progress: {e}")
+            _logger.warning("progress_update_failed draft_id=%s err=%s", draft_id, e)
 
     try:
+        _logger.info(
+            "automation_pipeline_start draft_id=%s prompt_version=%s",
+            draft_id,
+            CONTENT_GENERATION_PROMPT_VERSION,
+        )
         router = ModelRoutingEngine(api_key=api_key)
         if curriculum is None or not str(curriculum).strip():
             curriculum = (
@@ -187,7 +198,12 @@ def run_automation_pipeline(
             progress_callback=_update_progress,
         )
         t_extraction_end = time.time()
-        print(f"DEBUG: Extracted {len(extracted)} questions from PDF in {t_extraction_end - t_extraction_start:.2f}s.")
+        _logger.info(
+            "extraction_done draft_id=%s questions=%d duration_sec=%.2f",
+            draft_id,
+            len(extracted),
+            t_extraction_end - t_extraction_start,
+        )
 
         _update_progress(60, "Applying Learning Science & Pedagogy Analysis...", processed_count=0, total_count=len(extracted))
 
@@ -200,7 +216,12 @@ def run_automation_pipeline(
             pedagogy_system_prompt=pedagogy_system_prompt,
         )
         t_generation_end = time.time()
-        print(f"DEBUG: Generated content for {len(generated)} questions in {t_generation_end - t_generation_start:.2f}s.")
+        _logger.info(
+            "generation_done draft_id=%s questions=%d duration_sec=%.2f",
+            draft_id,
+            len(generated),
+            t_generation_end - t_generation_start,
+        )
 
         t_normalization_start = time.time()
         total_questions = len(generated)
@@ -215,11 +236,13 @@ def run_automation_pipeline(
         
         telemetry = {
             "total_time_sec": round(t_pipeline_end - t_pipeline_start, 2),
+            "prompt_version": CONTENT_GENERATION_PROMPT_VERSION,
+            "pipeline_job_id": draft_id,
             "nodes": {
                 "extraction_sec": round(t_extraction_end - t_extraction_start, 2),
                 "generation_sec": round(t_generation_end - t_generation_start, 2),
                 "normalization_sec": round(t_normalization_end - t_normalization_start, 2),
-            }
+            },
         }
 
         def _finalize(meta: dict) -> None:
@@ -232,6 +255,8 @@ def run_automation_pipeline(
                     "total_count": total_questions,
                     "status_message": "Generation complete!",
                     "id": draft_id,
+                    "pipeline_job_id": draft_id,
+                    "prompt_version": CONTENT_GENERATION_PROMPT_VERSION,
                     "subject": subject,
                     "paper_code": paper_code,
                     "pedagogy_profile": pedagogy.get_profile_summary(),
@@ -244,7 +269,7 @@ def run_automation_pipeline(
         read_modify_write_json(meta_path, _finalize)
 
     except InterruptedError:
-        print(f"Task {draft_id} cancelled.")
+        _logger.info("automation_pipeline_cancelled draft_id=%s", draft_id)
         try:
             read_modify_write_json(
                 meta_path,
@@ -257,10 +282,14 @@ def run_automation_pipeline(
                 ),
             )
         except Exception as inner_e:
-            print(f"Failed to update metadata after cancel: {inner_e}")
+            _logger.warning("metadata_update_failed_after_cancel draft_id=%s err=%s", draft_id, inner_e)
     except Exception as e:
         error_str = str(e)
-        print(f"Background Processing Error: {error_str}")
+        _logger.exception(
+            "automation_pipeline_failed draft_id=%s prompt_version=%s",
+            draft_id,
+            CONTENT_GENERATION_PROMPT_VERSION,
+        )
         try:
 
             def _fail(meta: dict) -> None:
@@ -275,4 +304,4 @@ def run_automation_pipeline(
 
             read_modify_write_json(meta_path, _fail)
         except Exception as inner_e:
-            print(f"Failed to update metadata with error: {inner_e}")
+            _logger.warning("metadata_update_failed_after_error draft_id=%s err=%s", draft_id, inner_e)

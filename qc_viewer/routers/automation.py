@@ -11,8 +11,9 @@ from fastapi import APIRouter, BackgroundTasks, File, Form, Header, HTTPExceptio
 from fastapi.responses import Response, StreamingResponse
 
 from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.scripts.prompts import CONTENT_GENERATION_PROMPT_VERSION
 from content_gen.scripts.processing.database_service import DatabaseService
-from qc_viewer.config import DRAFTS_ROOT
+from qc_viewer.config import DRAFTS_ROOT, is_publish_table_allowed
 from qc_viewer.services.automation_pipeline import CANCELLATION_EVENTS, run_automation_pipeline
 from pydantic import BaseModel
 from qc_viewer.services import draft_export
@@ -85,6 +86,8 @@ async def receive_draft(
         static_dir / "metadata.json",
         {
             "id": draft_id,
+            "pipeline_job_id": draft_id,
+            "prompt_version": CONTENT_GENERATION_PROMPT_VERSION,
             "subject": subject,
             "paper_code": paper_code,
             "filename": file.filename,
@@ -249,6 +252,8 @@ async def delete_draft(draft_id: str):
 async def publish_draft(request: PublishRequest):
     if not request.table_name or not request.question_data:
         raise HTTPException(status_code=400, detail="Missing table_name or question_data")
+    if not is_publish_table_allowed(request.table_name):
+        raise HTTPException(status_code=400, detail="Invalid table_name")
 
     db = DatabaseService()
     try:
@@ -274,10 +279,21 @@ async def get_metrics():
                 except Exception:
                     continue
 
+    active_drafts = 0
+    if drafts_root.exists():
+        for d in drafts_root.iterdir():
+            if d.is_dir() and (d / "metadata.json").exists():
+                try:
+                    st = read_json(d / "metadata.json")
+                    if st.get("status") == "PROCESSING":
+                        active_drafts += 1
+                except Exception:
+                    continue
+
     return {
         "total_cost": total_cost,
         "total_tokens": total_tokens,
-        "active_drafts": 5,
+        "active_drafts": active_drafts,
         "timestamp": datetime.now().isoformat(),
     }
 

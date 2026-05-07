@@ -3,7 +3,7 @@ import litellm
 from typing import Optional, List, Dict, Any, cast
 from content_gen.core.config_schema import EdmateConfig
 from content_gen.core.config import CoreConfig
-from content_gen.core.metrics import MetricsTracker
+from content_gen.core.metrics import create_metrics_tracker
 
 # Set up callbacks for observability if requested
 # Users can set LITELLM_CALLBACKS=["opik"] in their .env
@@ -31,7 +31,7 @@ class ModelRoutingEngine:
     ):
         # Load config from YAML/JSON if not provided
         self.config = config or CoreConfig.load_from_yaml()
-        self.tracker = MetricsTracker()
+        self.tracker = create_metrics_tracker()
         # Per-request / BYOK key passed to litellm (never mutate os.environ).
         _k = (api_key or "").strip()
         self._api_key: Optional[str] = _k or None
