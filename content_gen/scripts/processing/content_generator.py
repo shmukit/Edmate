@@ -1,9 +1,12 @@
+import logging
 import os
 import re
-import json
-import time
 from typing import List, Dict, Optional, Callable
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_LLM_RESPONSE_LOG = Path("content_gen/logs/all_llm_responses.log")
 
 # Try to import LLM libraries
 try:
@@ -42,11 +45,22 @@ class ContentGenerator:
     using the modular ModelRoutingEngine.
     """
 
-    def __init__(self, router: Optional[ModelRoutingEngine] = None):
+    def __init__(
+        self,
+        router: Optional[ModelRoutingEngine] = None,
+        *,
+        log_raw_llm_responses: bool = True,
+        raw_response_log_path: Optional[Path] = None,
+        raw_response_trace_sink: Optional[Callable[[str], None]] = None,
+    ):
         """
-        Initialize the generator with a modular router.
+        log_raw_llm_responses: append full raw model output to ``raw_response_log_path`` (default).
+        raw_response_trace_sink: if set, receives the same trace block and file logging is skipped.
         """
         self.router = router or ModelRoutingEngine()
+        self._log_raw_llm_responses = log_raw_llm_responses
+        self._raw_response_log_path = raw_response_log_path or _DEFAULT_LLM_RESPONSE_LOG
+        self._raw_response_trace_sink = raw_response_trace_sink
 
     def _default_curriculum(self) -> str:
         raw = getattr(self.router.config.workspace, "default_curriculum", None)
@@ -236,48 +250,68 @@ class ContentGenerator:
                 flashcards.append(Flashcard(front_text=front, back_text=back))
         return flashcards
 
-    def _parse_response(self, response: str, batch_indices: List[int]) -> Dict[int, Dict]:
-        """
-        Parses the LLM output back into a structured dictionary using strict markers.
-        """
-        results = {}
+    def _trace_raw_llm_response(self, batch_indices: List[int], response: str) -> None:
+        """Record full LLM output for debugging (file, custom sink, or skipped)."""
+        block = f"\n\n{'='*50}\nBatch: {batch_indices}\n{'='*50}\n{response}"
+        if self._raw_response_trace_sink is not None:
+            self._raw_response_trace_sink(block)
+            logger.debug(
+                "LLM raw response traced via sink for batch %s (%d chars)",
+                batch_indices,
+                len(response),
+            )
+            return
+        if not self._log_raw_llm_responses:
+            return
+        try:
+            path = self._raw_response_log_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(block)
+            logger.debug(
+                "LLM raw response appended to %s for batch %s (%d chars)",
+                path,
+                batch_indices,
+                len(response),
+            )
+        except OSError as e:
+            logger.warning("Could not append LLM trace log: %s", e)
 
-        # Log response
-        log_dir = Path("content_gen/logs")
-        log_dir.mkdir(parents=True, exist_ok=True)
-        with open(log_dir / "all_llm_responses.log", "a", encoding="utf-8") as f:
-            f.write(f"\n\n{'='*50}\nBatch: {batch_indices}\n{'='*50}\n")
-            f.write(response)
-
-        # More robust splitting
-        # Look for "Question X", "Q1", markdown headers, or just digits followed by period/brace
+    def _split_response_into_sections(self, response: str) -> List[str]:
+        """Split flat LLM text on question headers; returns re.split list (captures + bodies)."""
         header_pattern = r'(?mi)^\s*(?:#+\s*)?(?:Question|Q|Problem)?\s*[:\s]*(\d+)\s*[:\.\-\)]*\s*$'
         sections = re.split(header_pattern, response)
         if len(sections) < 3:
             alt_pattern = r'(?m)^\s*(?:#+\s*)?(\d{1,3})[\)\.\:\-]\s+'
             sections = re.split(alt_pattern, response)
-
-        # Fallback for single question batches or if headers were omitted
         if len(sections) < 3:
-            # If we expected multiple questions but got none, try a simpler digit-only header
             alt_pattern = r'(?mi)^\s*(\d{1,3})\s*$'
             sections = re.split(alt_pattern, response)
+        return sections
 
-        if len(sections) < 3:
-            if len(batch_indices) == 1:
-                results[batch_indices[0]] = self._parse_single_content(response)
-                return results
-            return results
-
+    def _build_results_from_sections(self, sections: List[str]) -> Dict[int, Dict]:
+        """Requires len(sections) >= 3 (header split produced captures + bodies)."""
+        results: Dict[int, Dict] = {}
         for i in range(1, len(sections), 2):
             try:
                 q_num = int(sections[i])
-                content = sections[i+1]
+                content = sections[i + 1]
                 results[q_num] = self._parse_single_content(content)
             except (ValueError, IndexError):
                 continue
-
         return results
+
+    def _parse_response(self, response: str, batch_indices: List[int]) -> Dict[int, Dict]:
+        """
+        Parses the LLM output back into a structured dictionary using strict markers.
+        """
+        self._trace_raw_llm_response(batch_indices, response)
+        sections = self._split_response_into_sections(response)
+        if len(sections) < 3:
+            if len(batch_indices) == 1:
+                return {batch_indices[0]: self._parse_single_content(response)}
+            return {}
+        return self._build_results_from_sections(sections)
 
     def _parse_single_content(self, content: str) -> Dict:
         """Helper to parse markers from a single question block."""

@@ -101,7 +101,7 @@ def test_wrapper_question_number_range_is_configurable():
 
 
 def test_parse_response_returns_empty_for_multi_without_headers():
-    generator = ContentGenerator(router=MagicMock())
+    generator = ContentGenerator(router=MagicMock(), log_raw_llm_responses=False)
     parsed = generator._parse_response(
         "This is a combined response with no explicit question headers.",
         [1, 2, 3]
