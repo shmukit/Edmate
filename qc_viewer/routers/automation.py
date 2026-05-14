@@ -328,7 +328,7 @@ async def get_config():
     kit_path = Path(PROJECT_ROOT) / "content_gen" / "tools" / "PDF-Extract-Kit"
     kit_present = kit_path.is_dir() and (kit_path / "pdf_extract_kit").is_dir()
 
-    engine = (extraction_settings.get("engine") or "pdf_extract_kit").lower()
+    engine = (extraction_settings.get("engine") or "vision").lower()
     extraction_hints: dict[str, str] = {}
     if engine == "pdf_extract_kit":
         extraction_hints["summary"] = (
