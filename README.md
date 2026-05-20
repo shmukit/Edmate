@@ -152,6 +152,32 @@ If a partner platform wants end-users to provide their own API key in the platfo
 3. Partner backend sends requests to Edmate with `X-API-Key`.
 4. Edmate processes the file and returns job status/results.
 
+## Pricing & Limits
+
+- **Free / Open Source** – No upload limits, but you cannot download output files.
+- **Basic Solutions Plan ($10/month)** – Up to **30 uploads per month**, each **≤ 10 MB** (optimal for documents up to **50 pages**). Unlimited exports in CSV/JSON/MD/Docx.
+- **Pro Solutions Plan ($50/month)** – Unlimited uploads, each ≤ **25 MB** (up to **200 pages**). Advanced exports (Word & Image ZIPs), high‑concurrency ingestion, dedicated schema slots, and **priority support**.
+
+These limits are now documented in the **FAQ** section of the marketing page and reflected in the UI.
+
+## FAQ
+
+We added a comprehensive FAQ section on the landing page covering:
+- File size limits
+- Page count recommendations
+- BYOK vs hosted Gemini usage
+- Pedagogical techniques applied
+- Data security and API key handling
+
+The FAQ is styled consistently for both dark and light themes.
+
+## Development Notes
+
+- The large `marketing.css` file has been split into modular sub‑files (`nav.css`, `hero.css`, `features.css`, `pricing.css`, `footer.css`, `faq.css`, `responsive.css`, `theme.css`).
+- Base font size is now **15 px** for a tighter, more professional SaaS feel across all pages.
+- Mobile responsiveness has been overhauled with a slide‑over sidebar, full‑width layout on mobile, and a simplified navigation bar.
+- Theme toggle button styles are now encapsulated in `faq.css` and removed from inline HTML.
+
 ### Supported API key headers
 
 - Preferred: `X-API-Key`

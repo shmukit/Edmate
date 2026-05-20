@@ -40,6 +40,12 @@
                 </svg>
                 <span>GitHub</span>
             </a>
+            <div class="theme-toggle-container">
+                <button class="btn-theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <span class="theme-icon-dark">🌙</span>
+                    <span class="theme-icon-light">☀️</span>
+                </button>
+            </div>
             <a href="/automate" class="btn-github btn-nav-primary">Automation Hub</a>
         </div>
     </header>
@@ -167,7 +173,11 @@
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                            Unlimited Document Exports (with BYOK)
+                            Unlimited Exports (with BYOK)
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Optimal: up to 50-page PDFs (max 10 MB)
                         </li>
                     </ul>
                     <a href="https://github.com/shmukit/Edmate" class="btn-pricing-action" target="_blank">Star & Clone Repo</a>
@@ -188,15 +198,19 @@
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                            Unlock Web Export (CSV/JSON/MD)
+                            Unlock Web Export (CSV / JSON / MD / Docx)
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                            Standard API Response Latency
+                            Up to 30 uploads/month · max 10 MB each
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                            Save Up to 50 active drafts
+                            Optimal: docs up to 50 pages
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            50 active drafts in workspace
                         </li>
                     </ul>
                     <a href="/automate" class="btn-pricing-action">Activate Basic Plan</a>
@@ -221,15 +235,84 @@
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlimited uploads · max 25 MB / 200 pages
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             High-concurrency parallel ingestion
                         </li>
                         <li class="plan-feature-item">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             Dedicated database schema slots
                         </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Priority support & SLA
+                        </li>
                     </ul>
                     <a href="/automate" class="btn-pricing-action">Get Started Pro</a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FAQ Section ────────────────────────────── -->
+    <section id="faq" class="faq-section">
+        <div class="faq-container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-desc">Everything you need to know about using Edmate AI.</p>
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Is there a file size limit for documents?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. For optimal performance, documents should be <strong>under 10 MB</strong>. The Vision AI engine must render each page as an image for layout-aware extraction — very large files increase processing time and API costs significantly. If you have a large textbook or report, we recommend splitting it into chapter-level PDFs for best results.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How many pages can I process per document?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>The pipeline is optimised for documents <strong>under 50 pages</strong>. Longer documents (e.g., 200-page textbooks) will work on the Pro plan, but processing time and token costs scale linearly with page count. We strongly recommend splitting large documents into focused chapters for the highest quality output and lowest cost.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What happens if I don't provide my own API key (BYOK)?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>You can still use the platform for free using our default hosted Gemini model. You can view and interact with the generated output in the browser. However, <strong>downloading the output</strong> in any format (CSV, JSON, Docx, etc.) requires a paid Basic or Pro plan. BYOK users always retain full download access for free.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What Learning Science techniques does Edmate AI apply?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Edmate AI's pedagogy engine applies evidence-backed techniques including <strong>Spaced Repetition</strong>, <strong>Cognitive Scaffolding</strong>, <strong>Concept Gap detection</strong>, and <strong>High-Integrity Assessment (HIA)</strong> generation — producing Q&As, Flashcards, Viva Defense prompts, and AI-resilient exercises that are structurally resistant to direct AI-assisted cheating.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Is my data and API key secure?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Your API keys are <strong>never stored on our servers</strong>. They exist only in your current browser session and are transmitted directly to the LLM provider. Uploaded documents are processed in-memory and are not permanently retained. For full auditability, you can run the entire platform locally via the open-source repository.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -278,5 +361,26 @@
         </div>
     </footer>
 
+    <script type="module">
+        import { ThemeManager } from '/js/theme.js';
+        ThemeManager.init();
+
+        // ── FAQ Accordion ──────────────────────────────
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                // Close all
+                document.querySelectorAll('.faq-question').forEach(b => {
+                    b.setAttribute('aria-expanded', 'false');
+                    b.nextElementSibling.classList.remove('open');
+                });
+                // Open clicked unless it was already open
+                if (!expanded) {
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.nextElementSibling.classList.add('open');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
