@@ -1,141 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edmate QC Content Viewer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="shortcut icon" href="/favicon.svg">
-<script>
-MathJax = {
-  tex: {
-    inlineMath: [['\\(','\\)'],['$','$']],
-    displayMath: [['\\[','\\]'],['$$','$$']]
-  },
-  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
-  startup: { typeset: true }
-};
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edmate AI | Open-Source Assessment Automation & Pedagogy Engine</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Styles -->
     <link rel="stylesheet" href="/css/automate.css">
-    <link rel="stylesheet" href="/css/viewer.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.svg">
 </head>
-<body>
+<body class="landing-body">
 
-  </div>
-
-<aside id="mainSidebar">
-  <div class="sidebar-header">
-    <div class="logo">
-        <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
-            <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
-        </svg>
-        <span>Edmate AI</span>
-    </div>
-    <button class="btn-collapse" id="btnCollapseSidebar" title="Toggle Sidebar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-    </button>
-  </div>
-
-  <div class="sidebar-content">
-    <nav>
-      <a href="/" class="nav-item active">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span>Standard Viewer</span>
-      </a>
-      <a href="/automate" class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <span>Automation Hub</span>
-      </a>
-      <a href="/analytics" class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="20" x2="18" y2="10"></line>
-          <line x1="12" y1="20" x2="12" y2="4"></line>
-          <line x1="6" y1="20" x2="6" y2="14"></line>
-        </svg>
-        <span>Analytics</span>
-      </a>
-    </nav>
-  
-    <div class="sidebar-divider"></div>
-  
-    <div class="paper-selector" id="paperSelector">
-      <div class="selector-label">Search Papers</div>
-  
-      <div class="selected-badge" id="selectedBadge" onclick="clearSelection()" style="margin-top: 8px;">
-        <div class="badge-text" id="badgeText">—</div>
-        <div class="badge-change">✕ change</div>
-      </div>
-  
-      <div class="search-box" id="searchBox" style="margin-top: 8px;">
-        <input class="search-input" id="searchInput" type="text" placeholder="Search papers..." autocomplete="off">
-        <span class="search-icon">⌕</span>
-        <div class="dropdown-list" id="dropdownList"></div>
-      </div>
-    </div>
-  
-    <div class="question-list" id="questionList">
-      <div class="loading-text">Select a paper to load questions.</div>
-    </div>
-  </div>
-</aside>
-
-<main>
-  <div class="container" id="contentView">
-    <nav class="breadcrumb-nav">
-      <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
-      <div class="breadcrumb-item active">Standard Viewer</div>
-    </nav>
-
-    <header class="workspace-header">
-        <div class="header-title-group">
-            <h1>Dashboard</h1>
-            <p class="subtitle">Quality control and verification workspace.</p>
-        </div>
-        <div class="header-actions-group">
-            <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
+    <!-- ── Global Navigation Header ──────────────── -->
+    <header class="global-navbar">
+        <a href="/" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+            </svg>
+            <span>Edmate AI</span>
+        </a>
+        <nav class="navbar-menu">
+            <a href="#features" class="navbar-link">Features</a>
+            <a href="#pricing" class="navbar-link">Pricing</a>
+            <a href="/how-it-works" class="navbar-link">Documentation</a>
+            <a href="/analytics" class="navbar-link">Analytics</a>
+        </nav>
+        <div class="navbar-actions">
+            <a href="https://github.com/shmukit/Edmate" class="btn-github" target="_blank">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
                 </svg>
-            </button>
-            <div class="theme-toggle-container">
-                <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
-                    <span class="theme-icon-light">☀️</span>
-                    <span class="theme-icon-dark">🌙</span>
-                </button>
-            </div>
+                <span>GitHub</span>
+            </a>
+            <a href="/automate" class="btn-github btn-nav-primary">Automation Hub</a>
         </div>
     </header>
 
-    <div class="empty-state">
-      <span style="font-size:3rem">🔬</span>
-      <h2>Ready to Verify</h2>
-      <p>Select a paper from the sidebar to begin your QC review process.</p>
-    </div>
-  </div>
-</main>
+    <!-- ── Hero Landing Section ──────────────────── -->
+    <section class="hero-section">
+        <div class="hero-badge">
+            <span style="font-size: 1rem;">✨</span> Open-Source & Enterprise Ready
+        </div>
+        <h1 class="hero-title">Automate Assessment Workflows with Learning Science</h1>
+        <p class="hero-subtitle">
+            Ingest PDFs, extract complex questions with layout-aware vision engines, enrich them with spaced repetition explanations, and PERSIST directly into your databases.
+        </p>
+        <div class="hero-ctas">
+            <a href="/automate" class="btn-hero-primary">Launch Automation Hub</a>
+            <a href="https://github.com/shmukit/Edmate" class="btn-hero-secondary" target="_blank">Star on GitHub</a>
+        </div>
 
-<script type="module">
-import { ThemeManager } from '/js/theme.js';
-import { LayoutManager } from '/js/ui.js';
-import { bootStandardViewer } from '/js/controllers/viewer.js';
+        <!-- Sleek App Mockup Preview -->
+        <div class="demo-preview-container">
+            <div class="demo-header">
+                <div class="demo-dot red"></div>
+                <div class="demo-dot yellow"></div>
+                <div class="demo-dot green"></div>
+                <div class="demo-browser-bar">https://edmate-automation.mpower-social.com/automate</div>
+            </div>
+            <div class="demo-content">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" style="position: absolute; opacity: 0.15; transform: scale(8);">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <div style="text-align: center; z-index: 5; background: rgba(17, 24, 39, 0.85); padding: 40px; border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.2); backdrop-filter: blur(8px);">
+                    <h3 style="font-family:'Outfit'; font-size: 2rem; color: #fff; margin-bottom: 12px;">Visual AI Engine</h3>
+                    <p style="max-width: 500px; line-height: 1.6; color: var(--text-dim);">
+                        Experience Edmate's high-speed Vision Extraction pipeline. Paste your API keys directly to operate fully locally and perform layout-aware extractions for FREE.
+                    </p>
+                    <a href="/automate" class="btn-hero-primary" style="display: inline-block; margin-top: 24px; font-size: 0.95rem; padding: 10px 24px;">Try the Pipeline</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-ThemeManager.init();
-LayoutManager.init();
-bootStandardViewer();
-</script>
+    <!-- ── Features Showcase Section ─────────────── -->
+    <section id="features" class="features-section">
+        <h2 class="section-title">Engineered for Technical Integrity</h2>
+        <p class="section-desc">We decouple raw model outputs from rigid schemas to serve curriculum-aligned educational pipelines.</p>
+        
+        <div class="features-grid">
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">🔑</div>
+                <h3>Bring Your Own Key (BYOK)</h3>
+                <p>Plug in your personal LLM API credentials (Gemini, OpenAI, Anthropic). We never persist your keys on our servers — everything operates directly in your browser session.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">🛡️</div>
+                <h3>High-Integrity Assessments</h3>
+                <p>Generate authentic, generative-AI resilient Q&As: AI Critique exercises, Viva Defense probing, and Scaffolded Sequences that combat direct student cheating.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">💾</div>
+                <h3>Database Agnostic</h3>
+                <p>Designed using the Adapter Pattern. Persist approved questions seamlessly into Postgres/Supabase, SQL/NoSQL databases, or export them instantly to CSV, JSON, Word, or ZIP.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">⚡</div>
+                <h3>Open-Core Architecture</h3>
+                <p>Keep your workflows entirely local. Technicians can clone the repository, run the CLI orchestrator, or deploy the FastAPI server natively on their local devices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Pricing Plans Section ─────────────────── -->
+    <section id="pricing" class="pricing-section">
+        <div class="pricing-container">
+            <h2 class="section-title">Simple, Dynamic Pricing Plans</h2>
+            <p class="section-desc">Host the entire engine locally for free, bring your own API keys, or use our high-speed hosted routers.</p>
+            
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Free & Open Source</div>
+                    <p class="plan-desc">For developers, hackers, and self-hosted environments. Run the platform entirely on your PC.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$0</span>
+                        <span class="plan-period">/ forever</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Self-Host CLI or local Server
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Bring Your Own Key (BYOK) on Web
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Full Layout-Aware Vision Extraction
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlimited Document Exports (with BYOK)
+                        </li>
+                    </ul>
+                    <a href="https://github.com/shmukit/Edmate" class="btn-pricing-action" target="_blank">Star & Clone Repo</a>
+                </div>
+
+                <!-- Basic Solutions Plan -->
+                <div class="pricing-card featured">
+                    <div class="plan-name">Basic Solutions Plan</div>
+                    <p class="plan-desc">For independent educators and publishers who want a simple, ready-to-run hosted web editor.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$10</span>
+                        <span class="plan-period">/ month</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Access Default Hosted Gemini LLM
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlock Web Export (CSV/JSON/MD)
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Standard API Response Latency
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Save Up to 50 active drafts
+                        </li>
+                    </ul>
+                    <a href="/automate" class="btn-pricing-action">Activate Basic Plan</a>
+                </div>
+
+                <!-- Pro Solutions Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Pro Solutions Plan</div>
+                    <p class="plan-desc">For institutions and scale operations needing high throughput, embedded graphics, and premium Word formats.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$50</span>
+                        <span class="plan-period">/ month</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            All Hosted Default Models Included
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Advanced exports: Word & Image ZIPs
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            High-concurrency parallel ingestion
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Dedicated database schema slots
+                        </li>
+                    </ul>
+                    <a href="/automate" class="btn-pricing-action">Get Started Pro</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Global Marketing Footer ───────────────── -->
+    <footer class="global-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="footer-brand-title">
+                    <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                        <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+                    </svg>
+                    <span>Edmate AI</span>
+                </a>
+                <p class="footer-brand-desc">
+                    Open-source parsing infrastructure making curriculum-aligned academic assessments accessible and resilient in the age of generative intelligence.
+                </p>
+            </div>
+            <div class="footer-column">
+                <h4>Engine</h4>
+                <ul class="footer-links-list">
+                    <li><a href="/automate" class="footer-link">Automation Hub</a></li>
+                    <li><a href="/viewer" class="footer-link">Standard Viewer</a></li>
+                    <li><a href="/analytics" class="footer-link">Analytics Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Open Source</h4>
+                <ul class="footer-links-list">
+                    <li><a href="https://github.com/shmukit/Edmate" class="footer-link" target="_blank">GitHub Repository</a></li>
+                    <li><a href="https://github.com/shmukit/Edmate/blob/main/LICENSE" class="footer-link" target="_blank">MIT License</a></li>
+                    <li><a href="https://github.com/shmukit/Edmate/blob/main/CONTRIBUTING.md" class="footer-link" target="_blank">Contributing Guide</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Resources</h4>
+                <ul class="footer-links-list">
+                    <li><a href="/how-it-works" class="footer-link">How it Works</a></li>
+                    <li><a href="/how-it-works#pedagogy" class="footer-link">Learning Science</a></li>
+                    <li><a href="/how-it-works#hia" class="footer-link">HIA Resilience</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Edmate AI. Open core software built with ❤️.</span>
+            <span>Developed in partnership with academic institutions. Licensed under MIT.</span>
+        </div>
+    </footer>
+
 </body>
 </html>

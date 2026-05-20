@@ -19,11 +19,33 @@ export const AutomationUI = {
     async init() {
         ThemeManager.init();
         this.setupEventListeners();
+        this.initByokConfig();
         await this.fetchPipelineConfig();
         this.fetchDrafts();
         window.addEventListener('hashchange', () => this.checkHash());
         // Initial deep link check
         setTimeout(() => this.checkHash(), 400);
+    },
+
+    initByokConfig() {
+        const savedProvider = localStorage.getItem('edmate-byok-provider');
+        const savedKey = localStorage.getItem('edmate-byok-key');
+        const savedModel = localStorage.getItem('edmate-byok-model');
+        const apiPref = localStorage.getItem('edmate-api-preference');
+
+        const sidebarProvider = document.getElementById('byokProviderSelect');
+        const sidebarKey = document.getElementById('byokApiKey');
+        const sidebarModel = document.getElementById('byokModelId');
+
+        if (sidebarProvider && savedProvider) sidebarProvider.value = savedProvider;
+        if (sidebarKey && savedKey) sidebarKey.value = savedKey;
+        if (sidebarModel && savedModel) sidebarModel.value = savedModel;
+
+        // If no preference is set, trigger the onboarding modal
+        if (!apiPref) {
+            const modal = document.getElementById('byokOnboardingModal');
+            if (modal) modal.style.display = 'flex';
+        }
     },
 
     async fetchPipelineConfig() {
@@ -190,7 +212,79 @@ export const AutomationUI = {
 
         // File Upload for Images
         document.getElementById('imageUploadInput')?.addEventListener('change', (e) => this.handleImageUpload(e));
-        
+
+        // BYOK Onboarding Modal Listeners
+        const onboardingModal = document.getElementById('byokOnboardingModal');
+        const btnOnboardByok = document.getElementById('btnOnboardByok');
+        const btnOnboardDefault = document.getElementById('btnOnboardDefault');
+        const onboardOptions = document.getElementById('onboardOptions');
+        const onboardByokForm = document.getElementById('onboardByokForm');
+        const btnBackToOptions = document.getElementById('btnBackToOptions');
+        const btnSaveOnboardKeys = document.getElementById('btnSaveOnboardKeys');
+
+        btnOnboardByok?.addEventListener('click', () => {
+            if (onboardOptions) onboardOptions.style.display = 'none';
+            if (onboardByokForm) onboardByokForm.style.display = 'block';
+        });
+
+        btnOnboardDefault?.addEventListener('click', () => {
+            localStorage.setItem('edmate-api-preference', 'default');
+            if (onboardingModal) onboardingModal.style.display = 'none';
+            const sidebarKey = document.getElementById('byokApiKey');
+            if (sidebarKey) sidebarKey.value = '';
+        });
+
+        btnBackToOptions?.addEventListener('click', () => {
+            if (onboardByokForm) onboardByokForm.style.display = 'none';
+            if (onboardOptions) onboardOptions.style.display = 'flex';
+        });
+
+        btnSaveOnboardKeys?.addEventListener('click', () => {
+            const provider = document.getElementById('onboardProviderSelect')?.value || 'gemini';
+            const key = document.getElementById('onboardApiKey')?.value || '';
+            
+            if (!key) {
+                alert('Please enter a valid API key.');
+                return;
+            }
+
+            localStorage.setItem('edmate-byok-provider', provider);
+            localStorage.setItem('edmate-byok-key', key);
+            localStorage.setItem('edmate-api-preference', 'byok');
+
+            const sidebarProvider = document.getElementById('byokProviderSelect');
+            const sidebarKey = document.getElementById('byokApiKey');
+            if (sidebarProvider) sidebarProvider.value = provider;
+            if (sidebarKey) sidebarKey.value = key;
+
+            if (onboardingModal) onboardingModal.style.display = 'none';
+        });
+
+        // Paywall Modal listeners
+        const paywallModal = document.getElementById('downloadPaywallModal');
+        const btnPaywallByok = document.getElementById('btnPaywallByok');
+        const btnClosePaywall = document.getElementById('btnClosePaywall');
+
+        btnPaywallByok?.addEventListener('click', () => {
+            if (paywallModal) paywallModal.style.display = 'none';
+            if (onboardingModal) {
+                const savedKey = localStorage.getItem('edmate-byok-key') || '';
+                const savedProvider = localStorage.getItem('edmate-byok-provider') || 'gemini';
+                const onboardApiKey = document.getElementById('onboardApiKey');
+                const onboardProviderSelect = document.getElementById('onboardProviderSelect');
+                if (onboardApiKey) onboardApiKey.value = savedKey;
+                if (onboardProviderSelect) onboardProviderSelect.value = savedProvider;
+
+                if (onboardOptions) onboardOptions.style.display = 'none';
+                if (onboardByokForm) onboardByokForm.style.display = 'block';
+                onboardingModal.style.display = 'flex';
+            }
+        });
+
+        btnClosePaywall?.addEventListener('click', () => {
+            if (paywallModal) paywallModal.style.display = 'none';
+        });
+
         // Analytics Nav
         document.getElementById('navAnalytics')?.addEventListener('click', (e) => {
             e.preventDefault();

@@ -408,6 +408,21 @@ export const ReviewController = {
             this.showToast('Open a draft in Review to export', 'danger');
             return;
         }
+        
+        // Paid solutions / BYOK Paywall Gate (only active on hosted web domains)
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (!isLocalhost) {
+            const byokKey = document.getElementById('byokApiKey')?.value;
+            if (!byokKey) {
+                const paywallModal = document.getElementById('downloadPaywallModal');
+                if (paywallModal) {
+                    paywallModal.style.display = 'flex';
+                    this.closeExportMenu();
+                    return;
+                }
+            }
+        }
+
         try {
             await AutomationAPI.exportDraft(this.currentDraftData.id, format);
             this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
