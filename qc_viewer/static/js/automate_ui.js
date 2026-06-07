@@ -31,6 +31,7 @@ export const AutomationUI = {
             const resp = await fetch('/api/automate/config');
             if (!resp.ok) throw new Error('Failed to fetch config');
             const config = await resp.json();
+            this.pipelineConfig = config;
             
             if (config.workspace) {
                 const curSelect = document.getElementById('curriculumSelect');

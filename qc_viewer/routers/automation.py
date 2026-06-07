@@ -355,8 +355,18 @@ async def refine_explanation(request: RefineRequest):
         # For refinement, we want a more capable model
         routing_engine.config.model_routing.generation = "openai/gpt-4o"
         refined = routing_engine.generate_content(prompt, task_type="generation")
+        refined_question = dict(request.original_q)
+        original_generated = refined_question.get("generated_content")
+        generated_content = (
+            dict(original_generated)
+            if isinstance(original_generated, dict)
+            else {}
+        )
+        generated_content["detailed_explanation"] = refined
+        refined_question["generated_content"] = generated_content
         return {
             "explanation": refined,
+            "refined_question": refined_question,
             "model": routing_engine.config.model_routing.generation,
             "timestamp": datetime.now().isoformat(),
         }

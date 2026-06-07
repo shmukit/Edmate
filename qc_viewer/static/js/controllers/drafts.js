@@ -1,5 +1,17 @@
 import { AutomationAPI } from '../automate_api.js';
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+}[char]));
+
+const statusClassName = (status) => String(status || 'unknown')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '') || 'unknown';
+
 export const DraftController = {
     activeStreams: {},
 
@@ -12,8 +24,8 @@ export const DraftController = {
         text.textContent = `Uploading ${file.name}...`;
 
         try {
-            const subject = document.getElementById('curriculumSelect')?.value || 'General';
-            const paperCode = document.getElementById('targetTableSelect')?.value || '';
+            const subject = this.pipelineConfig?.workspace?.default_subject || 'General';
+            const paperCode = file.name.replace(/\.[^/.]+$/, '').trim() || file.name;
             
             // Upload the file
             const result = await AutomationAPI.uploadPDF(file, subject, paperCode);
@@ -27,9 +39,12 @@ export const DraftController = {
 
             // IMMEDIATE HANDOVER: Inject the card right away without waiting for any fetches
             if (result && result.id) {
+                const safeResultId = escapeHtml(result.id);
                 const handoverState = {
                     id: result.id,
                     filename: file.name,
+                    subject,
+                    paper_code: paperCode,
                     status: 'PROCESSING',
                     progress: 10,
                     status_message: 'Initializing AI pipeline...',
@@ -48,10 +63,10 @@ export const DraftController = {
                     // Prepend the new card HTML
                     const dateStr = 'Just now';
                     const newCardHTML = `
-                    <div class="draft-card processing-active" data-id="${result.id}">
+                    <div class="draft-card processing-active" data-id="${safeResultId}">
                         <div class="draft-info">
                             <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-                                <h3 style="margin:0;">${file.name}</h3>
+                                <h3 style="margin:0;">${escapeHtml(file.name)}</h3>
                             </div>
                             <p>
                                 <span>${dateStr}</span>
@@ -67,9 +82,9 @@ export const DraftController = {
                             <div class="action-buttons">
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span class="loader" style="width:16px; height:16px;"></span>
-                                    <button class="btn btn-outline btn-sm btn-stop" data-id="${result.id}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
+                                    <button class="btn btn-outline btn-sm btn-stop" data-id="${safeResultId}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
                                 </div>
-                                <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${result.id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
+                                <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${safeResultId}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
                             </div>
                         </div>
                     </div>`;
@@ -127,6 +142,7 @@ export const DraftController = {
         let hasProcessing = false;
         draftList.innerHTML = drafts.map(d => {
             const status = d.status || 'UNKNOWN';
+            const statusClass = statusClassName(status);
             const isProcessing = status === 'PROCESSING' || status === 'EXTRACTING';
             if (isProcessing) hasProcessing = true;
             
@@ -150,15 +166,15 @@ export const DraftController = {
             const statusMsg = d.status_message || (isProcessing ? 'Processing...' : '');
 
             return `
-            <div class="draft-card ${isProcessing ? 'processing-active' : ''}" data-id="${d.id}">
+            <div class="draft-card ${isProcessing ? 'processing-active' : ''}" data-id="${escapeHtml(d.id)}">
                 <div class="draft-info">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-                        <h3 style="margin:0;">${d.filename || 'Untitled Document'}</h3>
+                        <h3 style="margin:0;">${escapeHtml(d.filename || 'Untitled Document')}</h3>
                         ${qCount > 0 ? `<span class="question-count-badge">${qCount} Questions</span>` : ''}
                     </div>
                     <p>
-                        <span>${dateStr}${reviewedStr}${timeStr}</span>
-                        <span class="status-message-streaming" style="font-size:0.75rem;">${statusMsg ? ` • ${statusMsg}` : ''}</span>
+                        <span>${escapeHtml(`${dateStr}${reviewedStr}${timeStr}`)}</span>
+                        <span class="status-message-streaming" style="font-size:0.75rem;">${statusMsg ? ` • ${escapeHtml(statusMsg)}` : ''}</span>
                     </p>
                     ${isProcessing ? `
                         <div class="mini-progress-container" style="width: 200px; height: 4px; background: #334155; border-radius: 2px; margin-top: 8px; overflow: hidden;">
@@ -168,10 +184,10 @@ export const DraftController = {
                     ` : ''}
                 </div>
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <span class="status-badge status-${status.toLowerCase()}">${status}</span>
+                    <span class="status-badge status-${statusClass}">${escapeHtml(status)}</span>
                     <div class="action-buttons">
                         ${this.renderActionButton(d)}
-                        <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${d.id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
+                        <button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${escapeHtml(d.id)}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>
                     </div>
                 </div>
             </div>
@@ -183,7 +199,7 @@ export const DraftController = {
                 if (e.target.closest('.action-buttons')) return;
                 const id = card.dataset.id;
                 const d = drafts.find(x => x.id === id);
-                if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') this.openReview(id);
+                if (d && (d.status === 'PROCESSED' || d.status === 'REVIEW_READY')) this.openReview(id);
             };
         });
 
@@ -291,7 +307,7 @@ export const DraftController = {
             const badgeEl = card.querySelector('.status-badge');
             if (badgeEl) {
                 badgeEl.textContent = status;
-                badgeEl.className = `status-badge status-${String(status).toLowerCase()}`;
+                badgeEl.className = `status-badge status-${statusClassName(status)}`;
             }
             const mini = card.querySelector('.mini-progress-container');
             const pctEl = card.querySelector('.draft-progress-pct')
@@ -302,7 +318,7 @@ export const DraftController = {
             const actions = card.querySelector('.action-buttons');
             if (actions && typeof this.renderActionButton === 'function') {
                 const id = d.id;
-                actions.innerHTML = `${this.renderActionButton(d)}<button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${id}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>`;
+                actions.innerHTML = `${this.renderActionButton(d)}<button type="button" class="btn btn-outline btn-sm btn-delete" data-id="${escapeHtml(id)}" style="border:1px solid rgba(239,68,68,0.3); color:var(--danger)">Delete</button>`;
                 actions.querySelector('.btn-delete')?.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.deleteDraft(id);
@@ -334,8 +350,8 @@ export const DraftController = {
     renderActionButton(d) {
         if (d.status === 'PROCESSED' || d.status === 'REVIEW_READY') {
             return `<div style="display:flex; align-items:center; gap:8px;">
-                <button type="button" class="btn btn-outline btn-sm btn-review" data-id="${d.id}">Review</button>
-                <button type="button" class="btn btn-outline btn-sm btn-card-export" data-id="${d.id}" title="Choose export format">📥 Export ▾</button>
+                <button type="button" class="btn btn-outline btn-sm btn-review" data-id="${escapeHtml(d.id)}">Review</button>
+                <button type="button" class="btn btn-outline btn-sm btn-card-export" data-id="${escapeHtml(d.id)}" title="Choose export format">📥 Export ▾</button>
             </div>`;
         } else if (d.status === 'FAILED') {
             return `<span style="color:var(--danger); font-size:0.8rem;">Error</span>`;
@@ -343,7 +359,7 @@ export const DraftController = {
             return `
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span class="loader" style="width:16px; height:16px;"></span>
-                    <button class="btn btn-outline btn-sm btn-stop" data-id="${d.id}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
+                    <button class="btn btn-outline btn-sm btn-stop" data-id="${escapeHtml(d.id)}" style="border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger)">Stop</button>
                 </div>
             `;
         } else {
