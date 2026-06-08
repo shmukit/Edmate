@@ -100,7 +100,17 @@ workspace:
 > [!CAUTION]
 > **Database Schema Consistency**: Edmate's `database_service.py` currently expects tables to have specific columns (e.g., `title`, `options`, `correct_options`). If your database uses different column names, you must update the SQL queries in `content_gen/scripts/processing/database_service.py` to match your schema.
 
-### 3. Understanding Pipeline Settings
+### 3. Auth & Storage Configuration
+Edmate supports both local self-hosted deployment and cloud SaaS operation. Configure these settings in `content_gen/.env`:
+
+- **Authentication (`EDMATE_AUTH_REQUIRED`)**: 
+  - `false` (Default): Operates in "Self-Hosted Mode". All requests bypass auth checks and are treated as unrestricted "pro" users. Perfect for local development.
+  - `true`: Operates in "Cloud Mode". Requires a valid JWT token via `Authorization: Bearer <token>`. Anonymous users have restricted access (e.g., cannot export without hitting a paywall).
+- **Storage Backend (`EDMATE_STORAGE_BACKEND`)**:
+  - `local` (Default): Saves all drafts and extracted assets locally to the `.drafts` directory.
+  - `s3`: Placeholder for cloud deployments to store files in AWS S3 or compatible blob storage.
+
+### 4. Understanding Pipeline Settings
 The **Automation Hub** provides several "Admin" settings to handle diverse document formats:
 - **Extraction Guardrails**: Adjust "Detection Mode" to **Strict** for standard papers or **Open** for noisy documents.
 - **Model Routing**: Strategies to balance cost and quality. Edmate can use cheaper models (like Gemini Flash) for extraction and switch to high-precision models (like GPT-4o) for final content generation.

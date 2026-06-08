@@ -35,13 +35,21 @@ export const AutomationAPI = {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/automate/draft', true);
 
-            // Only set BYOK headers if the user provided a key
-            if (byokKey) {
-                const resolvedProvider = byokProvider || providerHint;
-                if (resolvedProvider) xhr.setRequestHeader('X-LLM-Provider', resolvedProvider);
-                xhr.setRequestHeader('X-API-Key', byokKey);
-                if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
-            }
+            // Inject Auth headers
+            import('/js/auth.js').then(({ AuthUI }) => {
+                const headers = AuthUI.getAuthHeaders();
+                for (const [key, value] of Object.entries(headers)) {
+                    xhr.setRequestHeader(key, value);
+                }
+                
+                // Only set BYOK headers if the user provided a key
+                if (byokKey) {
+                    const resolvedProvider = byokProvider || providerHint;
+                    if (resolvedProvider) xhr.setRequestHeader('X-LLM-Provider', resolvedProvider);
+                    xhr.setRequestHeader('X-API-Key', byokKey);
+                    if (byokModel)    xhr.setRequestHeader('X-Model-ID', byokModel);
+                }
+            });
 
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable && onProgress) {
@@ -63,20 +71,26 @@ export const AutomationAPI = {
         });
     },
 
+    async fetchWithAuth(url, options = {}) {
+        const { AuthUI } = await import('/js/auth.js');
+        const headers = { ...options.headers, ...AuthUI.getAuthHeaders() };
+        return fetch(url, { ...options, headers });
+    },
+
     async fetchDrafts() {
-        const response = await fetch('/api/automate/drafts');
+        const response = await this.fetchWithAuth('/api/automate/drafts');
         if (!response.ok) throw new Error('Failed to fetch drafts');
         return await response.json();
     },
 
     async getDraft(id) {
-        const response = await fetch(`/api/automate/draft/${id}`);
+        const response = await this.fetchWithAuth(`/api/automate/draft/${id}`);
         if (!response.ok) throw new Error('Failed to fetch draft detail');
         return await response.json();
     },
 
     async updateDraft(id, updates) {
-        const response = await fetch(`/api/automate/draft/${id}`, {
+        const response = await this.fetchWithAuth(`/api/automate/draft/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updates)
@@ -86,20 +100,20 @@ export const AutomationAPI = {
     },
 
     async deleteDraft(id) {
-        const response = await fetch(`/api/automate/draft/${id}`, { method: 'DELETE' });
+        const response = await this.fetchWithAuth(`/api/automate/draft/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete draft');
         return await response.json();
     },
 
     async stopDraft(id) {
-        const response = await fetch(`/api/automate/draft/${id}/stop`, { method: 'POST' });
+        const response = await this.fetchWithAuth(`/api/automate/draft/${id}/stop`, { method: 'POST' });
         if (!response.ok) throw new Error('Failed to stop processing');
         return await response.json();
     },
 
     async publishQuestion(payload) {
         // payload: { draft_id, table_name, question_data }
-        const response = await fetch('/api/automate/publish', {
+        const response = await this.fetchWithAuth('/api/automate/publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -111,7 +125,7 @@ export const AutomationAPI = {
 
     async refineQuestion(payload) {
         // payload: { feedback, original_q }
-        const response = await fetch('/api/automate/refine', {
+        const response = await this.fetchWithAuth('/api/automate/refine', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -126,7 +140,7 @@ export const AutomationAPI = {
      */
     async exportDraft(id, format) {
         const q = format === 'markdown' ? 'markdown' : format;
-        const resp = await fetch(`/api/automate/draft/${encodeURIComponent(id)}/export?format=${encodeURIComponent(q)}`);
+        const resp = await this.fetchWithAuth(`/api/automate/draft/${encodeURIComponent(id)}/export?format=${encodeURIComponent(q)}`);
         if (!resp.ok) {
             let detail = `Export failed (${resp.status})`;
             try {

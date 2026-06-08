@@ -42,7 +42,12 @@ def create_app() -> FastAPI:
     )
 
     app.add_middleware(EdmateApiSecurityMiddleware)
-
+    
+    from qc_viewer.middleware.auth import EdmateAuthMiddleware
+    from qc_viewer.middleware.quota import EdmateQuotaMiddleware
+    
+    app.add_middleware(EdmateQuotaMiddleware)
+    app.add_middleware(EdmateAuthMiddleware)
     app.include_router(api_v1_router)
     app.include_router(static_pages_router)
     app.include_router(questions_router)

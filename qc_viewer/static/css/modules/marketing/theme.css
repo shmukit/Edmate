@@ -19,6 +19,7 @@
     color: var(--primary);
 }
 [data-theme="light"] .navbar-brand {
+    color: var(--text-main);
     /* Rely on var(--text-main) */
 }
 [data-theme="light"] .navbar-brand svg {

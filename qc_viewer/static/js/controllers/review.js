@@ -409,11 +409,9 @@ export const ReviewController = {
             return;
         }
         
-        // Paid solutions / BYOK Paywall Gate (only active on hosted web domains)
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (!isLocalhost) {
-            const byokKey = document.getElementById('byokApiKey')?.value;
-            if (!byokKey) {
+        // Paid solutions / Auth Paywall Gate
+        import('/js/auth.js').then(async ({ AuthUI }) => {
+            if (!AuthUI.token) {
                 const paywallModal = document.getElementById('downloadPaywallModal');
                 if (paywallModal) {
                     paywallModal.style.display = 'flex';
@@ -421,14 +419,14 @@ export const ReviewController = {
                     return;
                 }
             }
-        }
 
-        try {
-            await AutomationAPI.exportDraft(this.currentDraftData.id, format);
-            this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
-            this.closeExportMenu();
-        } catch (err) {
-            this.showToast(err.message || 'Export failed', 'danger');
-        }
+            try {
+                await AutomationAPI.exportDraft(this.currentDraftData.id, format);
+                this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
+                this.closeExportMenu();
+            } catch (err) {
+                this.showToast(err.message || 'Export failed', 'danger');
+            }
+        });
     },
 };
