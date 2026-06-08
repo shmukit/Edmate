@@ -1,576 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edmate QC Content Viewer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="shortcut icon" href="/favicon.svg">
-<script>
-MathJax = {
-  tex: {
-    inlineMath: [['\\(','\\)'],['$','$']],
-    displayMath: [['\\[','\\]'],['$$','$$']]
-  },
-  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
-  startup: { typeset: true }
-};
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edmate AI | Open-Source Assessment Automation & Pedagogy Engine</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Styles -->
     <link rel="stylesheet" href="/css/automate.css">
-    <link rel="stylesheet" href="/css/viewer.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.svg">
 </head>
-<body>
+<body class="landing-body">
 
-  </div>
-
-<aside id="mainSidebar">
-  <div class="sidebar-header">
-    <div class="logo">
-        <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
-            <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
-        </svg>
-        <span>Edmate AI</span>
-    </div>
-    <button class="btn-collapse" id="btnCollapseSidebar" title="Toggle Sidebar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-    </button>
-  </div>
-
-  <div class="sidebar-content">
-    <nav>
-      <a href="/" class="nav-item active">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span>Standard Viewer</span>
-      </a>
-      <a href="/automate" class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <span>Automation Hub</span>
-      </a>
-      <a href="/analytics" class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="20" x2="18" y2="10"></line>
-          <line x1="12" y1="20" x2="12" y2="4"></line>
-          <line x1="6" y1="20" x2="6" y2="14"></line>
-        </svg>
-        <span>Analytics</span>
-      </a>
-    </nav>
-  
-    <div class="sidebar-divider"></div>
-  
-    <div class="paper-selector" id="paperSelector">
-      <div class="selector-label">Search Papers</div>
-  
-      <div class="selected-badge" id="selectedBadge" onclick="clearSelection()" style="margin-top: 8px;">
-        <div class="badge-text" id="badgeText">—</div>
-        <div class="badge-change">✕ change</div>
-      </div>
-  
-      <div class="search-box" id="searchBox" style="margin-top: 8px;">
-        <input class="search-input" id="searchInput" type="text" placeholder="Search papers..." autocomplete="off">
-        <span class="search-icon">⌕</span>
-        <div class="dropdown-list" id="dropdownList"></div>
-      </div>
-    </div>
-  
-    <div class="question-list" id="questionList">
-      <div class="loading-text">Select a paper to load questions.</div>
-    </div>
-  </div>
-</aside>
-
-<main>
-  <div class="container" id="contentView">
-    <nav class="breadcrumb-nav">
-      <div class="breadcrumb-item"><a href="/">Edmate AI</a></div>
-      <div class="breadcrumb-item active">Standard Viewer</div>
-    </nav>
-
-    <header class="workspace-header">
-        <div class="header-title-group">
-            <h1>Dashboard</h1>
-            <p class="subtitle">Quality control and verification workspace.</p>
-        </div>
-        <div class="header-actions-group">
-            <button id="btnMobileNav" class="btn-mobile-nav" title="Toggle Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
+    <!-- ── Global Navigation Header ──────────────── -->
+    <header class="global-navbar">
+        <a href="/" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+            </svg>
+            <span>Edmate AI (Beta)</span>
+        </a>
+        <nav class="navbar-menu">
+            <a href="#features" class="navbar-link">Features</a>
+            <a href="#pricing" class="navbar-link">Pricing</a>
+            <a href="/how-it-works" class="navbar-link">Documentation</a>
+            <a href="/analytics" class="navbar-link">Analytics</a>
+        </nav>
+        <div class="navbar-actions">
+            <a href="https://github.com/shmukit/Edmate" class="btn-github" target="_blank">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
                 </svg>
-            </button>
+                <span>GitHub</span>
+            </a>
             <div class="theme-toggle-container">
-                <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
-                    <span class="theme-icon-light">☀️</span>
+                <button class="btn-theme-toggle" id="themeToggle" title="Toggle Theme">
                     <span class="theme-icon-dark">🌙</span>
+                    <span class="theme-icon-light">☀️</span>
                 </button>
             </div>
+            <a href="/automate" class="btn-github btn-nav-primary">Automation Hub</a>
         </div>
     </header>
 
-    <div class="empty-state">
-      <span style="font-size:3rem">🔬</span>
-      <h2>Ready to Verify</h2>
-      <p>Select a paper from the sidebar to begin your QC review process.</p>
-    </div>
-  </div>
-</main>
-
-<script type="module">
-import { ThemeManager } from '/js/theme.js';
-import { LayoutManager } from '/js/ui.js';
-import { AnalyticsController } from '/js/controllers/analytics.js';
-
-ThemeManager.init();
-LayoutManager.init();
-
-const API = '/api';
-const ROOT = '/';
-const AUTOMATE = '/automate';
-let allPapers = [];
-let currentTable = null;
-
-// ── Flashcard state ──────────────────────────────────────────────
-window.fcCards = [];
-window.fcIndex = 0;
-window.fcFlipped = false;
-
-// ── Dropdown logic ────────────────────────────────────────────────
-async function init() {
-  try {
-    const res = await fetch(`${API}/papers`);
-    if (!res.ok) throw new Error('failed');
-    allPapers = await res.json();
-    renderDropdown(allPapers);
-  } catch {
-    document.getElementById('questionList').innerHTML =
-      '<div class="loading-text" style="color:#ef4444">⚠ Could not connect to backend.</div>';
-  }
-}
-
-function renderDropdown(papers) {
-  const list = document.getElementById('dropdownList');
-  list.innerHTML = '';
-  if (!papers.length) {
-    list.innerHTML = '<div class="dropdown-empty">No papers found.</div>';
-    return;
-  }
-  papers.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'dropdown-item';
-    const subject = p.table.replace('_questions','').replace('igcse_','IGCSE ');
-    item.innerHTML = `<span class="di-code">${p.code}</span><span class="di-table">${subject}</span>`;
-    item.onclick = () => window.selectPaper(p);
-    list.appendChild(item);
-  });
-}
-
-document.getElementById('searchInput').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
-  const filtered = allPapers.filter(p =>
-    p.code.toLowerCase().includes(q) ||
-    p.table.toLowerCase().includes(q)
-  );
-  renderDropdown(filtered);
-  document.getElementById('dropdownList').classList.add('open');
-});
-
-document.getElementById('searchInput').addEventListener('focus', () => {
-  renderDropdown(allPapers);
-  document.getElementById('dropdownList').classList.add('open');
-});
-
-document.addEventListener('click', e => {
-  if (!document.getElementById('paperSelector').contains(e.target)) {
-    document.getElementById('dropdownList').classList.remove('open');
-  }
-});
-
-window.selectPaper = function(p) {
-  document.getElementById('selectedBadge').classList.add('visible');
-  document.getElementById('badgeText').textContent =
-    `${p.code}  ·  ${p.table.replace('_questions','').replace('igcse_','IGCSE ')}`;
-  document.getElementById('searchBox').classList.add('hidden');
-  document.getElementById('searchInput').value = '';
-  document.getElementById('dropdownList').classList.remove('open');
-  currentTable = p.table;
-  loadQuestions(p.table, p.code);
-}
-
-window.clearSelection = function() {
-  document.getElementById('selectedBadge').classList.remove('visible');
-  document.getElementById('searchBox').classList.remove('hidden');
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchInput').focus();
-  document.getElementById('questionList').innerHTML =
-    '<div class="loading-text">Select a paper to load questions.</div>';
-  document.getElementById('contentView').innerHTML = `
-    <header style="display:flex; justify-content: flex-end; margin-bottom: 20px;">
-        <div class="theme-toggle-container">
-            <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
-                <span class="theme-icon-light">☀️</span>
-                <span class="theme-icon-dark">🌙</span>
-            </button>
+    <!-- ── Hero Landing Section ──────────────────── -->
+    <section class="hero-section">
+        <div class="hero-badge">
+            <span style="font-size: 1rem;">✨</span> Open-Source & Enterprise Ready
         </div>
-    </header>
-    <div class="empty-state">
-      <span style="font-size:2.5rem">🔬</span>
-      <h2>Ready to Verify</h2>
-      <p>Select a paper and question to begin QC review.</p>
-    </div>`;
-  currentTable = null;
-}
-
-// ── Question list ────────────────────────────────────────────────
-async function loadQuestions(table, code) {
-  const list = document.getElementById('questionList');
-  list.innerHTML = '<div class="loading-text">Loading questions…</div>';
-  try {
-    const res = await fetch(`${API}/questions?table=${table}&paper_code=${encodeURIComponent(code)}`);
-    if (!res.ok) throw new Error('failed');
-    const qs = await res.json();
-    list.innerHTML = '';
-    if (!qs.length) {
-      list.innerHTML = '<div class="loading-text">No questions found.</div>';
-      return;
-    }
-    list.innerHTML = `<div class="section-label">${qs.length} questions</div>`;
-    qs.forEach((q, i) => {
-      const hasContent = !!(q.summary_explanation);
-      const isVerified = q.is_verified;
-      const div = document.createElement('div');
-      div.className = 'q-item';
-      div.innerHTML = `
-        <span class="q-number">Q${q.question_number || (i+1)}</span>
-        <span class="q-dot ${isVerified ? 'has-content' : hasContent ? 'unverified' : ''}"></span>
-      `;
-      div.onclick = () => { renderQuestion(q, table); setActive(div); };
-      list.appendChild(div);
-    });
-  } catch {
-    list.innerHTML = '<div class="loading-text" style="color:#ef4444">Failed to load questions.</div>';
-  }
-}
-
-function setActive(el) {
-  document.querySelectorAll('.q-item').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-}
-
-// ── Markdown → HTML (handles mixed HTML + markdown inline markers) ──
-function markdownToHtml(text) {
-  if (!text) return '';
-
-  const replaceSubSup = (match) => {
-    return match
-      .replace(/<sup[^>]*>(.*?)<\/sup>/g, '^{$1}')
-      .replace(/<sub[^>]*>(.*?)<\/sub>/g, '_{$1}')
-      .replace(/<\/?(p|strong|em|br)[^>]*>/g, '');
-  };
-
-  text = text.replace(/\\\([\s\S]*?\\\)/g, replaceSubSup);
-  text = text.replace(/\\\[[\s\S]*?\\\]/g, replaceSubSup);
-  text = text.replace(/\$\$[\s\S]*?\$\$/g, replaceSubSup);
-
-  const hasHtmlBlocks = /<[a-z][\s\S]*>/i.test(text);
-
-  if (hasHtmlBlocks) {
-    return text
-      .replace(/\*\*\*(.+?)\*\*\*/gs, '<strong><em>$1</em></strong>')
-      .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
-      .replace(/(?<![a-zA-Z="])\*(?!\s)(.+?)(?<!\s)\*/gs, '<em>$1</em>')
-      .replace(/__(.+?)__/g, '<strong>$1</strong>')
-      .replace(/(?<!>)\n(?!<)/g, '<br>');
-  }
-
-  let html = text
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/__(.+?)__/g, '<strong>$1</strong>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/^---+$/gm, '<hr>')
-    .replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
-    .replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-  html = html
-    .split(/\n{2,}/)
-    .map(block => {
-      const t = block.trim();
-      if (!t) return '';
-      if (/^<(h[1-3]|ul|ol|li|hr|blockquote)/.test(t)) return block;
-      return `<p>${block.replace(/\n/g, '<br>')}</p>`;
-    })
-    .join('\n');
-
-  return html;
-}
-
-function typesetMath() {
-  if (window.MathJax && MathJax.typesetPromise) {
-    if (MathJax.startup && MathJax.startup.document) {
-      MathJax.startup.document.clear();
-      MathJax.startup.document.updateDocument();
-    }
-    MathJax.typesetPromise().catch(() => {});
-  }
-}
-
-function renderQuestion(q, table) {
-  const subject = (table || '').replace('_questions','').replace('igcse_','IGCSE ').toUpperCase();
-  const view = document.getElementById('contentView');
-
-  // Option analysis HTML
-  let oeHtml = '';
-  if (q.option_explanations && q.option_explanations.length > 0) {
-    oeHtml = q.option_explanations.map((exp, i) => `
-      <div class="opt-analysis-item">
-        <div class="opt-analysis-label">Option ${String.fromCharCode(65+i)}
-          ${q.correct_options && q.correct_options.includes(i) ? '✓ Correct' : ''}
+        <h1 class="hero-title">Automate Assessment Workflows with Learning Science</h1>
+        <p class="hero-subtitle">
+            Ingest any document, extract complex questions with layout-aware Vision AI, apply Learning Science techniques to generate highly effective assessment content, and persist directly into your database.
+        </p>
+        <div class="hero-ctas">
+            <a href="/automate" class="btn-hero-primary">Launch Automation Hub</a>
+            <a href="https://github.com/shmukit/Edmate" class="btn-hero-secondary" target="_blank">Star on GitHub</a>
         </div>
-        <div class="explanation">${markdownToHtml(exp) || 'No detail.'}</div>
-      </div>`).join('');
-  } else {
-    oeHtml = '<p style="color:var(--text-dim);font-size:.9rem">No option analysis generated yet.</p>';
-  }
 
-  // Multi-Diagram Support
-  let diagramHtml = '';
-  if (q.diagrams) {
-    const images = q.diagrams.split('\n').filter(u => u.trim());
-    if (images.length > 0) {
-      diagramHtml = `<div class="diagram-wrap">
-        ${images.map(url => `<img src="${url.trim()}" alt="Question diagram">`).join('')}
-      </div>`;
-    }
-  }
+        <!-- Sleek App Mockup Preview -->
+        <div class="demo-preview-container">
+            <div class="demo-header">
+                <div class="demo-dot red"></div>
+                <div class="demo-dot yellow"></div>
+                <div class="demo-dot green"></div>
+                <div class="demo-browser-bar">https://edmate-automation.mpower-social.com/automate</div>
+            </div>
+            <div class="demo-content">
+                <div style="display: flex; align-items: stretch; justify-content: space-between; width: 100%; max-width: 900px; gap: 12px; padding: 20px; overflow-x: auto;">
+                    <div style="flex: 1; background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 16px; text-align: center; min-width: 140px; display: flex; flex-direction: column;">
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;">📄</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 6px;">1. Inject Docs or PDF</div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; color: var(--primary); font-size: 1.5rem; font-weight: bold;">›</div>
+                    
+                    <div style="flex: 1; background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 8px; padding: 16px; text-align: center; min-width: 140px; display: flex; flex-direction: column;">
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;">👁️</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 6px;">2. Choose Extraction AI</div>
+                    </div>
 
-  const rawExp = q.detailed_explanation || q.summary_explanation;
-  const explanationHtml = rawExp
-    ? markdownToHtml(rawExp)
-    : '<p style="color:var(--text-dim)">No explanation generated yet. Run the AI pipeline for this paper.</p>';
+                    <div style="display: flex; align-items: center; color: var(--primary); font-size: 1.5rem; font-weight: bold;">›</div>
+                    
+                    <div style="flex: 1; background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 16px; text-align: center; min-width: 140px; display: flex; flex-direction: column;">
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;">🧠</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 6px;">3. Apply Learning Science</div>
+                    </div>
 
-  view.innerHTML = `
-    <header style="display:flex; justify-content: flex-end; margin-bottom: 20px;">
-        <div class="theme-toggle-container">
-            <button id="themeToggle" class="btn-theme-toggle" title="Toggle Theme">
-                <span class="theme-icon-light">☀️</span>
-                <span class="theme-icon-dark">🌙</span>
-            </button>
+                    <div style="display: flex; align-items: center; color: var(--primary); font-size: 1.5rem; font-weight: bold;">›</div>
+                    
+                    <div style="flex: 1; background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 8px; padding: 16px; text-align: center; min-width: 140px; display: flex; flex-direction: column;">
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;">💾</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 6px;">4. Store Output or Download</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </header>
-    <div class="card">
-      <div>
-        <span class="tag tag-blue">${subject}</span>
-        <span class="tag tag-green">${q.question_identifier || ''}</span>
-        ${q.is_verified ? '<span class="tag tag-orange">✓ Verified</span>' : ''}
-      </div>
-      <h1 class="q-title">Question ${q.question_number || ''}</h1>
-      <div class="q-body">${q.title || '<em style="color:var(--text-dim)">[No question text]</em>'}</div>
-      ${diagramHtml}
-      <div class="options-grid">
-        ${(q.options || []).map((opt, i) => `
-          <div class="option ${q.correct_options && q.correct_options.includes(i) ? 'correct' : ''}">
-            <div class="opt-letter">${String.fromCharCode(65+i)}</div>
-            <div class="opt-text">${opt || '<em style="color:var(--text-dim)">[empty]</em>'}</div>
-          </div>`).join('')}
-      </div>
-    </div>
+    </section>
 
-    <div class="card" style="padding:24px 28px">
-      <div class="tabs">
-        <div class="tab active" data-tab="tab-explanation">General Explanation</div>
-        <div class="tab" data-tab="tab-options">Option Analysis</div>
-        <div class="tab" data-tab="tab-flashcards">Flashcards</div>
-      </div>
-
-      <div class="tab-content active" id="tab-explanation">
-        <div class="explanation">${explanationHtml}</div>
-      </div>
-
-      <div class="tab-content" id="tab-options">${oeHtml}</div>
-
-      <div class="tab-content" id="tab-flashcards">
-        <div id="flashcardContainer">
-          <div class="loading-text">Click the Flashcards tab to load…</div>
+    <!-- ── Features Showcase Section ─────────────── -->
+    <section id="features" class="features-section">
+        <h2 class="section-title">Engineered for Technical Integrity</h2>
+        <p class="section-desc">We decouple raw model outputs from rigid schemas to serve curriculum-aligned educational pipelines.</p>
+        
+        <div class="features-grid">
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">🔑</div>
+                <h3>Bring Your Own Key (BYOK)</h3>
+                <p>Plug in your personal LLM API credentials (Gemini, OpenAI, Anthropic). We never persist your keys on our servers — everything operates directly in your browser session.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">🧠</div>
+                <h3>Learning Science (Pedagogy)</h3>
+                <p>Generate assessment contents grounded in Learning Science techniques including Spaced Repetition, Cognitive Scaffolding, and targeted Concept Gaps to maximize student retention.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">🛡️</div>
+                <h3>High-Integrity Assessments</h3>
+                <p>Generate authentic, generative-AI resilient Q&As: AI Critique exercises, Viva Defense probing, and Scaffolded Sequences that combat direct student cheating.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">💾</div>
+                <h3>Database Agnostic</h3>
+                <p>Designed using the Adapter Pattern. Persist approved questions seamlessly into Postgres/Supabase, SQL/NoSQL databases, or export them instantly to CSV, JSON, Word, or ZIP.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">⚡</div>
+                <h3>Open-Core Architecture</h3>
+                <p>Keep your workflows entirely local. Technicians can clone the repository, run the CLI orchestrator, or deploy the FastAPI server natively on their local devices.</p>
+            </div>
         </div>
-      </div>
-    </div>
-  `;
+    </section>
 
-  view.querySelectorAll('.tab').forEach(tab => {
-    tab.onclick = () => {
-      view.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      view.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      tab.classList.add('active');
-      view.querySelector(`#${tab.dataset.tab}`).classList.add('active');
-      if (tab.dataset.tab === 'tab-flashcards') {
-        loadFlashcards(q.topic_id, q.subtopic_id, q.id);
-      }
-      typesetMath();
-    };
-  });
+    <!-- ── Pricing Plans Section ─────────────────── -->
+    <section id="pricing" class="pricing-section">
+        <div class="pricing-container">
+            <h2 class="section-title">Simple, Dynamic Pricing Plans</h2>
+            <p class="section-desc">Host the entire engine locally for free, bring your own API keys, or use our high-speed hosted routers.</p>
+            
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Free & Open Source</div>
+                    <p class="plan-desc">For developers, hackers, and self-hosted environments. Run the platform entirely on your PC.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$0</span>
+                        <span class="plan-period">/ forever</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Self-Host CLI or local Server
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Bring Your Own Key (BYOK) on Web
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Full Layout-Aware Vision Extraction
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlimited Exports (with BYOK)
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Optimal: up to 50-page PDFs (max 10 MB)
+                        </li>
+                    </ul>
+                    <a href="https://github.com/shmukit/Edmate" class="btn-pricing-action" target="_blank">Star & Clone Repo</a>
+                </div>
 
-  typesetMath();
-}
+                <!-- Basic Solutions Plan -->
+                <div class="pricing-card featured">
+                    <div class="plan-name">Basic Solutions Plan</div>
+                    <p class="plan-desc">For independent educators and publishers who want a simple, ready-to-run hosted web editor.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$10</span>
+                        <span class="plan-period">/ month</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Access Default Hosted Gemini LLM
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlock Web Export (CSV / JSON / MD / Docx)
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Up to 30 uploads/month · max 10 MB each
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Optimal: docs up to 50 pages
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            50 active drafts in workspace
+                        </li>
+                    </ul>
+                    <a href="/automate" class="btn-pricing-action">Activate Basic Plan</a>
+                </div>
 
-async function loadFlashcards(topicId, subtopicId, questionId) {
-  const container = document.getElementById('flashcardContainer');
-  if (!container) return;
-
-  let isFallback = false;
-  if (!topicId || topicId === 'unknown-topic') {
-    topicId = 'unknown-topic';
-    isFallback = true;
-  }
-
-  container.innerHTML = '<div class="loading-text">Loading flashcards…</div>';
-  try {
-    let url = `${API}/flashcards?topic_id=${encodeURIComponent(topicId)}`;
-    if (subtopicId && subtopicId !== 'undefined') url += `&subtopic_id=${encodeURIComponent(subtopicId)}`;
-    if (questionId) url += `&question_id=${encodeURIComponent(questionId)}`;
-    
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const cards = await res.json();
-
-    if (!cards.length) {
-      container.innerHTML = `
-        <div class="fc-empty">
-          <div class="fc-empty-icon">🃏</div>
-          <p>No flashcards found for this question yet.</p>
-        </div>`;
-      return;
-    }
-
-    window.fcCards = cards;
-    window.fcIndex = 0;
-    window.fcFlipped = false;
-    const isSpecific = cards.length > 0 && cards[0].is_specific;
-    renderFlashcardViewer(container, isFallback, isSpecific);
-    typesetMath();
-  } catch (e) {
-    console.error('Flashcard Load Error:', e);
-    container.innerHTML = '<p style="color:var(--text-dim);font-size:.9rem">Could not load flashcards.</p>';
-  }
-}
-
-function renderFlashcardViewer(container, isFallback, isSpecific) {
-  const total = window.fcCards.length;
-  
-  const statusIndicator = isSpecific ? 
-    `<div style="background:rgba(52,211,153,0.1); color:#34d399; padding:8px 12px; border-radius:10px; font-size:0.75rem; text-align:center; margin-bottom:16px; font-weight:600; border:1px solid rgba(52,211,153,0.2); display:flex; align-items:center; justify-content:center; gap:6px;">
-       <span style="font-size:1rem">✨</span> Question-Specific AI Flashcards (${total})
-     </div>` :
-    (isFallback ? 
-      `<div style="background:rgba(251,191,36,0.1); color:#fbbf24; padding:8px 12px; border-radius:10px; font-size:0.75rem; text-align:center; margin-bottom:16px; font-weight:600; border:1px solid rgba(251,191,36,0.2); display:flex; align-items:center; justify-content:center; gap:6px;">
-         <span style="font-size:1rem">⚠️</span> Topic Fallback (${total} generic cards)
-       </div>` : 
-      ''
-    );
-
-  container.innerHTML = `
-    ${statusIndicator}
-    <div class="fc-wrapper">
-      <div class="fc-progress-bar" id="fcPips"></div>
-      <div class="fc-counter" id="fcCounter"></div>
-      <div class="fc-scene" id="fcScene">
-        <div class="fc-card" id="fcCard">
-          <div class="fc-face fc-face-front">
-            <div class="fc-label">Question</div>
-            <div class="fc-text" id="fcFrontText"></div>
-            <div class="fc-tap-hint">Tap to reveal answer</div>
-          </div>
-          <div class="fc-face fc-face-back">
-            <div class="fc-label">Answer</div>
-            <div class="fc-text" id="fcBackText"></div>
-            <div class="fc-tap-hint">Tap to flip back</div>
-          </div>
+                <!-- Pro Solutions Plan -->
+                <div class="pricing-card">
+                    <div class="plan-name">Pro Solutions Plan</div>
+                    <p class="plan-desc">For institutions and scale operations needing high throughput, embedded graphics, and premium Word formats.</p>
+                    <div class="plan-price-block">
+                        <span class="plan-price">$50</span>
+                        <span class="plan-period">/ month</span>
+                    </div>
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            All Hosted Default Models Included
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Advanced exports: Word & Image ZIPs
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Unlimited uploads · max 25 MB / 200 pages
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            High-concurrency parallel ingestion
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Dedicated database schema slots
+                        </li>
+                        <li class="plan-feature-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Priority support & SLA
+                        </li>
+                    </ul>
+                    <a href="/automate" class="btn-pricing-action">Get Started Pro</a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="fc-nav">
-        <button class="fc-nav-btn" id="fcPrev" title="Previous">&#8592;</button>
-        <div class="fc-nav-center">
-          <button class="fc-flip-btn" id="fcFlip">↩ Flip</button>
+    </section>
+
+    <!-- ── FAQ Section ────────────────────────────── -->
+    <section id="faq" class="faq-section">
+        <div class="faq-container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-desc">Everything you need to know about using Edmate AI.</p>
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Is there a file size limit for documents?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. For optimal performance, documents should be <strong>under 10 MB</strong>. The Vision AI engine must render each page as an image for layout-aware extraction — very large files increase processing time and API costs significantly. If you have a large textbook or report, we recommend splitting it into chapter-level PDFs for best results.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How many pages can I process per document?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>The pipeline is optimised for documents <strong>under 50 pages</strong>. Longer documents (e.g., 200-page textbooks) will work on the Pro plan, but processing time and token costs scale linearly with page count. We strongly recommend splitting large documents into focused chapters for the highest quality output and lowest cost.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What happens if I don't provide my own API key (BYOK)?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>You can still use the platform for free using our default hosted Gemini model. You can view and interact with the generated output in the browser. However, <strong>downloading the output</strong> in any format (CSV, JSON, Docx, etc.) requires a paid Basic or Pro plan. BYOK users always retain full download access for free.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What Learning Science techniques does Edmate AI apply?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Edmate AI's pedagogy engine applies evidence-backed techniques including <strong>Spaced Repetition</strong>, <strong>Cognitive Scaffolding</strong>, <strong>Concept Gap detection</strong>, and <strong>High-Integrity Assessment (HIA)</strong> generation — producing Q&As, Flashcards, Viva Defense prompts, and AI-resilient exercises that are structurally resistant to direct AI-assisted cheating.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Is my data and API key secure?
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Your API keys are <strong>never stored on our servers</strong>. They exist only in your current browser session and are transmitted directly to the LLM provider. Uploaded documents are processed in-memory and are not permanently retained. For full auditability, you can run the entire platform locally via the open-source repository.</p>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <button class="fc-nav-btn" id="fcNext" title="Next">&#8594;</button>
-      </div>
-    </div>`;
+    </section>
 
-  document.getElementById('fcScene').onclick = window.flipCard;
-  document.getElementById('fcFlip').onclick = window.flipCard;
-  document.getElementById('fcPrev').onclick = window.prevCard;
-  document.getElementById('fcNext').onclick = window.nextCard;
+    <!-- ── Global Marketing Footer ───────────────── -->
+    <footer class="global-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="footer-brand-title">
+                    <svg width="24" height="24" viewBox="0 0 32 32" style="color: var(--primary)">
+                        <path d="M19 5L10 18H15.5L12.5 27L22 14H16.5L19 5Z" fill="currentColor"/>
+                    </svg>
+                    <span>Edmate AI</span>
+                </a>
+                <p class="footer-brand-desc">
+                    Open-source parsing infrastructure making curriculum-aligned academic assessments accessible and resilient in the age of generative intelligence.
+                </p>
+            </div>
+            <div class="footer-column">
+                <h4>Engine</h4>
+                <ul class="footer-links-list">
+                    <li><a href="/automate" class="footer-link">Automation Hub</a></li>
+                    <li><a href="/viewer" class="footer-link">Standard Viewer</a></li>
+                    <li><a href="/analytics" class="footer-link">Analytics Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Open Source</h4>
+                <ul class="footer-links-list">
+                    <li><a href="https://github.com/shmukit/Edmate" class="footer-link" target="_blank">GitHub Repository</a></li>
+                    <li><a href="https://github.com/shmukit/Edmate/blob/main/LICENSE" class="footer-link" target="_blank">MIT License</a></li>
+                    <li><a href="https://github.com/shmukit/Edmate/blob/main/CONTRIBUTING.md" class="footer-link" target="_blank">Contributing Guide</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Resources</h4>
+                <ul class="footer-links-list">
+                    <li><a href="/how-it-works" class="footer-link">How it Works</a></li>
+                    <li><a href="/how-it-works#pedagogy" class="footer-link">Learning Science</a></li>
+                    <li><a href="/how-it-works#hia" class="footer-link">HIA Resilience</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Edmate AI. Open core software built with ❤️.</span>
+        </div>
+    </footer>
 
-  updateFlashcardDisplay();
-}
+    <script type="module">
+        import { ThemeManager } from '/js/theme.js';
+        ThemeManager.init();
 
-function updateFlashcardDisplay() {
-  const total = window.fcCards.length;
-  const card = window.fcCards[window.fcIndex];
-  const pipsEl = document.getElementById('fcPips');
-  if (pipsEl) {
-    pipsEl.innerHTML = window.fcCards.map((_, i) => {
-      const cls = i < window.fcIndex ? 'done' : i === window.fcIndex ? 'current' : '';
-      return `<div class="fc-pip ${cls}"></div>`;
-    }).join('');
-  }
-  const counter = document.getElementById('fcCounter');
-  if (counter) counter.textContent = `${window.fcIndex + 1} / ${total}`;
-  const frontEl = document.getElementById('fcFrontText');
-  const backEl = document.getElementById('fcBackText');
-  if (frontEl) frontEl.innerHTML = markdownToHtml(card.frontText || 'No front text');
-  if (backEl) backEl.innerHTML = markdownToHtml(card.backText || 'No answer');
-  window.fcFlipped = false;
-  const cardEl = document.getElementById('fcCard');
-  if (cardEl) cardEl.classList.remove('flipped');
-  const prevBtn = document.getElementById('fcPrev');
-  const nextBtn = document.getElementById('fcNext');
-  if (prevBtn) prevBtn.disabled = window.fcIndex === 0;
-  if (nextBtn) nextBtn.disabled = window.fcIndex === total - 1;
-  document.onkeydown = handleFcKey;
-  typesetMath();
-}
-
-window.flipCard = function() {
-  window.fcFlipped = !window.fcFlipped;
-  const cardEl = document.getElementById('fcCard');
-  if (cardEl) cardEl.classList.toggle('flipped', window.fcFlipped);
-}
-
-window.prevCard = function() {
-  if (window.fcIndex > 0) { window.fcIndex--; updateFlashcardDisplay(); }
-}
-
-window.nextCard = function() {
-  if (window.fcIndex < window.fcCards.length - 1) { window.fcIndex++; updateFlashcardDisplay(); }
-}
-
-function handleFcKey(e) {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); window.nextCard(); }
-  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); window.prevCard(); }
-  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); window.flipCard(); }
-}
-
-init();
-</script>
+        // ── FAQ Accordion ──────────────────────────────
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                // Close all
+                document.querySelectorAll('.faq-question').forEach(b => {
+                    b.setAttribute('aria-expanded', 'false');
+                    b.nextElementSibling.classList.remove('open');
+                });
+                // Open clicked unless it was already open
+                if (!expanded) {
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.nextElementSibling.classList.add('open');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

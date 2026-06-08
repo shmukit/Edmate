@@ -47,8 +47,7 @@ def test_router_task_routing(mock_completion):
     mock_completion.assert_called_with(
         model="test/extraction",
         messages=[{"role": "user", "content": "extract this"}],
-        response_format=None,
-        timeout=120
+        timeout=120,
     )
 
     # Test default generation task
@@ -56,7 +55,6 @@ def test_router_task_routing(mock_completion):
     mock_completion.assert_called_with(
         model="test/generation",
         messages=[{"role": "user", "content": "generate this"}],
-        response_format=None,
-        timeout=180
+        timeout=180,
     )
 

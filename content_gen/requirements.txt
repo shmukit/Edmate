@@ -18,6 +18,9 @@ azure-storage-blob>=12.19.0  # Azure Blob Storage
 # Database
 psycopg2-binary>=2.9.0  # PostgreSQL adapter
 
+# Optional: shared LLM metrics (EDMATE_METRICS_BACKEND=redis)
+redis>=4.6.0
+
 # Optional: API Integrations
 google-generativeai>=0.3.0  # Gemini API
 openai>=1.0.0  # OpenAI/ChatGPT API

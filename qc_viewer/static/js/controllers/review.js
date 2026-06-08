@@ -451,12 +451,25 @@ export const ReviewController = {
             this.showToast('Open a draft in Review to export', 'danger');
             return;
         }
-        try {
-            await AutomationAPI.exportDraft(this.currentDraftData.id, format);
-            this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
-            this.closeExportMenu();
-        } catch (err) {
-            this.showToast(err.message || 'Export failed', 'danger');
-        }
+        
+        // Paid solutions / Auth Paywall Gate
+        import('/js/auth.js').then(async ({ AuthUI }) => {
+            if (!AuthUI.token) {
+                const paywallModal = document.getElementById('downloadPaywallModal');
+                if (paywallModal) {
+                    paywallModal.style.display = 'flex';
+                    this.closeExportMenu();
+                    return;
+                }
+            }
+
+            try {
+                await AutomationAPI.exportDraft(this.currentDraftData.id, format);
+                this.showToast(`Downloaded ${String(format).toUpperCase()}`, 'success');
+                this.closeExportMenu();
+            } catch (err) {
+                this.showToast(err.message || 'Export failed', 'danger');
+            }
+        });
     },
 };

@@ -66,7 +66,7 @@ DEFAULT_EXTRACTION_NOISE_PATTERNS: List[str] = [
 
 
 class ExtractionSettings(BaseModel):
-    engine: ExtractionEngine = ExtractionEngine.PDF_EXTRACT_KIT
+    engine: ExtractionEngine = ExtractionEngine.VISION
     min_question_number: int = 1
     max_question_number: Optional[int] = None
     question_detection_mode: DetectionMode = DetectionMode.BALANCED

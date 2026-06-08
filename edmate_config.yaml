@@ -10,7 +10,7 @@ storage_settings:
   image_mode: "base64"
 
 extraction_settings:
-  engine: "pdf_extract_kit"
+  engine: "vision"
   # Optional: override boilerplate regexes for PDF text cleanup (empty list = skip these only)
   # extraction_noise_patterns: []
   segmentation_preset: "bangladeshi"

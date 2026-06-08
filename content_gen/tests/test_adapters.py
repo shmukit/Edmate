@@ -15,7 +15,7 @@ def test_storage_adapter_save_question():
 
     # Initialize adapter with mocked connection
     empty_ws = EdmateConfig(workspace=WorkspaceConfig())
-    with patch("psycopg2.connect", return_value=mock_conn):
+    with patch("content_gen.adapters.postgres_adapter.connect_real_dict", return_value=mock_conn):
         adapter = PostgresStorageAdapter(
             "postgres://user:pass@host:5432/db", edmate_config=empty_ws
         )
@@ -54,7 +54,7 @@ def test_storage_adapter_save_flashcards():
     mock_cur = MagicMock()
 
     empty_ws = EdmateConfig(workspace=WorkspaceConfig())
-    with patch("psycopg2.connect", return_value=mock_conn):
+    with patch("content_gen.adapters.postgres_adapter.connect_real_dict", return_value=mock_conn):
         adapter = PostgresStorageAdapter(
             "postgres://user:pass@host:5432/db", edmate_config=empty_ws
         )

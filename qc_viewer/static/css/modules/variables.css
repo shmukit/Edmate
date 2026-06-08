@@ -54,10 +54,17 @@
     font-family: 'Inter', sans-serif;
 }
 
+html {
+    font-size: 15px; /* Tighter than browser default 16px — more professional SaaS feel */
+}
+
 body {
     background-color: var(--bg);
     color: var(--text-main);
     height: 100vh;
     display: flex;
     overflow: hidden;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }

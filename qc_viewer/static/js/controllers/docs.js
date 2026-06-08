@@ -72,8 +72,8 @@ export const DocsController = {
             await this.renderMermaid(content);
             
             // Re-render MathJax
-            if (window.MathJax) {
-                MathJax.typesetPromise([content]);
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise([content]).catch(e => console.warn('MathJax error', e));
             }
 
             // Scroll to top of content

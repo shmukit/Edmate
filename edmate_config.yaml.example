@@ -19,7 +19,7 @@ storage_settings:
   image_mode: "base64"
 
 extraction_settings:
-  engine: "pdf_extract_kit"
+  engine: "vision"
   min_question_number: 1
   max_question_number: null
   question_detection_mode: "balanced"

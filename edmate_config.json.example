@@ -11,7 +11,7 @@
     "image_mode": "cdn"
   },
   "extraction_settings": {
-    "engine": "pdf_extract_kit",
+    "engine": "vision",
     "min_question_number": 1,
     "max_question_number": 40,
     "question_detection_mode": "balanced"

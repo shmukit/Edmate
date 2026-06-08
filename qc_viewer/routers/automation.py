@@ -11,21 +11,44 @@ from fastapi import APIRouter, BackgroundTasks, File, Form, Header, HTTPExceptio
 from fastapi.responses import Response, StreamingResponse
 
 from content_gen.core.model_router import ModelRoutingEngine
+from content_gen.scripts.prompts import CONTENT_GENERATION_PROMPT_VERSION
 from content_gen.scripts.processing.database_service import DatabaseService
-from qc_viewer.config import DRAFTS_ROOT
+from qc_viewer.config import DRAFTS_ROOT, is_publish_table_allowed
 from qc_viewer.services.automation_pipeline import CANCELLATION_EVENTS, run_automation_pipeline
 from pydantic import BaseModel
 from qc_viewer.services import draft_export
 from qc_viewer.services.draft_store import (
+    ANONYMOUS_USER,
+    DraftNotFound,
     delete_draft_data,
     ensure_drafts_root,
     get_draft_dir,
+    is_draft_owned_by,
+    list_draft_metadata,
     load_metadata_if_exists,
     read_json,
     resolve_metadata_path,
     sort_key_from_timestamp,
     write_json,
 )
+
+
+def _get_user_id(request: Request) -> str:
+    """Extract user_id from request state (set by auth middleware)."""
+    return getattr(request.state, "user_id", ANONYMOUS_USER)
+
+
+def _require_draft_path(draft_id: str, user_id: Optional[str] = None) -> Path:
+    try:
+        return resolve_metadata_path(draft_id, user_id)
+    except DraftNotFound:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+
+def _require_ownership(draft_id: str, user_id: str) -> None:
+    """Raise 404 if the user does not own this draft."""
+    if not is_draft_owned_by(draft_id, user_id):
+        raise HTTPException(status_code=404, detail="Draft not found")
 
 
 class PublishRequest(BaseModel):
@@ -44,6 +67,7 @@ router = APIRouter()
 
 @router.post("/api/automate/draft")
 async def receive_draft(
+    request: Request,
     background_tasks: BackgroundTasks,
     subject: str = Form(...),
     paper_code: str = Form(...),
@@ -60,13 +84,14 @@ async def receive_draft(
 ):
     from qc_viewer.config import get_workspace_defaults
 
+    user_id = _get_user_id(request)
     default_curriculum, _default_subject = get_workspace_defaults()
     curriculum_resolved = (curriculum or "").strip() or default_curriculum
 
     draft_id = f"draft_{uuid.uuid4().hex[:8]}"
     ensure_drafts_root()
 
-    static_dir = get_draft_dir(draft_id)
+    static_dir = get_draft_dir(draft_id, user_id)
     static_dir.mkdir(parents=True, exist_ok=True)
 
     file_path = static_dir / "source.pdf"
@@ -77,6 +102,9 @@ async def receive_draft(
         static_dir / "metadata.json",
         {
             "id": draft_id,
+            "owner_id": user_id,
+            "pipeline_job_id": draft_id,
+            "prompt_version": CONTENT_GENERATION_PROMPT_VERSION,
             "subject": subject,
             "paper_code": paper_code,
             "filename": file.filename,
@@ -118,39 +146,27 @@ async def receive_draft(
 
 
 @router.get("/api/automate/drafts")
-async def list_drafts():
-    drafts = []
-    if not DRAFTS_ROOT.exists():
-        return []
-
-    for d in DRAFTS_ROOT.iterdir():
-        if d.is_dir() and (d / "metadata.json").exists():
-            try:
-                drafts.append(read_json(d / "metadata.json"))
-            except Exception:
-                continue
-        elif d.suffix == ".json" and d.name != "metadata.json":
-            try:
-                data = read_json(d)
-                if "id" in data:
-                    drafts.append(data)
-            except Exception:
-                continue
-
+async def list_drafts(request: Request):
+    user_id = _get_user_id(request)
+    drafts = list_draft_metadata(user_id)
     return sorted(drafts, key=sort_key_from_timestamp, reverse=True)
 
 
 @router.get("/api/automate/draft/{draft_id}")
-async def get_draft_results(draft_id: str):
-    return read_json(resolve_metadata_path(draft_id))
+async def get_draft_results(request: Request, draft_id: str):
+    user_id = _get_user_id(request)
+    _require_ownership(draft_id, user_id)
+    return read_json(_require_draft_path(draft_id, user_id))
 
 
 @router.get("/api/automate/draft/{draft_id}/export")
-async def export_draft(draft_id: str, format: str = "json"):
+async def export_draft(request: Request, draft_id: str, format: str = "json"):
+    user_id = _get_user_id(request)
+    _require_ownership(draft_id, user_id)
     fmt = format.lower()
     if fmt not in draft_export.SUPPORTED_FORMATS:
         raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
-    meta = read_json(resolve_metadata_path(draft_id))
+    meta = read_json(_require_draft_path(draft_id, user_id))
     body = draft_export.render(meta, fmt)
     filename = draft_export.safe_filename(meta, fmt)
     return Response(
@@ -162,9 +178,10 @@ async def export_draft(draft_id: str, format: str = "json"):
 
 @router.get("/api/automate/draft/{draft_id}/stream")
 async def stream_draft_progress(draft_id: str, request: Request):
+    user_id = _get_user_id(request)
     try:
-        meta_path = resolve_metadata_path(draft_id)
-    except HTTPException:
+        meta_path = resolve_metadata_path(draft_id, user_id)
+    except DraftNotFound:
         meta_path = DRAFTS_ROOT / draft_id / "metadata.json"
         if not meta_path.exists():
             meta_path = DRAFTS_ROOT / f"{draft_id}.json"
@@ -202,24 +219,28 @@ async def stream_draft_progress(draft_id: str, request: Request):
 
 
 @router.post("/api/automate/draft/{draft_id}/stop")
-async def stop_draft_processing(draft_id: str):
+async def stop_draft_processing(request: Request, draft_id: str):
+    user_id = _get_user_id(request)
+    _require_ownership(draft_id, user_id)
     if draft_id in CANCELLATION_EVENTS:
         CANCELLATION_EVENTS[draft_id].set()
         return {"status": "stopping"}
 
-    meta = load_metadata_if_exists(draft_id)
+    meta = load_metadata_if_exists(draft_id, user_id)
     if meta and meta.get("status") == "PROCESSING":
         meta["status"] = "FAILED"
         meta["status_message"] = "Stopped by user"
-        write_json(resolve_metadata_path(draft_id), meta)
+        write_json(_require_draft_path(draft_id, user_id), meta)
         return {"status": "stopped"}
 
     return {"status": "not_running"}
 
 
 @router.patch("/api/automate/draft/{draft_id}")
-async def update_draft(draft_id: str, updates: dict):
-    meta_path = resolve_metadata_path(draft_id)
+async def update_draft(request: Request, draft_id: str, updates: dict):
+    user_id = _get_user_id(request)
+    _require_ownership(draft_id, user_id)
+    meta_path = _require_draft_path(draft_id, user_id)
     try:
         data = read_json(meta_path)
         data.update(updates)
@@ -231,8 +252,10 @@ async def update_draft(draft_id: str, updates: dict):
 
 
 @router.delete("/api/automate/draft/{draft_id}")
-async def delete_draft(draft_id: str):
-    if delete_draft_data(draft_id):
+async def delete_draft(request: Request, draft_id: str):
+    user_id = _get_user_id(request)
+    _require_ownership(draft_id, user_id)
+    if delete_draft_data(draft_id, user_id):
         return {"status": "deleted"}
     raise HTTPException(status_code=404, detail="Draft not found")
 
@@ -241,6 +264,8 @@ async def delete_draft(draft_id: str):
 async def publish_draft(request: PublishRequest):
     if not request.table_name or not request.question_data:
         raise HTTPException(status_code=400, detail="Missing table_name or question_data")
+    if not is_publish_table_allowed(request.table_name):
+        raise HTTPException(status_code=400, detail="Invalid table_name")
 
     db = DatabaseService()
     try:
@@ -266,10 +291,21 @@ async def get_metrics():
                 except Exception:
                     continue
 
+    active_drafts = 0
+    if drafts_root.exists():
+        for d in drafts_root.iterdir():
+            if d.is_dir() and (d / "metadata.json").exists():
+                try:
+                    st = read_json(d / "metadata.json")
+                    if st.get("status") == "PROCESSING":
+                        active_drafts += 1
+                except Exception:
+                    continue
+
     return {
         "total_cost": total_cost,
         "total_tokens": total_tokens,
-        "active_drafts": 5,
+        "active_drafts": active_drafts,
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -304,7 +340,7 @@ async def get_config():
     kit_path = Path(PROJECT_ROOT) / "content_gen" / "tools" / "PDF-Extract-Kit"
     kit_present = kit_path.is_dir() and (kit_path / "pdf_extract_kit").is_dir()
 
-    engine = (extraction_settings.get("engine") or "pdf_extract_kit").lower()
+    engine = (extraction_settings.get("engine") or "vision").lower()
     extraction_hints: dict[str, str] = {}
     if engine == "pdf_extract_kit":
         extraction_hints["summary"] = (

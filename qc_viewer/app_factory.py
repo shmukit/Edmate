@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from qc_viewer.config import DOCS_ROOT, STATIC_ROOT
+from qc_viewer.middleware.security import EdmateApiSecurityMiddleware
 from qc_viewer.router_v1 import router as api_v1_router
 from qc_viewer.routers.automation import router as automation_router
 from qc_viewer.routers.questions import router as questions_router
@@ -40,6 +41,13 @@ def create_app() -> FastAPI:
         ],
     )
 
+    app.add_middleware(EdmateApiSecurityMiddleware)
+    
+    from qc_viewer.middleware.auth import EdmateAuthMiddleware
+    from qc_viewer.middleware.quota import EdmateQuotaMiddleware
+    
+    app.add_middleware(EdmateQuotaMiddleware)
+    app.add_middleware(EdmateAuthMiddleware)
     app.include_router(api_v1_router)
     app.include_router(static_pages_router)
     app.include_router(questions_router)

@@ -21,6 +21,11 @@ async def serve_root():
     return serve_static_html("index.html", "index.html not found")
 
 
+@router.get("/viewer")
+async def serve_viewer():
+    return serve_static_html("viewer.html", "viewer.html not found")
+
+
 @router.get("/automate")
 async def serve_hub():
     return serve_static_html("automate.html", "automate.html not found")

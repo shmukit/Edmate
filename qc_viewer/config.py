@@ -62,6 +62,20 @@ def get_allowed_table_ids() -> Tuple[str, ...]:
     return tuple(_LEGACY_TABLES)
 
 
+def is_publish_table_allowed(table_name: str) -> bool:
+    """
+    Tables allowed for /api/automate/publish (defense against SQL injection in dynamic INSERT).
+
+    Includes Prisma-style ``questions`` plus workspace ``target_tables`` / legacy list.
+    """
+    t = (table_name or "").strip()
+    if not t or not _TABLE_ID_RE.match(t):
+        return False
+    if t == "questions":
+        return True
+    return t in get_allowed_table_ids()
+
+
 def get_workspace_defaults() -> tuple[str, str]:
     """(default_curriculum, default_subject) from edmate_config workspace."""
     try:

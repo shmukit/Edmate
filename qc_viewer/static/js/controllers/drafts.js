@@ -394,6 +394,20 @@ export const DraftController = {
      * Floating export format picker for a draft card (PROCESSED / REVIEW_READY).
      */
     openDraftExportPopover(anchorEl, draftId) {
+        import('/js/auth.js').then(({ AuthUI }) => {
+            // Check if user is logged in
+            if (!AuthUI.token) {
+                // Anonymous users hit the paywall for exports
+                const paywallModal = document.getElementById('downloadPaywallModal');
+                if (paywallModal) paywallModal.style.display = 'flex';
+                return;
+            }
+            
+            this._showExportPopover(anchorEl, draftId);
+        });
+    },
+
+    _showExportPopover(anchorEl, draftId) {
         document.querySelector('.draft-export-popover')?.remove();
         const pop = document.createElement('div');
         pop.className = 'draft-export-popover';

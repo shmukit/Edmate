@@ -1,5 +1,12 @@
+"""
+Public / export-oriented Lab_QA question shape (nested metadata, option list, etc.).
+
+The live pipeline uses :mod:`content_gen.core.schemas` (:class:`ProcessedQuestion`).
+Map between the two with :mod:`content_gen.core.question_mapping`.
+"""
+
 from typing import List, Optional, Literal
-from pydantic import BaseModel, Field, UUID4
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, UUID4
 from enum import Enum
 
 class DifficultyLevel(str, Enum):
@@ -60,19 +67,23 @@ class MediaItem(BaseModel):
 
 class EdmateQuestion(BaseModel):
     """The standard v1.0.0 Edmate Lab_QA Question Schema"""
-    schema_version: str = Field("1.0.0", alias="$schema_version")
+
+    model_config = ConfigDict(use_enum_values=True, populate_by_name=True)
+
+    # Python attribute is schema_version; JSON may use "$schema_version" (Lab_QA export).
+    schema_version: str = Field(
+        default="1.0.0",
+        validation_alias=AliasChoices("schema_version", "$schema_version"),
+        serialization_alias="$schema_version",
+    )
     id: Optional[UUID4] = None
     metadata: Metadata
     content: dict = Field(..., description="Type-specific content based on QuestionType")
     # Note: Using dict for content to allow flexible types, can be further specialized
-    
+
     # Common fields that can be promoted to direct child for convenience
-    question_text: str 
+    question_text: str
     options: Optional[List[Option]] = None
     explanations: Explanations
     flashcards: List[Flashcard] = []
     media: List[MediaItem] = []
-
-    class Config:
-        use_enum_values = True
-        populate_by_name = True

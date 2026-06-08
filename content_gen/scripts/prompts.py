@@ -2,6 +2,9 @@
 Central repository for system prompts used in the content generation pipeline.
 """
 
+# Bump when CONTENT_GENERATION_PROMPT meaningfully changes (QC / reproducibility).
+CONTENT_GENERATION_PROMPT_VERSION = "2026-05-01"
+
 # The primary system prompt for Gemini to generate educational content
 CONTENT_GENERATION_PROMPT = """
 You are an expert [Subject] teacher specializing in [Curriculum] curriculum. 
