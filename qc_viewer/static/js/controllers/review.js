@@ -1,5 +1,36 @@
 import { AutomationAPI } from '../automate_api.js';
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+}[char]));
+
+const sanitizeRenderedHtml = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    template.content
+        .querySelectorAll('script, iframe, object, embed, link, meta, style')
+        .forEach((node) => node.remove());
+    template.content.querySelectorAll('*').forEach((node) => {
+        [...node.attributes].forEach((attr) => {
+            const name = attr.name.toLowerCase();
+            const value = attr.value.trim().toLowerCase();
+            if (
+                name.startsWith('on') ||
+                name === 'style' ||
+                ((name === 'href' || name === 'src' || name === 'xlink:href') &&
+                    (value.startsWith('javascript:') || value.startsWith('data:text/html')))
+            ) {
+                node.removeAttribute(attr.name);
+            }
+        });
+    });
+    return template.innerHTML;
+};
+
 export const ReviewController = {
     async openReview(id) {
         try {
@@ -26,7 +57,7 @@ export const ReviewController = {
             <div class="draft-card question-item ${q.status === 'REJECTED' ? 'rejected' : ''}" data-index="${i}" style="margin-bottom:10px; ${this.currentQuestionIndex === i ? 'border-color:var(--primary)' : ''}">
                 <div style="flex:1">
                     <b style="color:${q.status === 'REJECTED' ? 'var(--danger)' : 'var(--primary-light)'}">Q${q.question_number}</b>${(q.extraction_warnings && q.extraction_warnings.length) ? '<span class="extraction-warn-inline" title="Extraction may be incomplete (e.g. options)">⚠</span>' : ''}: 
-                    ${q.text.substring(0, 50)}...
+                    ${escapeHtml(String(q.text || '').substring(0, 50))}...
                 </div>
                 ${q.status !== 'INJECTED' ? `
                     <button class="btn btn-primary btn-sm btn-inject" data-index="${i}">Inject</button>
@@ -81,7 +112,7 @@ export const ReviewController = {
                             <div class="edit-group opt-field" id="group-opt-${opt}">
                                 <label class="field-label" style="font-weight:700; text-transform:uppercase; font-size:0.7rem;">Option ${opt}</label>
                                 ${this.renderImageWrapper(q[`option_${opt}_diagram_base64`], `option_${opt}_diagram_base64`, true)}
-                                <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${opts[opt] || ''}</textarea>
+                                <textarea class="editable-field" id="edit-opt-${opt}" data-target="preview-opt-${opt}" style="min-height:40px; margin:0">${escapeHtml(opts[opt] || '')}</textarea>
                                 <div id="preview-opt-${opt}" class="preview-render-box" style="padding:8px; font-size:0.88rem; min-height:36px;"></div>
                             </div>
                         `).join('')}
@@ -94,7 +125,7 @@ export const ReviewController = {
                     <div class="hia-title">🛡️ High-Integrity Assessment: AI Critique</div>
                     <div class="critique-box">
                         <label class="field-label">AI-Generated Answer (Stimulus)</label>
-                        <textarea class="editable-field" id="edit-hia-stimulus" style="height:100px;">${hia.ai_generated_answer || ''}</textarea>
+                        <textarea class="editable-field" id="edit-hia-stimulus" style="height:100px;">${escapeHtml(hia.ai_generated_answer || '')}</textarea>
                         <div id="preview-hia-stimulus" class="preview-render-box"></div>
                     </div>
                     <label class="field-label">Planted Errors (Student must identify)</label>
@@ -115,7 +146,7 @@ export const ReviewController = {
                     <div class="viva-grid">
                         ${Object.entries(hia.viva_probes || {}).map(([stage, probe]) => `
                             <div class="viva-card">
-                                <h4>${stage}</h4>
+                                <h4>${escapeHtml(stage)}</h4>
                                 <div id="preview-viva-probe-${stage.toLowerCase().replace(/\s+/g,'-')}" class="preview-render-box" style="margin:0; min-height:0; padding:8px 10px;"></div>
                             </div>
                         `).join('')}
@@ -128,7 +159,7 @@ export const ReviewController = {
             ${qType !== 'mcq' ? warnBanner : ''}
             <div class="edit-group" id="group-text">
                 <label class="field-label">Question Text</label>
-                <textarea class="editable-field" id="edit-text" style="height:80px;">${q.text}</textarea>
+                <textarea class="editable-field" id="edit-text" style="height:80px;">${escapeHtml(q.text || '')}</textarea>
                 <div id="preview-text" class="preview-render-box"></div>
             </div>
 
@@ -138,13 +169,13 @@ export const ReviewController = {
 
             <div class="edit-group" id="group-core" style="margin-top:20px;">
                 <label class="field-label" style="color:var(--primary);">Core Concept</label>
-                <textarea class="editable-field" id="edit-core-concept" data-target="preview-core-concept">${gen.core_concept || ''}</textarea>
+                <textarea class="editable-field" id="edit-core-concept" data-target="preview-core-concept">${escapeHtml(gen.core_concept || '')}</textarea>
                 <div id="preview-core-concept" class="preview-render-box"></div>
             </div>
 
             <div class="edit-group" id="group-explanation">
                 <label class="field-label" style="color:#0ea5e9;">Detailed Explanation</label>
-                <textarea class="editable-field" id="edit-explanation" data-target="preview-explanation" style="height:150px;">${gen.detailed_explanation || ''}</textarea>
+                <textarea class="editable-field" id="edit-explanation" data-target="preview-explanation" style="height:150px;">${escapeHtml(gen.detailed_explanation || '')}</textarea>
                 <div id="preview-explanation" class="preview-render-box"></div>
             </div>
         `;
@@ -220,7 +251,7 @@ export const ReviewController = {
 
         // Convert Markdown to HTML
         try {
-            const html = marked.parse(text || '');
+            const html = sanitizeRenderedHtml(marked.parse(text || ''));
             container.innerHTML = html;
 
             // Trigger MathJax typesetting
@@ -247,25 +278,31 @@ export const ReviewController = {
         }
     },
 
-    async saveCurrentEdits(manual = false) {
-        if (this.currentQuestionIndex === null || !this.isDirty) return;
-        const q = this.currentDraftData.questions[this.currentQuestionIndex];
+    async saveCurrentEdits(manual = false, force = false) {
+        if (!this.currentDraftData?.id || (!this.isDirty && !force)) return;
+
+        if (this.currentQuestionIndex !== null) {
+            const q = this.currentDraftData.questions[this.currentQuestionIndex];
         
-        q.text = document.getElementById('edit-text').value;
-        const optA = document.getElementById('edit-opt-A');
-        const optB = document.getElementById('edit-opt-B');
-        const optC = document.getElementById('edit-opt-C');
-        const optD = document.getElementById('edit-opt-D');
-        if (optA && optB && optC && optD && q.options) {
-            q.options.A = optA.value;
-            q.options.B = optB.value;
-            q.options.C = optC.value;
-            q.options.D = optD.value;
+            const textEl = document.getElementById('edit-text');
+            if (textEl) q.text = textEl.value;
+            const optA = document.getElementById('edit-opt-A');
+            const optB = document.getElementById('edit-opt-B');
+            const optC = document.getElementById('edit-opt-C');
+            const optD = document.getElementById('edit-opt-D');
+            if (optA && optB && optC && optD && q.options) {
+                q.options.A = optA.value;
+                q.options.B = optB.value;
+                q.options.C = optC.value;
+                q.options.D = optD.value;
+            }
+        
+            if (!q.generated_content) q.generated_content = {};
+            const coreEl = document.getElementById('edit-core-concept');
+            const expEl = document.getElementById('edit-explanation');
+            if (coreEl) q.generated_content.core_concept = coreEl.value;
+            if (expEl) q.generated_content.detailed_explanation = expEl.value;
         }
-        
-        if (!q.generated_content) q.generated_content = {};
-        q.generated_content.core_concept = document.getElementById('edit-core-concept').value;
-        q.generated_content.detailed_explanation = document.getElementById('edit-explanation').value;
         
         const statusEl = document.getElementById('saveStatus');
         if (statusEl) statusEl.textContent = 'Saving changes...';
@@ -290,7 +327,7 @@ export const ReviewController = {
     },
 
     async publishQuestion(index) {
-        this.saveCurrentEdits();
+        await this.saveCurrentEdits();
         const q = this.currentDraftData.questions[index];
         const gen = q.generated_content || {};
         const tableName = document.getElementById('targetTableSelect').value;
@@ -325,26 +362,26 @@ export const ReviewController = {
             await AutomationAPI.publishQuestion(payload);
             q.status = 'INJECTED';
             this.showToast(`✅ Injected Q${q.question_number} to ${tableName}`);
-            this.saveCurrentEdits();
+            await this.saveCurrentEdits(false, true);
             this.renderReviewList();
         } catch (error) { this.showToast('❌ Injection failed', 'danger'); }
     },
 
-    acceptAll() {
+    async acceptAll() {
         if (!confirm('Inject all processed questions into the production database?')) return;
-        this.currentDraftData.questions.forEach((q, i) => {
+        for (const [i, q] of this.currentDraftData.questions.entries()) {
             if (q.status !== 'INJECTED' && q.status !== 'REJECTED') {
-                this.publishQuestion(i);
+                await this.publishQuestion(i);
             }
-        });
+        }
     },
 
-    rejectCurrentQuestion() {
+    async rejectCurrentQuestion() {
         if (this.currentQuestionIndex === null) return;
         const q = this.currentDraftData.questions[this.currentQuestionIndex];
         q.status = 'REJECTED';
         this.showToast(`🚫 Q${q.question_number} rejected`);
-        this.saveCurrentEdits();
+        await this.saveCurrentEdits(false, true);
         this.renderReviewList();
     },
 
@@ -364,10 +401,16 @@ export const ReviewController = {
 
         try {
             const result = await AutomationAPI.refineQuestion({ feedback, original_q: q });
-            this.currentDraftData.questions[this.currentQuestionIndex] = result.refined_question;
+            if (result.refined_question) {
+                this.currentDraftData.questions[this.currentQuestionIndex] = result.refined_question;
+            } else {
+                if (!q.generated_content) q.generated_content = {};
+                q.generated_content.detailed_explanation = result.explanation || q.generated_content.detailed_explanation || '';
+            }
             this.previewQuestion(this.currentQuestionIndex);
+            this.setDirty(true);
+            await this.saveCurrentEdits(false, true);
             this.showToast('✨ Content refined successfully');
-            this.saveCurrentEdits();
         } catch (e) { this.showToast('Refine failed', 'danger'); }
     },
 
